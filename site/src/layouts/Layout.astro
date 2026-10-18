@@ -1,0 +1,106 @@
+---
+import { client } from '../lib/client';
+import 'modern-normalize/modern-normalize.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = `${client.name} — ${client.activity.label} à ${client.contact.address.city}`,
+  description = client.seo.description || client.activity.pitch,
+  image = client.brand.logo || '/favicon.svg',
+  noindex = false,
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://localhost:4321');
+
+const schemaLocalBusiness = {
+  '@context': 'https://schema.org',
+  '@type': client.activity.type || 'LocalBusiness',
+  name: client.name,
+  description: description,
+  url: canonicalURL.toString(),
+  telephone: client.contact.phone,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: client.contact.address.street,
+    addressLocality: client.contact.address.city,
+    addressCountry: client.contact.address.country,
+  },
+  geo: client.contact.geo?.lat ? {
+    '@type': 'GeoCoordinates',
+    latitude: client.contact.geo.lat,
+    longitude: client.contact.geo.lng,
+  } : undefined,
+  priceRange: '$$',
+};
+---
+
+<!doctype html>
+<html lang={client.locale || 'fr'}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <!-- Open Graph / WhatsApp / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={image} />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
+
+    <!-- Style tokens CSS injectés depuis client.json -->
+    <style define:vars={{
+      'color-primary': client.brand.colors.primary,
+      'color-secondary': client.brand.colors.secondary,
+      'color-accent': client.brand.colors.accent,
+      'color-surface': client.brand.colors.surface,
+    }}>
+      :root {
+        --color-primary: var(--color-primary);
+        --color-secondary: var(--color-secondary);
+        --color-accent: var(--color-accent);
+        --color-surface: var(--color-surface);
+        --font-heading: system-ui, -apple-system, sans-serif;
+        --font-body: system-ui, -apple-system, sans-serif;
+      }
+
+      body {
+        font-family: var(--font-body);
+        color: #1a1a1a;
+        background-color: var(--color-surface);
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-heading);
+        line-height: 1.2;
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

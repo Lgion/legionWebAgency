@@ -1,0 +1,50 @@
+@use 'scss/default';
+@use 'scss/chrome';
+
+// STRUCTURE GLOBALE (Commune à tous les accordéons si nécessaire)
+// ...
+
+.accordion,
+.b5_accordion {
+    $block: &;
+
+    // Reset si la liste de cartes utilise une balise <ul>
+    &:is(ul) {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    // Cartographie BEM pure vers Bootstrap pour garder le JSX propre
+    &__header {
+        @extend .accordion-header !optional;
+    }
+
+    &__button {
+        @extend .accordion-button !optional;
+        
+        &.--collapsed {
+            @extend .collapsed !optional;
+        }
+    }
+
+    &__body {
+        @extend .accordion-body !optional;
+        @extend .accordion-collapse !optional;
+        @extend .collapse !optional;
+
+        &.--open {
+            @extend .show !optional;
+        }
+    }
+
+    // MODIFICATEURS
+    // Esthétique par défaut (Bootstrap)
+    &.--default {
+        @include default.index($block: $block);
+    }
+
+    // Esthétique Chrome
+    &.--chrome {
+        @include chrome.index($block: $block);
+    }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "web-agency-boilerplate",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Boilerplate d'agence web pour commerces traditionnels (Astro + SCSS BEM LegionUI + API Hono + GitHub Pages)",
+  "workspaces": [
+    "site",
+    "api"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=site",
+    "dev:site": "npm run dev --workspace=site",
+    "dev:api": "npm run dev --workspace=api",
+    "build": "npm run build --workspace=site && npm run build --workspace=api",
+    "build:site": "npm run build --workspace=site",
+    "build:api": "npm run build --workspace=api",
+    "preview": "npm run preview --workspace=site",
+    "seed": "npm run seed --workspace=api",
+    "seed:demo": "npm run seed:demo --workspace=api"
+  },
+  "keywords": [
+    "astro",
+    "bem",
+    "scss",
+    "legionui",
+    "hono",
+    "github-pages",
+    "local-business"
+  ],
+  "author": "WebAgency",
+  "license": "MIT"
+}

@@ -1,0 +1,99 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { client } from '../lib/client';
+---
+
+<Layout>
+  <main class="homePage">
+    <section class="heroBanner">
+      <div class="heroBanner__content">
+        <span class="heroBanner__badge">{client.activity.label}</span>
+        <h1 class="heroBanner__title">{client.name}</h1>
+        <p class="heroBanner__pitch">{client.activity.pitch}</p>
+        
+        <div class="heroBanner__actions">
+          <a href={`https://wa.me/${client.contact.whatsapp.replace(/[^0-9]/g, '')}`} class="btn btn--whatsapp" target="_blank" rel="noopener">
+            Contacter sur WhatsApp
+          </a>
+          <a href={`tel:${client.contact.phone}`} class="btn btn--phone">
+            Appeler directement
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style lang="scss">
+  .homePage {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .heroBanner {
+    padding: 4rem 1.5rem;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0) 100%);
+
+    &__content {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    &__badge {
+      display: inline-block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(0,0,0,0.05);
+      margin-bottom: 1rem;
+    }
+
+    &__title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin: 0 0 1rem;
+    }
+
+    &__pitch {
+      font-size: 1.125rem;
+      color: #555;
+      margin: 0 0 2rem;
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &--whatsapp {
+      background-color: #25D366;
+      color: white;
+    }
+
+    &--phone {
+      background-color: #1a1a1a;
+      color: white;
+    }
+  }
+</style>

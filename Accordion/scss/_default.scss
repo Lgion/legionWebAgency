@@ -1,0 +1,89 @@
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function index($defaultValues: "") {
+    @return ($defaultValues);
+}
+
+/******VARIABLES******/
+$index: (
+    exempleParam_Block_ComponentVariable: red
+);
+
+/************************************************************/
+/**************************PLACEHOLDER**************************/
+/************************************************************/
+%accordionDefault {
+    --template: "ul.b5_accordion > li > h2 > button ^ section";
+
+    --bs-accordion-color: var(--bs-body-color);
+    --bs-accordion-bg: var(--bs-body-bg);
+    --bs-accordion-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
+    --bs-accordion-border-color: var(--bs-border-color);
+    --bs-accordion-border-width: var(--bs-border-width);
+    --bs-accordion-border-radius: var(--bs-border-radius);
+    --bs-accordion-btn-padding-x: 1.25rem;
+    --bs-accordion-btn-padding-y: 1rem;
+    --bs-accordion-btn-color: var(--bs-body-color);
+    --bs-accordion-btn-bg: var(--bs-accordion-bg);
+    --bs-accordion-active-color: var(--bs-primary-text-emphasis);
+    --bs-accordion-active-bg: var(--bs-primary-bg-subtle);
+
+    &__item {
+        color: var(--bs-accordion-color);
+        background-color: var(--bs-accordion-bg);
+        border: var(--bs-accordion-border-width) solid var(--bs-accordion-border-color);
+
+        &:first-of-type {
+            border-top-left-radius: var(--bs-accordion-border-radius);
+            border-top-right-radius: var(--bs-accordion-border-radius);
+        }
+
+        &:last-of-type {
+            border-bottom-right-radius: var(--bs-accordion-border-radius);
+            border-bottom-left-radius: var(--bs-accordion-border-radius);
+        }
+
+        &:not(:first-of-type) {
+            border-top: 0;
+        }
+
+        &:has(h2 button:not(.collapsed)) {
+            border: solid;
+            margin-bottom: 1em;
+            box-shadow: 0 0 10px 1px;
+        }
+    }
+
+    &__heading {}
+
+    &__content {}
+}
+
+/************************************************************/
+/**************************MIXIN**************************/
+/************************************************************/
+@mixin index($paramMixi_: (), $block: ".b5_accordion") {
+    $paramMixi: index(map-merge($index, $paramMixi_));
+
+    // 1. EXTENSION DU WRAPPER
+    @extend %accordionDefault;
+
+    // 2. EXTENSION DES ÉLÉMENTS INTERNES (Mappage mixte dynamique)
+    >li,
+    >#{$block}__item {
+        @extend %accordionDefault__item;
+
+        >h2,
+        >h3,
+        >h4,
+        >#{$block}__heading {
+            @extend %accordionDefault__heading;
+        }
+
+        >section,
+        >#{$block}__content {
+            @extend %accordionDefault__content;
+        }
+    }
+}

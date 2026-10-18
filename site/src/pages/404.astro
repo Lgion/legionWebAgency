@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { client } from '../lib/client';
+---
+
+<Layout title={`Page non trouvée — ${client.name}`} noindex={true}>
+  <main class="notFound">
+    <div class="notFound__container">
+      <h1 class="notFound__code">404</h1>
+      <h2 class="notFound__title">Oups, page introuvable !</h2>
+      <p class="notFound__text">La page que vous recherchez n'existe pas ou a été déplacée.</p>
+      <a href="/" class="notFound__btn">Retour à l'accueil</a>
+    </div>
+  </main>
+</Layout>
+
+<style lang="scss">
+  .notFound {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+
+    &__code {
+      font-size: 6rem;
+      font-weight: 800;
+      margin: 0;
+      color: var(--color-primary, #333);
+    }
+
+    &__title {
+      font-size: 1.75rem;
+      margin: 1rem 0;
+    }
+
+    &__text {
+      color: #666;
+      margin-bottom: 2rem;
+    }
+
+    &__btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: #1a1a1a;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  }
+</style>

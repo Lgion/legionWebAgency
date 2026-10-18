@@ -1,0 +1,26 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "seed": "tsx scripts/seed.ts",
+    "seed:demo": "tsx scripts/seed.ts --demo"
+  },
+  "dependencies": {
+    "@clerk/backend": "^1.24.0",
+    "@hono/node-server": "^1.13.8",
+    "dotenv": "^16.4.7",
+    "hono": "^4.6.20",
+    "mongodb": "^6.13.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

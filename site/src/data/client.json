@@ -1,0 +1,72 @@
+{
+  "$comment": "Brief client : copier en client.json et remplir à partir de l'interview. Les champs 'generated' sont calculés automatiquement.",
+  "slug": "nom-du-commerce",
+  "name": "Nom exact du commerce",
+  "activity": {
+    "type": "HairSalon",
+    "label": "Salon de coiffure et d'esthétique",
+    "pitch": "Phrase d'accroche en une ligne",
+    "differentiators": ["accueil", "rapidité", "spécialité tresses"]
+  },
+  "tier": 3,
+  "modules": ["vitrine", "admin", "catalogue", "analytics", "panier", "checkout", "commandes"],
+  "locale": "fr",
+  "currency": "XOF",
+  "timezone": "Africa/Abidjan",
+  "contact": {
+    "phone": "+225XXXXXXXXXX",
+    "whatsapp": "+225XXXXXXXXXX",
+    "email": "contact@exemple.com",
+    "address": {
+      "street": "Rue, repère local",
+      "district": "Quartier",
+      "city": "Ville",
+      "country": "CI"
+    },
+    "geo": { "lat": 0, "lng": 0 },
+    "socials": { "facebook": "", "instagram": "", "tiktok": "" }
+  },
+  "hours": [
+    { "days": ["Mo", "Tu", "We", "Th", "Fr", "Sa"], "opens": "08:00", "closes": "20:00" },
+    { "days": ["Su"], "opens": null, "closes": null }
+  ],
+  "booking": { "mode": "sans-rdv | rdv | les-deux", "channel": "whatsapp" },
+  "brand": {
+    "mood": "chaleureux, moderne",
+    "colors": { "primary": "#000000", "secondary": "#000000", "accent": "#000000", "surface": "#ffffff" },
+    "fonts": { "heading": "", "body": "" },
+    "logo": "",
+    "pattern": "description du motif souhaité",
+    "footerVariant": "ticket | carte-visite | devanture | autre"
+  },
+  "services": [
+    { "slug": "exemple-prestation", "name": "", "category": "", "price": 0, "priceFrom": false, "duration": 60, "description": "" }
+  ],
+  "products": [
+    { "slug": "exemple-produit", "name": "", "category": "", "price": 0, "stock": 0, "description": "" }
+  ],
+  "promotions": [],
+  "delivery": {
+    "enabled": false,
+    "zones": [{ "name": "", "fee": 0 }],
+    "homeService": false
+  },
+  "payments": {
+    "wave": true,
+    "paydunya": false,
+    "whatsappOrder": true,
+    "cashOnDelivery": true
+  },
+  "primaryAction": "whatsapp | appel | reservation | commande | visite",
+  "seo": {
+    "city": "",
+    "keywords": [],
+    "description": ""
+  },
+  "analytics": { "plausibleDomain": "" },
+  "features": { "roleSimulator": false },
+  "generated": {
+    "storageKey": "nom-du-commerce:app",
+    "demoDb": "demo_nom-du-commerce"
+  }
+}

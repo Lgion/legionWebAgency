@@ -1,0 +1,210 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO Optimized)
+=========================================================
+Squelette attendu (Emmet) :
+ul.b5_accordion.--chrome
+ └── details
+      ├── summary (header)
+      │    ├── h3 (heading)
+      │    └── svg (icon)
+      └── div (panel content)
+           ├── p (description)
+           └── a (link)
+=========================================================
+*/
+
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function index($defaultValues: "") {
+    @return ($defaultValues);
+}
+
+/******VARIABLES******/
+$index: (
+    border-color: #dadce0,
+    accent-color: #1967d2,
+    text-color: #202124,
+    body-text-color: #5f6368,
+    font-family: ('Google Sans', 'Inter', sans-serif),
+    gap: 10px
+);
+
+/************************************************************/
+/**************************PLACEHOLDER**************************/
+/************************************************************/
+%accordionChrome {
+    // Styles pour le conteneur global (le UL WrapperList)
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    &__item {
+        // Styles pour le tag <details>
+        position: relative;
+        width: 100%;
+        transition: border-color 0.3s ease;
+        border-bottom: 1px solid;
+
+        &:focus-within {
+            &::after {
+                content: "";
+                position: absolute;
+                left: 0;
+                bottom: -1px;
+                width: 100%;
+                height: 2px;
+            }
+        }
+
+        & ::-webkit-details-marker {
+            display: none;
+        }
+    }
+
+    &__header {
+        cursor: pointer;
+        padding: 24px 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        user-select: none;
+        outline: none;
+        transition: background-color 0.2s ease;
+        list-style: none;
+
+        &:hover {
+            background-color: rgba(26, 115, 232, 0.04);
+            border-radius: 8px;
+        }
+    }
+
+    &__heading {
+        font-size: 1.25rem;
+        font-weight: 500;
+        line-height: 1.5;
+        margin: 0;
+        transition: color 0.25s ease;
+
+        @media (max-width: 576px) {
+            font-size: 1.1rem;
+        }
+    }
+
+    &__icon {
+        width: 32px;
+        height: 32px;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        flex-shrink: 0;
+    }
+
+    &__panel {
+        padding: 0 8px 24px 8px;
+        animation: chromeSlideDown 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    &__description {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    &__link {
+        text-decoration: none;
+        font-weight: 500;
+        transition: text-decoration 0.2s ease;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+@keyframes chromeSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/************************************************************/
+/**************************MIXIN**************************/
+/************************************************************/
+@mixin index($paramMixi_: (), $block: ".b5_accordion") {
+    $paramMixi: index(map-merge($index, $paramMixi_));
+
+    // 1. EXTENSION DU WRAPPER
+    @extend %accordionChrome;
+    gap: map-get($paramMixi, gap);
+
+    // 2. EXTENSION DES ÉLÉMENTS INTERNES (Mappage mixte dynamique)
+    >details,
+    >#{$block}__item {
+        @extend %accordionChrome__item;
+        font-family: map-get($paramMixi, font-family);
+        border-color: map-get($paramMixi, border-color);
+
+        &:focus-within {
+            border-color: map-get($paramMixi, accent-color);
+
+            &::after {
+                background-color: map-get($paramMixi, accent-color);
+            }
+        }
+
+        &[open] {
+            >summary,
+            >#{$block}__header {
+                >svg,
+                >#{$block}__icon {
+                    transform: rotate(45deg);
+                }
+            }
+        }
+
+        >summary,
+        >#{$block}__header {
+            @extend %accordionChrome__header;
+
+            >h3,
+            >h2,
+            >h4,
+            >#{$block}__heading {
+                @extend %accordionChrome__heading;
+                color: map-get($paramMixi, text-color);
+            }
+
+            >svg,
+            >#{$block}__icon {
+                @extend %accordionChrome__icon;
+                fill: map-get($paramMixi, accent-color);
+            }
+        }
+
+        >div,
+        >#{$block}__panel {
+            @extend %accordionChrome__panel;
+
+            >p,
+            >#{$block}__description {
+                @extend %accordionChrome__description;
+                color: map-get($paramMixi, body-text-color);
+            }
+
+            >a,
+            >#{$block}__link {
+                @extend %accordionChrome__link;
+                color: map-get($paramMixi, accent-color);
+            }
+        }
+    }
+}
