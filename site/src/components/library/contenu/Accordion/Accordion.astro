@@ -1,0 +1,43 @@
+---
+import './index.scss';
+
+export interface AccordionItem {
+  id?: string;
+  title: string;
+  content: string;
+  defaultOpen?: boolean;
+}
+
+interface Props {
+  id?: string;
+  items: AccordionItem[];
+  modifier?: 'default' | 'chrome';
+  className?: string;
+}
+
+const {
+  id = 'accordionExample',
+  items = [],
+  modifier = 'default',
+  className = '',
+} = Astro.props;
+---
+
+<ul id={id} class={`b5_accordion --${modifier} ${className}`}>
+  {items.map((item) => (
+    <li class="b5_accordion__item">
+      <details open={item.defaultOpen} class="b5_accordion__details">
+        <summary class="b5_accordion__header">
+          <h3 class="b5_accordion__heading">{item.title}</h3>
+          <svg class="b5_accordion__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </summary>
+        <div class="b5_accordion__panel">
+          <p class="b5_accordion__description">{item.content}</p>
+        </div>
+      </details>
+    </li>
+  ))}
+</ul>

@@ -1,0 +1,147 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO Optimized)
+=========================================================
+Squelette attendu (Emmet) :
+ul.b5_accordion.--default
+ └── li.b5_accordion__item
+      └── details
+           ├── summary.b5_accordion__header
+           │    ├── h3.b5_accordion__heading
+           │    └── svg.b5_accordion__icon
+           └── div.b5_accordion__panel
+                └── p.b5_accordion__description
+=========================================================
+*/
+
+@function index($defaultValues: "") {
+  @return ($defaultValues);
+}
+
+$index: (
+  bg-color: #ffffff,
+  border-color: #e2e8f0,
+  active-bg: #f8fafc,
+  text-color: #1e293b,
+  border-radius: 8px
+);
+
+%accordionDefault {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  --template: "ul.b5_accordion.--default > li > details > summary + div";
+
+  &__item {
+    border: 1px solid #e2e8f0;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &:has(details[open]) {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border-color: #cbd5e1;
+    }
+  }
+
+  &__header {
+    cursor: pointer;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    font-weight: 600;
+    list-style: none;
+    user-select: none;
+    outline: none;
+    background: #ffffff;
+    transition: background-color 0.2s ease;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+  }
+
+  &__heading {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  &__panel {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid #f1f5f9;
+    background-color: #ffffff;
+  }
+
+  &__description {
+    margin: 0;
+    color: #475569;
+    line-height: 1.6;
+  }
+}
+
+@mixin index($paramMixi_: (), $block: ".b5_accordion") {
+  $paramMixi: index(map-merge($index, $paramMixi_));
+
+  @extend %accordionDefault;
+
+  > li,
+  > #{$block}__item {
+    @extend %accordionDefault__item;
+    border-radius: map-get($paramMixi, border-radius);
+    border-color: map-get($paramMixi, border-color);
+
+    details[open] {
+      summary,
+      #{$block}__header {
+        svg,
+        #{$block}__icon {
+          transform: rotate(45deg);
+        }
+      }
+    }
+
+    summary,
+    #{$block}__header {
+      @extend %accordionDefault__header;
+
+      h3, h2, h4,
+      #{$block}__heading {
+        @extend %accordionDefault__heading;
+        color: map-get($paramMixi, text-color);
+      }
+
+      svg,
+      #{$block}__icon {
+        @extend %accordionDefault__icon;
+        stroke: map-get($paramMixi, text-color);
+      }
+    }
+
+    div,
+    #{$block}__panel {
+      @extend %accordionDefault__panel;
+
+      p,
+      #{$block}__description {
+        @extend %accordionDefault__description;
+      }
+    }
+  }
+}

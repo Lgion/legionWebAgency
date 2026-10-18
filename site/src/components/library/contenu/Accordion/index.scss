@@ -1,0 +1,19 @@
+@use 'scss/default';
+@use 'scss/chrome';
+
+.b5_accordion {
+  $block: &;
+
+  list-style-type: none;
+  padding: 0;
+
+  // Modificateur par défaut
+  &.--default {
+    @include default.index($block: $block);
+  }
+
+  // Modificateur esthétique Chrome
+  &.--chrome {
+    @include chrome.index($block: $block);
+  }
+}
