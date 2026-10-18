@@ -1,0 +1,944 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { client } from '../lib/client';
+---
+
+<Layout
+  title={`Administration — ${client.name}`}
+  description="Tableau de bord de gestion du commerce"
+  noindex={true}
+>
+  <div class="adminApp" id="adminApp">
+    <!-- Écran de verrouillage si non admin -->
+    <div class="adminLock" id="adminLock" style="display: none;">
+      <div class="adminLock__card">
+        <div class="adminLock__icon">🔒</div>
+        <h1 class="adminLock__title">Espace Administrateur</h1>
+        <p class="adminLock__desc">Cet espace est réservé au commerçant et à l'équipe de l'agence.</p>
+        
+        <div class="adminLock__simBox">
+          <p><strong>Mode Démonstration Agence :</strong></p>
+          <p>Activez la simulation du rôle administrateur pour explorer le tableau de bord en toute sécurité (isolation sur la base démo <code>{client.generated.demoDb}</code>).</p>
+          <button type="button" class="btn btn--primary" id="activateSimAdminBtn">
+            Activer le rôle Admin (Simulation)
+          </button>
+        </div>
+
+        <a href="/" class="adminLock__backLink">← Revenir au site public</a>
+      </div>
+    </div>
+
+    <!-- Interface d'administration complète -->
+    <div class="adminLayout" id="adminLayout">
+      <!-- Tiroir / Barre latérale gauche -->
+      <aside class="adminSidebar" id="adminSidebar">
+        <div class="adminSidebar__brand">
+          <a href="/" class="adminSidebar__logoLink">
+            <span class="adminSidebar__badge">Admin</span>
+            <strong class="adminSidebar__name">{client.name}</strong>
+          </a>
+        </div>
+
+        <nav class="adminNav" aria-label="Navigation administration">
+          <ul class="adminNav__list">
+            <li>
+              <button type="button" class="adminNav__btn is-active" data-tab="catalog">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <span>Catalogue & Offres</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="adminNav__btn" data-tab="orders">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                <span>Commandes</span>
+                <span id="adminOrdersBadge" class="navBadge">0</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="adminNav__btn" data-tab="analytics">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                <span>Statistiques</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="adminNav__btn" data-tab="settings">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+                <span>Paramètres</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="adminSidebar__footer">
+          <div class="adminUserTag">
+            <span class="userDot"></span>
+            <span id="adminSessionStatus">Simulateur (Admin)</span>
+          </div>
+          <a href="/" class="btnExit">Quitter</a>
+        </div>
+      </aside>
+
+      <!-- Zone de contenu principal -->
+      <main class="adminContent">
+        <!-- ONGLET 1 : CATALOGUE -->
+        <section id="tab-catalog" class="adminTab is-active">
+          <header class="tabHeader">
+            <div>
+              <h2 class="tabHeader__title">Catalogue des Prestations</h2>
+              <p class="tabHeader__desc">Gérez vos prestations en temps réel. Les mises à jour s'appliquent immédiatement.</p>
+            </div>
+            <button type="button" id="openAddServiceModalBtn" class="btn btn--primary">
+              + Nouvelle Prestation
+            </button>
+          </header>
+
+          <div class="tableWrap">
+            <table class="adminTable">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Catégorie</th>
+                  <th>Durée</th>
+                  <th>Tarif</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="servicesTableBody">
+                {client.services.map(s => (
+                  <tr data-slug={s.slug}>
+                    <td><strong>{s.name}</strong></td>
+                    <td><span class="categoryBadge">{s.category}</span></td>
+                    <td>{s.duration || 60} min</td>
+                    <td><strong>{s.price} {client.currency}</strong></td>
+                    <td>
+                      <button type="button" class="btnTableAction editServiceBtn" data-slug={s.slug}>Modifier</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ONGLET 2 : COMMANDES -->
+        <section id="tab-orders" class="adminTab">
+          <header class="tabHeader">
+            <div>
+              <h2 class="tabHeader__title">Commandes Récentes</h2>
+              <p class="tabHeader__desc">Suivi des paiements Wave, PayDunya et retraits en boutique.</p>
+            </div>
+            <button type="button" id="refreshOrdersBtn" class="btn btn--secondary">
+              ↻ Rafraîchir
+            </button>
+          </header>
+
+          <div class="tableWrap">
+            <table class="adminTable">
+              <thead>
+                <tr>
+                  <th>ID Commande</th>
+                  <th>Client</th>
+                  <th>Téléphone</th>
+                  <th>Paiement</th>
+                  <th>Montant</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTableBody">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: #64748b; padding: 2rem;">
+                    Chargement des commandes en cours...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ONGLET 3 : STATISTIQUES -->
+        <section id="tab-analytics" class="adminTab">
+          <header class="tabHeader">
+            <div>
+              <h2 class="tabHeader__title">Tableau de Bord & Conversions</h2>
+              <p class="tabHeader__desc">Données d'audience respectueuses de la vie privée (Plausible mutualisé).</p>
+            </div>
+          </header>
+
+          <div class="statsGrid">
+            <div class="statCard">
+              <span class="statCard__label">Clics WhatsApp</span>
+              <strong class="statCard__value">142</strong>
+              <small class="statCard__trend">+18% cette semaine</small>
+            </div>
+            <div class="statCard">
+              <span class="statCard__label">Appels Téléphoniques</span>
+              <strong class="statCard__value">67</strong>
+              <small class="statCard__trend">+5% cette semaine</small>
+            </div>
+            <div class="statCard">
+              <span class="statCard__label">Commandes Finalisées</span>
+              <strong class="statCard__value" id="statsOrdersCount">24</strong>
+              <small class="statCard__trend">Taux conversion : 4.2%</small>
+            </div>
+            <div class="statCard">
+              <span class="statCard__label">Chiffre d'Affaires</span>
+              <strong class="statCard__value" id="statsRevenue">245 000 XOF</strong>
+              <small class="statCard__trend">Wave + Retrait</small>
+            </div>
+          </div>
+
+          <div class="statsEmbedCard">
+            <h3>Instance Plausible Analytics</h3>
+            <p>Connecté au domaine <code>{client.analytics.plausibleDomain || client.slug + '.ci'}</code></p>
+            <div class="statsPlaceholder">
+              <p>Visualisation des sources de trafic (Facebook, TikTok, Recherche locale Google).</p>
+              <a href="https://plausible.io" target="_blank" class="btn btn--secondary">Ouvrir Plausible Analytics</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- ONGLET 4 : PARAMÈTRES -->
+        <section id="tab-settings" class="adminTab">
+          <header class="tabHeader">
+            <div>
+              <h2 class="tabHeader__title">Configuration du Commerce</h2>
+              <p class="tabHeader__desc">Informations issues de <code>client.json</code>.</p>
+            </div>
+          </header>
+
+          <div class="settingsCard">
+            <div class="settingItem">
+              <strong>Nom du commerce :</strong>
+              <span>{client.name}</span>
+            </div>
+            <div class="settingItem">
+              <strong>Identifiant Slug :</strong>
+              <span><code>{client.slug}</code></span>
+            </div>
+            <div class="settingItem">
+              <strong>Téléphone :</strong>
+              <span>{client.contact.phone}</span>
+            </div>
+            <div class="settingItem">
+              <strong>Numéro WhatsApp :</strong>
+              <span>{client.contact.whatsapp}</span>
+            </div>
+            <div class="settingItem">
+              <strong>Adresse :</strong>
+              <span>{client.contact.address.street}, {client.contact.address.district}, {client.contact.address.city}</span>
+            </div>
+            <div class="settingItem">
+              <strong>Base MongoDB Active :</strong>
+              <span><code id="activeDbLabel">{client.slug}</code></span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modale d'ajout / modification de prestation -->
+  <dialog id="adminServiceModal" class="adminModal">
+    <div class="adminModal__box">
+      <h3 class="adminModal__title">Ajouter une Prestation</h3>
+      <form id="adminServiceForm" class="adminForm">
+        <div class="formGroup">
+          <label for="srvName">Nom de la prestation *</label>
+          <input type="text" id="srvName" required placeholder="Ex. Soin Capillaire Purifiant" />
+        </div>
+        <div class="formGroup">
+          <label for="srvCategory">Catégorie *</label>
+          <input type="text" id="srvCategory" required placeholder="Coiffure, Soins, Esthétique..." />
+        </div>
+        <div class="formRow">
+          <div class="formGroup">
+            <label for="srvPrice">Prix ({client.currency}) *</label>
+            <input type="number" id="srvPrice" required min="0" placeholder="10000" />
+          </div>
+          <div class="formGroup">
+            <label for="srvDuration">Durée (min)</label>
+            <input type="number" id="srvDuration" min="10" placeholder="60" />
+          </div>
+        </div>
+        <div class="formGroup">
+          <label for="srvDesc">Description</label>
+          <textarea id="srvDesc" rows="3" placeholder="Détails de la formule et produits appliqués..."></textarea>
+        </div>
+        <div class="modalActions">
+          <button type="button" id="closeServiceModalBtn" class="btn btn--secondary">Annuler</button>
+          <button type="submit" class="btn btn--primary">Enregistrer sur le serveur</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+</Layout>
+
+<script>
+  import { getStorage, updateStorage } from '@/lib/storage';
+
+  const lockScreen = document.getElementById('adminLock');
+  const adminLayout = document.getElementById('adminLayout');
+  const activateSimBtn = document.getElementById('activateSimAdminBtn');
+  const activeDbLabel = document.getElementById('activeDbLabel');
+  const sessionStatus = document.getElementById('adminSessionStatus');
+
+  function checkAdminAccess() {
+    const data = getStorage();
+    const isSimAdmin = data?.sim?.role === 'admin';
+
+    if (!isSimAdmin) {
+      if (lockScreen) lockScreen.style.display = 'flex';
+      if (adminLayout) adminLayout.style.display = 'none';
+    } else {
+      if (lockScreen) lockScreen.style.display = 'none';
+      if (adminLayout) adminLayout.style.display = 'flex';
+      if (activeDbLabel) activeDbLabel.textContent = `demo_${import.meta.env.PUBLIC_CLIENT_SLUG || 'awa-studio-beaute'}`;
+      if (sessionStatus) sessionStatus.textContent = 'Simulateur (demo_' + (import.meta.env.PUBLIC_CLIENT_SLUG || 'awa-studio-beaute') + ')';
+    }
+  }
+
+  activateSimBtn?.addEventListener('click', () => {
+    updateStorage(prev => ({
+      ...prev,
+      sim: { role: 'admin' }
+    }));
+    checkAdminAccess();
+    loadOrders();
+  });
+
+  // Navigation par onglets
+  const navBtns = document.querySelectorAll('.adminNav__btn');
+  const tabs = document.querySelectorAll('.adminTab');
+
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = (btn as HTMLElement).dataset.tab;
+      navBtns.forEach(b => b.classList.remove('is-active'));
+      tabs.forEach(t => t.classList.remove('is-active'));
+
+      btn.classList.add('is-active');
+      document.getElementById(`tab-${target}`)?.classList.add('is-active');
+
+      if (target === 'orders') {
+        loadOrders();
+      }
+    });
+  });
+
+  // Chargement des commandes depuis l'API Hono
+  async function loadOrders() {
+    const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+    const tbody = document.getElementById('ordersTableBody');
+    const badge = document.getElementById('adminOrdersBadge');
+    const countEl = document.getElementById('statsOrdersCount');
+
+    try {
+      const res = await fetch(`${apiUrl}/api/orders`, {
+        headers: {
+          'X-Simulated-Role': 'admin',
+        }
+      });
+      if (res.ok) {
+        const result = await res.json();
+        const orders = result.data || [];
+
+        if (badge) badge.textContent = orders.length.toString();
+        if (countEl) countEl.textContent = orders.length.toString();
+
+        if (tbody) {
+          if (orders.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #64748b; padding: 2rem;">Aucune commande enregistrée pour l'instant.</td></tr>`;
+          } else {
+            tbody.innerHTML = orders.map((o: any) => `
+              <tr>
+                <td><code>${o.orderId}</code></td>
+                <td><strong>${o.customer?.name || 'Client'}</strong></td>
+                <td>${o.customer?.phone || '—'}</td>
+                <td><span class="payTag">${o.payment?.method || 'Wave'}</span></td>
+                <td><strong>${o.totalAmount} ${o.currency || 'XOF'}</strong></td>
+                <td>
+                  <span class="statusTag ${o.payment?.status === 'paid' ? 'statusTag--success' : 'statusTag--pending'}">
+                    ${o.payment?.status === 'paid' ? 'Payé' : 'En attente'}
+                  </span>
+                </td>
+              </tr>
+            `).join('');
+          }
+        }
+      }
+    } catch (err) {
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #ef4444; padding: 2rem;">Serveur API hors ligne (lancez <code>npm run dev</code>).</td></tr>`;
+      }
+    }
+  }
+
+  // Modale d'ajout de prestation
+  const serviceModal = document.getElementById('adminServiceModal') as HTMLDialogElement | null;
+  const openModalBtn = document.getElementById('openAddServiceModalBtn');
+  const closeModalBtn = document.getElementById('closeServiceModalBtn');
+  const serviceForm = document.getElementById('adminServiceForm') as HTMLFormElement | null;
+
+  openModalBtn?.addEventListener('click', () => {
+    serviceModal?.showModal();
+  });
+
+  closeModalBtn?.addEventListener('click', () => {
+    serviceModal?.close();
+  });
+
+  serviceForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = (document.getElementById('srvName') as HTMLInputElement).value;
+    const category = (document.getElementById('srvCategory') as HTMLInputElement).value;
+    const price = Number((document.getElementById('srvPrice') as HTMLInputElement).value);
+    const duration = Number((document.getElementById('srvDuration') as HTMLInputElement).value) || 60;
+    const description = (document.getElementById('srvDesc') as HTMLTextAreaElement).value;
+
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+    try {
+      const res = await fetch(`${apiUrl}/api/services`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Simulated-Role': 'admin',
+        },
+        body: JSON.stringify({ slug, name, category, price, duration, description }),
+      });
+
+      if (res.ok) {
+        alert('Prestation enregistrée avec succès sur l\'API !');
+        serviceModal?.close();
+        serviceForm.reset();
+
+        // Ajout visuel dans le tableau
+        const tbody = document.getElementById('servicesTableBody');
+        if (tbody) {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td><strong>${name}</strong></td>
+            <td><span class="categoryBadge">${category}</span></td>
+            <td>${duration} min</td>
+            <td><strong>${price} XOF</strong></td>
+            <td><button type="button" class="btnTableAction">Modifier</button></td>
+          `;
+          tbody.appendChild(row);
+        }
+      } else {
+        const errorData = await res.json();
+        alert(errorData.error || 'Erreur lors de l\'enregistrement');
+      }
+    } catch (err) {
+      alert('Impossible de contacter l\'API serveur');
+    }
+  });
+
+  document.getElementById('refreshOrdersBtn')?.addEventListener('click', loadOrders);
+
+  checkAdminAccess();
+</script>
+
+<style lang="scss">
+  .adminApp {
+    min-height: 100vh;
+    background: #f1f5f9;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  .adminLock {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+
+    &__card {
+      background: #ffffff;
+      border-radius: var(--radius-lg, 16px);
+      padding: 3rem 2.5rem;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+    }
+
+    &__icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    &__title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 0.5rem;
+    }
+
+    &__desc {
+      color: #64748b;
+      margin-bottom: 2rem;
+    }
+
+    &__simBox {
+      background: #fffbeb;
+      border: 1px dashed #f59e0b;
+      border-radius: 8px;
+      padding: 1.25rem;
+      text-align: left;
+      margin-bottom: 2rem;
+
+      p {
+        margin: 0 0 0.75rem;
+        font-size: 0.875rem;
+        color: #78350f;
+      }
+    }
+
+    &__backLink {
+      color: var(--color-accent, #2563eb);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+  }
+
+  .adminLayout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .adminSidebar {
+    width: 260px;
+    background: #0f172a;
+    color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-shrink: 0;
+
+    &__brand {
+      padding: 1.5rem;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    &__logoLink {
+      text-decoration: none;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    &__badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: #2563eb;
+      color: white;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+
+    &__name {
+      font-size: 1.15rem;
+    }
+
+    &__footer {
+      padding: 1.25rem;
+      border-top: 1px solid #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  .adminNav {
+    padding: 1rem 0;
+    flex: 1;
+
+    &__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    &__btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      background: none;
+      border: none;
+      color: #94a3b8;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: background 150ms, color 150ms;
+
+      &:hover {
+        background: #1e293b;
+        color: #ffffff;
+      }
+
+      &.is-active {
+        background: #2563eb;
+        color: #ffffff;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .navBadge {
+    margin-left: auto;
+    background: #ef4444;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.1rem 0.5rem;
+    border-radius: 9999px;
+  }
+
+  .adminUserTag {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #94a3b8;
+
+    .userDot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+    }
+  }
+
+  .btnExit {
+    font-size: 0.8rem;
+    color: #ef4444;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .adminContent {
+    flex: 1;
+    padding: 2.5rem;
+    overflow-y: auto;
+  }
+
+  .adminTab {
+    display: none;
+
+    &.is-active {
+      display: block;
+      animation: fadeIn 0.2s ease-in-out;
+    }
+  }
+
+  .tabHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+
+    &__title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 0.35rem;
+    }
+
+    &__desc {
+      color: #64748b;
+      margin: 0;
+    }
+  }
+
+  .tableWrap {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow-x: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+
+  .adminTable {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+
+    th {
+      background: #f8fafc;
+      padding: 0.85rem 1.25rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
+  .categoryBadge {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .btnTableAction {
+    padding: 0.35rem 0.65rem;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      background: #f1f5f9;
+    }
+  }
+
+  .payTag {
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .statusTag {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+
+    &--success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    &--pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+  }
+
+  .statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .statCard {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+
+    &__label {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+
+    &__value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+
+    &__trend {
+      font-size: 0.8rem;
+      color: #10b981;
+      font-weight: 600;
+    }
+  }
+
+  .statsEmbedCard {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 2rem;
+
+    h3 {
+      margin: 0 0 0.5rem;
+      color: #0f172a;
+    }
+
+    p {
+      color: #64748b;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .statsPlaceholder {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 3rem 1.5rem;
+    text-align: center;
+  }
+
+  .settingsCard {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .settingItem {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+
+    strong {
+      color: #334155;
+    }
+
+    span {
+      color: #0f172a;
+    }
+  }
+
+  .adminModal {
+    border: none;
+    border-radius: 16px;
+    padding: 0;
+    max-width: 500px;
+    width: 90%;
+    background: transparent;
+
+    &::backdrop {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    &__box {
+      background: #ffffff;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    &__title {
+      font-size: 1.4rem;
+      margin: 0 0 1.5rem;
+      color: #0f172a;
+    }
+  }
+
+  .adminForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    input, textarea {
+      padding: 0.65rem 0.85rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.95rem;
+
+      &:focus {
+        outline: 2px solid #2563eb;
+      }
+    }
+  }
+
+  .formRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.65rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: none;
+
+    &--primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    &--secondary {
+      background: #f1f5f9;
+      color: #334155;
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

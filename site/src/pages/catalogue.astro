@@ -8,6 +8,7 @@ import Header from '../components/library/layout/Header/Header.astro';
 import Footer from '../components/library/layout/Footer/Footer.astro';
 import FabContact from '../components/library/conversion/FabContact/FabContact.astro';
 import FabTools from '../components/library/conversion/FabTools/FabTools.astro';
+import CartDrawer from '../components/library/commerce/Cart/CartDrawer.astro';
 
 const demoItems = [
   {
@@ -79,19 +80,43 @@ const demoService = {
         </div>
       </section>
 
-      <!-- Section Prestations : ServiceCard -->
+      <!-- Section Prestations : ServiceCard & Panier -->
       <section class="demoSection">
-        <h2 class="demoSection__title">3. E-commerce & Prestations : ServiceCard (Pattern Lien-Modale)</h2>
-        <div style="max-width: 360px;">
+        <h2 class="demoSection__title">3. E-commerce & Panier : ServiceCard & CartDrawer</h2>
+        <div style="max-width: 360px; margin-bottom: 1.5rem;">
           <ServiceCard service={demoService} />
         </div>
+        <button type="button" class="demoCartOpenBtn" id="demoOpenCartBtn">
+          🛒 Tester le CartDrawer (3 étapes)
+        </button>
       </section>
     </div>
   </div>
 
+  <CartDrawer />
   <FabContact />
   <FabTools />
 </Layout>
+
+<script>
+  import { updateStorage } from '@/lib/storage';
+
+  document.getElementById('demoOpenCartBtn')?.addEventListener('click', () => {
+    // Ajoute un article démo s'il n'y en a pas
+    updateStorage(prev => {
+      if (prev.cart.length === 0) {
+        prev.cart.push({
+          id: 'soin-visage-eclat',
+          name: 'Soin Visage Éclat Bio',
+          price: 25000,
+          quantity: 1
+        });
+      }
+      return prev;
+    });
+    window.dispatchEvent(new CustomEvent('cart:open'));
+  });
+</script>
 
 <style lang="scss">
   .cataloguePage {
@@ -181,6 +206,24 @@ const demoService = {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
+    }
+  }
+
+  .demoCartOpenBtn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: transform 150ms;
+
+    &:hover {
+      transform: translateY(-2px);
     }
   }
 </style>

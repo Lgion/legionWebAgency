@@ -13,3 +13,4 @@
 | `layout` | `Footer` | `carte-visite`, `ticket`, `classique` | `stable` | Horaires temps réel + Google Maps façade |
 | `conversion` | `FabContact` | Speed dial (WhatsApp + Tel) | `stable` | Bouton fixe bas droite |
 | `conversion` | `FabTools` | Menu d'outils + sélecteur rôles | `stable` | Bouton fixe bas gauche |
+| `commerce` | `CartDrawer` | 3 étapes (Panier, Livraison, Wave QR / WhatsApp) | `stable` | Tunnel de commande intégré |
