@@ -1,0 +1,142 @@
+---
+import { client } from '@/lib/client';
+
+const phoneClean = client.contact.phone.replace(/[^0-9+]/g, '');
+const whatsappClean = client.contact.whatsapp.replace(/[^0-9]/g, '');
+---
+
+<aside class="fabContact" aria-label="Actions rapides de contact">
+  <details class="fabContact__details">
+    <summary class="fabContact__trigger" aria-label="Ouvrir les options de contact rapide">
+      <svg class="fabContact__icon fabContact__icon--chat" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+      </svg>
+      <svg class="fabContact__icon fabContact__icon--close" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </summary>
+
+    <div class="fabContact__menu">
+      <a
+        href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent("Bonjour, je souhaite des renseignements sur vos prestations.")}`}
+        class="fabContact__btn fabContact__btn--wa"
+        target="_blank"
+        rel="noopener"
+        aria-label="Discussion directe sur WhatsApp"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
+        </svg>
+        <span>WhatsApp</span>
+      </a>
+
+      <a
+        href={`tel:${phoneClean}`}
+        class="fabContact__btn fabContact__btn--phone"
+        aria-label={`Appeler le ${client.contact.phone}`}
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+        </svg>
+        <span>Téléphoner</span>
+      </a>
+    </div>
+  </details>
+</aside>
+
+<style lang="scss">
+  .fabContact {
+    position: fixed;
+    right: 1.25rem;
+    bottom: max(1.25rem, env(safe-area-inset-bottom, 1.25rem));
+    z-index: var(--z-fab, 300);
+
+    &__details {
+      position: relative;
+
+      &[open] {
+        .fabContact__icon--chat { display: none; }
+        .fabContact__icon--close { display: block; }
+        .fabContact__menu {
+          display: flex;
+          animation: popUp 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+      }
+    }
+
+    &__trigger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #25D366;
+      color: white;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.4);
+      cursor: pointer;
+      list-style: none;
+      outline: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+      &::-webkit-details-marker { display: none; }
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+      }
+    }
+
+    &__icon {
+      &--close { display: none; }
+    }
+
+    &__menu {
+      display: none;
+      flex-direction: column;
+      gap: 0.65rem;
+      position: absolute;
+      right: 0;
+      bottom: 68px;
+      min-width: 170px;
+    }
+
+    &__btn {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-full, 9999px);
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: transform 0.15s ease;
+
+      &:hover {
+        transform: translateX(-4px);
+      }
+
+      &--wa {
+        background-color: #25D366;
+      }
+
+      &--phone {
+        background-color: #0f172a;
+      }
+    }
+  }
+
+  @keyframes popUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+</style>

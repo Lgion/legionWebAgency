@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /_catalogue
+Disallow: /catalogue
 Disallow: /panier
 
 Sitemap: https://localhost:4321/sitemap-index.xml

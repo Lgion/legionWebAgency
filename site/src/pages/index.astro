@@ -1,67 +1,193 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { client } from '../lib/client';
+import Header from '../components/library/layout/Header/Header.astro';
+import Footer from '../components/library/layout/Footer/Footer.astro';
+import FabContact from '../components/library/conversion/FabContact/FabContact.astro';
+import FabTools from '../components/library/conversion/FabTools/FabTools.astro';
+import ServiceCard from '../components/library/contenu/ServiceCard/ServiceCard.astro';
+import Accordion from '../components/library/contenu/Accordion/Accordion.astro';
+
+const faqs = [
+  {
+    title: "Faut-il prendre rendez-vous pour venir ?",
+    content: "Nous vous accueillons avec et sans rendez-vous pendant toutes nos heures d'ouverture. Les personnes ayant réservé via WhatsApp restent prioritaires sur les créneaux chargés."
+  },
+  {
+    title: "Quels sont les modes de paiement acceptés ?",
+    content: "Nous acceptons les espèces, les paiements mobiles locaux (Wave, Orange Money) ainsi que les règlements directs à la caisse."
+  },
+  {
+    title: "Proposez-vous un service à domicile ou la livraison ?",
+    content: client.delivery.enabled
+      ? "Oui, nous proposons la livraison et les prestations à domicile sur demande dans les zones sélectionnées."
+      : "Nos prestations s'effectuent directement en établissement pour vous garantir la meilleure qualité d'accueil et d'équipement."
+  }
+];
 ---
 
 <Layout>
+  <Header />
+
   <main class="homePage">
-    <section class="heroBanner">
-      <div class="heroBanner__content">
-        <span class="heroBanner__badge">{client.activity.label}</span>
-        <h1 class="heroBanner__title">{client.name}</h1>
-        <p class="heroBanner__pitch">{client.activity.pitch}</p>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero__container">
+        <span class="hero__badge">{client.activity.label}</span>
+        <h1 class="hero__title">{client.name}</h1>
+        <p class="hero__pitch">{client.activity.pitch}</p>
         
-        <div class="heroBanner__actions">
-          <a href={`https://wa.me/${client.contact.whatsapp.replace(/[^0-9]/g, '')}`} class="btn btn--whatsapp" target="_blank" rel="noopener">
-            Contacter sur WhatsApp
+        <div class="hero__actions">
+          <a href={`https://wa.me/${client.contact.whatsapp.replace(/[^0-9]/g, '')}`} class="btn btn--primary" target="_blank" rel="noopener">
+            Prendre contact sur WhatsApp
           </a>
-          <a href={`tel:${client.contact.phone}`} class="btn btn--phone">
-            Appeler directement
+          <a href="#prestations" class="btn btn--secondary">
+            Voir nos prestations
           </a>
         </div>
       </div>
     </section>
+
+    <!-- Prestations Section -->
+    <section class="section" id="prestations">
+      <div class="section__container">
+        <div class="section__header">
+          <h2 class="section__title">Nos Prestations</h2>
+          <p class="section__subtitle">Découvrez notre savoir-faire et nos forfaits adaptés à vos envies.</p>
+        </div>
+
+        <div class="servicesGrid">
+          {client.services.map((service) => (
+            <ServiceCard service={service} />
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ / Accordion Section -->
+    <section class="section section--subtle" id="faq">
+      <div class="section__container section__container--narrow">
+        <div class="section__header">
+          <h2 class="section__title">Questions Fréquentes</h2>
+          <p class="section__subtitle">Tout ce que vous devez savoir avant votre venue.</p>
+        </div>
+
+        <Accordion items={faqs} modifier="chrome" />
+      </div>
+    </section>
   </main>
+
+  <!-- Modale accessible (Dialog) pour le pattern lien-modale -->
+  <dialog id="serviceModal" class="serviceModal" aria-labelledby="modalTitle">
+    <div class="serviceModal__box">
+      <button type="button" id="modalCloseBtn" class="serviceModal__close" aria-label="Fermer la boîte de dialogue">✕</button>
+      <h3 id="modalTitle" class="serviceModal__title"></h3>
+      <p id="modalPrice" class="serviceModal__price"></p>
+      <p id="modalDesc" class="serviceModal__desc"></p>
+      <div class="serviceModal__actions">
+        <a id="modalWaBtn" href="#" class="btn btn--primary" target="_blank" rel="noopener">Réserver cette prestation</a>
+        <a id="modalFullLink" href="#" class="btn btn--secondary">Page complète</a>
+      </div>
+    </div>
+  </dialog>
+
+  <Footer />
+  <FabContact />
+  <FabTools />
 </Layout>
+
+<script>
+  // Script d'amélioration progressive pour le pattern lien-modale
+  const modal = document.getElementById('serviceModal') as HTMLDialogElement | null;
+  const closeBtn = document.getElementById('modalCloseBtn');
+  const titleEl = document.getElementById('modalTitle');
+  const priceEl = document.getElementById('modalPrice');
+  const descEl = document.getElementById('modalDesc');
+  const waBtn = document.getElementById('modalWaBtn') as HTMLAnchorElement | null;
+  const fullLink = document.getElementById('modalFullLink') as HTMLAnchorElement | null;
+
+  document.querySelectorAll('.modalTrigger').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      // Si la balise dialog est supportée, interception du clic
+      if (modal && typeof modal.showModal === 'function') {
+        e.preventDefault();
+        const target = e.currentTarget as HTMLElement;
+        const slug = target.dataset.slug || '';
+        const title = target.dataset.title || '';
+        const price = target.dataset.price || '';
+        const desc = target.dataset.desc || '';
+
+        if (titleEl) titleEl.textContent = title;
+        if (priceEl) priceEl.textContent = price;
+        if (descEl) descEl.textContent = desc;
+        if (fullLink) fullLink.href = `/prestations/${slug}`;
+        if (waBtn) {
+          waBtn.href = `https://wa.me/?text=${encodeURIComponent('Bonjour, je souhaite réserver : ' + title)}`;
+        }
+
+        modal.showModal();
+        window.history.pushState({ modalOpen: true, slug }, '', `/prestations/${slug}`);
+      }
+    });
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    modal?.close();
+  });
+
+  modal?.addEventListener('close', () => {
+    window.history.pushState(null, '', '/');
+  });
+
+  // Fermeture par clic sur le backdrop
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.close();
+    }
+  });
+</script>
 
 <style lang="scss">
   .homePage {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    background-color: var(--color-surface, #ffffff);
   }
 
-  .heroBanner {
-    padding: 4rem 1.5rem;
+  .hero {
+    padding: 5rem 1.25rem 4rem;
     text-align: center;
-    background: linear-gradient(135deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0) 100%);
+    background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
 
-    &__content {
-      max-width: 640px;
+    &__container {
+      max-width: 760px;
       margin: 0 auto;
     }
 
     &__badge {
       display: inline-block;
-      font-size: 0.875rem;
-      font-weight: 600;
+      font-size: 0.85rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      background: rgba(0,0,0,0.05);
-      margin-bottom: 1rem;
+      letter-spacing: 0.08em;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-full, 9999px);
+      background: rgba(15, 23, 42, 0.06);
+      color: var(--color-text-main, #0f172a);
+      margin-bottom: 1.5rem;
     }
 
     &__title {
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      margin: 0 0 1rem;
+      font-size: clamp(2.25rem, 6vw, 3.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin: 0 0 1.25rem;
+      color: var(--color-text-main, #0f172a);
     }
 
     &__pitch {
-      font-size: 1.125rem;
-      color: #555;
-      margin: 0 0 2rem;
+      font-size: 1.25rem;
+      color: var(--color-text-muted, #64748b);
+      margin: 0 0 2.5rem;
+      line-height: 1.6;
     }
 
     &__actions {
@@ -72,28 +198,140 @@ import { client } from '../lib/client';
     }
   }
 
+  .section {
+    padding: 4.5rem 1.25rem;
+
+    &--subtle {
+      background-color: #f8fafc;
+    }
+
+    &__container {
+      max-width: 1200px;
+      margin: 0 auto;
+
+      &--narrow {
+        max-width: 800px;
+      }
+    }
+
+    &__header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    &__title {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
+      color: var(--color-text-main, #0f172a);
+    }
+
+    &__subtitle {
+      font-size: 1.1rem;
+      color: var(--color-text-muted, #64748b);
+      margin: 0;
+    }
+  }
+
+  .servicesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.875rem 1.5rem;
-    border-radius: 8px;
+    padding: 0.85rem 1.75rem;
+    border-radius: var(--radius-md, 8px);
     font-weight: 600;
     text-decoration: none;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    transition: transform var(--transition-fast, 150ms), background 150ms;
 
     &:hover {
       transform: translateY(-2px);
     }
 
-    &--whatsapp {
-      background-color: #25D366;
+    &--primary {
+      background: #25D366;
       color: white;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
     }
 
-    &--phone {
-      background-color: #1a1a1a;
+    &--secondary {
+      background: #0f172a;
       color: white;
+    }
+  }
+
+  .serviceModal {
+    border: none;
+    border-radius: var(--radius-lg, 16px);
+    padding: 0;
+    max-width: 520px;
+    width: 90%;
+    background: transparent;
+
+    &::backdrop {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    &__box {
+      background: #ffffff;
+      padding: 2.25rem;
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: var(--shadow-float);
+      position: relative;
+    }
+
+    &__close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+
+      &:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+      }
+    }
+
+    &__title {
+      font-size: 1.75rem;
+      margin: 0 0 0.5rem;
+      color: #0f172a;
+    }
+
+    &__price {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--color-accent, #2563eb);
+      margin: 0 0 1rem;
+    }
+
+    &__desc {
+      color: #475569;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
     }
   }
 </style>

@@ -1,0 +1,186 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Accordion from '../components/library/contenu/Accordion/Accordion.astro';
+import Spinner from '../components/library/feedback/Spinner/Spinner.astro';
+import Skeleton from '../components/library/feedback/Skeleton/Skeleton.astro';
+import ServiceCard from '../components/library/contenu/ServiceCard/ServiceCard.astro';
+import Header from '../components/library/layout/Header/Header.astro';
+import Footer from '../components/library/layout/Footer/Footer.astro';
+import FabContact from '../components/library/conversion/FabContact/FabContact.astro';
+import FabTools from '../components/library/conversion/FabTools/FabTools.astro';
+
+const demoItems = [
+  {
+    title: "1. Variantes d'Accordion BEM LegionUI",
+    content: "Démontre le découplage SCSS sans classes utilitaires dans le template. Deux modificateurs : --default et --chrome."
+  },
+  {
+    title: "2. Structure sémantique HTML5 native",
+    content: "Utilise <details> et <summary> pour une indexation SEO sans JavaScript requis pour l'affichage de base."
+  }
+];
+
+const demoService = {
+  slug: "soin-visage-eclat",
+  name: "Soin Visage Éclat Bio",
+  category: "Esthétique & Spa",
+  price: 25000,
+  duration: 45,
+  description: "Nettoyage en profondeur, gommage aux extraits naturels et masque hydratant pour un teint lumineux instantané."
+};
+---
+
+<Layout title="Catalogue Visuel des Composants — WebAgency" noindex={true}>
+  <div class="cataloguePage">
+    <div class="catalogueBar">
+      <div class="catalogueBar__container">
+        <h1>🎨 Showcase des Composants (WebAgency Boilerplate)</h1>
+        <p>Outil de développement et de démonstration commerciale pour les prospects.</p>
+      </div>
+    </div>
+
+    <div class="catalogueContent">
+      <!-- Section Feedback : Spinners et Skeletons -->
+      <section class="demoSection">
+        <h2 class="demoSection__title">1. Feedback : Spinners CSS légers & Skeletons</h2>
+        <div class="demoGrid">
+          <div class="demoCard">
+            <h3>Spinners (CSS pur, sans GIF/Lottie)</h3>
+            <div class="demoCard__row">
+              <div><Spinner size="sm" /> <small>sm (20px)</small></div>
+              <div><Spinner size="md" /> <small>md (32px)</small></div>
+              <div><Spinner size="lg" color="#2563eb" /> <small>lg (48px)</small></div>
+            </div>
+          </div>
+          <div class="demoCard">
+            <h3>Skeletons (Zéro CLS)</h3>
+            <div class="demoCard__col">
+              <Skeleton width="60%" height="1.5rem" radius="sm" />
+              <Skeleton width="100%" height="1rem" radius="md" />
+              <Skeleton width="80%" height="1rem" radius="md" />
+              <Skeleton width="40px" height="40px" radius="full" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section Accordion : Variantes -->
+      <section class="demoSection">
+        <h2 class="demoSection__title">2. Contenu : Accordion LegionUI (`--default` vs `--chrome`)</h2>
+        <div class="demoGrid">
+          <div class="demoCard">
+            <h3>Variante `--default` (Cartouche BEM standard)</h3>
+            <Accordion items={demoItems} modifier="default" id="accordionDemoDefault" />
+          </div>
+          <div class="demoCard">
+            <h3>Variante `--chrome` (Style épuré Material/Google)</h3>
+            <Accordion items={demoItems} modifier="chrome" id="accordionDemoChrome" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Section Prestations : ServiceCard -->
+      <section class="demoSection">
+        <h2 class="demoSection__title">3. E-commerce & Prestations : ServiceCard (Pattern Lien-Modale)</h2>
+        <div style="max-width: 360px;">
+          <ServiceCard service={demoService} />
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <FabContact />
+  <FabTools />
+</Layout>
+
+<style lang="scss">
+  .cataloguePage {
+    background: #f1f5f9;
+    min-height: 100vh;
+    padding-bottom: 5rem;
+  }
+
+  .catalogueBar {
+    background: #0f172a;
+    color: #ffffff;
+    padding: 2.5rem 1.25rem;
+
+    &__container {
+      max-width: 1200px;
+      margin: 0 auto;
+
+      h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.75rem;
+      }
+
+      p {
+        margin: 0;
+        color: #94a3b8;
+      }
+    }
+  }
+
+  .catalogueContent {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .demoSection {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-lg, 16px);
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+
+    &__title {
+      font-size: 1.35rem;
+      color: #0f172a;
+      margin: 0 0 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #f1f5f9;
+    }
+  }
+
+  .demoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .demoCard {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md, 8px);
+    padding: 1.5rem;
+
+    h3 {
+      font-size: 1rem;
+      color: #334155;
+      margin: 0 0 1rem;
+    }
+
+    &__row {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+
+      div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+
+    &__col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+</style>

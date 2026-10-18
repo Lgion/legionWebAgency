@@ -8,7 +8,7 @@ export default defineConfig({
   base: process.env.PUBLIC_BASE_PATH || '/',
   integrations: [
     sitemap({
-      filter: (page) => !page.includes('/admin') && !page.includes('/_catalogue')
+      filter: (page) => !page.includes('/admin') && !page.includes('/catalogue')
     })
   ],
   vite: {

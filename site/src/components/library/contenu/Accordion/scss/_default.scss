@@ -13,6 +13,7 @@ ul.b5_accordion.--default
                 └── p.b5_accordion__description
 =========================================================
 */
+@use 'sass:map';
 
 @function index($defaultValues: "") {
   @return ($defaultValues);
@@ -97,15 +98,15 @@ $index: (
 }
 
 @mixin index($paramMixi_: (), $block: ".b5_accordion") {
-  $paramMixi: index(map-merge($index, $paramMixi_));
+  $paramMixi: index(map.merge($index, $paramMixi_));
 
   @extend %accordionDefault;
 
   > li,
   > #{$block}__item {
     @extend %accordionDefault__item;
-    border-radius: map-get($paramMixi, border-radius);
-    border-color: map-get($paramMixi, border-color);
+    border-radius: map.get($paramMixi, border-radius);
+    border-color: map.get($paramMixi, border-color);
 
     details[open] {
       summary,
@@ -124,13 +125,13 @@ $index: (
       h3, h2, h4,
       #{$block}__heading {
         @extend %accordionDefault__heading;
-        color: map-get($paramMixi, text-color);
+        color: map.get($paramMixi, text-color);
       }
 
       svg,
       #{$block}__icon {
         @extend %accordionDefault__icon;
-        stroke: map-get($paramMixi, text-color);
+        stroke: map.get($paramMixi, text-color);
       }
     }
 

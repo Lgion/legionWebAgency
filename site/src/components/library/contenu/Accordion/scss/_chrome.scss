@@ -13,6 +13,7 @@ ul.b5_accordion.--chrome
                 └── p.b5_accordion__description
 =========================================================
 */
+@use 'sass:map';
 
 @function index($defaultValues: "") {
   @return ($defaultValues);
@@ -114,21 +115,21 @@ $index: (
 }
 
 @mixin index($paramMixi_: (), $block: ".b5_accordion") {
-  $paramMixi: index(map-merge($index, $paramMixi_));
+  $paramMixi: index(map.merge($index, $paramMixi_));
 
   @extend %accordionChrome;
-  gap: map-get($paramMixi, gap);
+  gap: map.get($paramMixi, gap);
 
   > li,
   > #{$block}__item {
     @extend %accordionChrome__item;
-    border-color: map-get($paramMixi, border-color);
+    border-color: map.get($paramMixi, border-color);
 
     &:focus-within {
-      border-color: map-get($paramMixi, accent-color);
+      border-color: map.get($paramMixi, accent-color);
 
       &::after {
-        background-color: map-get($paramMixi, accent-color);
+        background-color: map.get($paramMixi, accent-color);
       }
     }
 
@@ -149,13 +150,13 @@ $index: (
       h3, h2, h4,
       #{$block}__heading {
         @extend %accordionChrome__heading;
-        color: map-get($paramMixi, text-color);
+        color: map.get($paramMixi, text-color);
       }
 
       svg,
       #{$block}__icon {
         @extend %accordionChrome__icon;
-        stroke: map-get($paramMixi, accent-color);
+        stroke: map.get($paramMixi, accent-color);
       }
     }
 
@@ -166,7 +167,7 @@ $index: (
       p,
       #{$block}__description {
         @extend %accordionChrome__description;
-        color: map-get($paramMixi, body-text-color);
+        color: map.get($paramMixi, body-text-color);
       }
     }
   }

@@ -1,0 +1,195 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { client } from '../../lib/client';
+import Header from '../../components/library/layout/Header/Header.astro';
+import Footer from '../../components/library/layout/Footer/Footer.astro';
+import FabContact from '../../components/library/conversion/FabContact/FabContact.astro';
+import FabTools from '../../components/library/conversion/FabTools/FabTools.astro';
+
+export function getStaticPaths() {
+  return client.services.map((service) => ({
+    params: { slug: service.slug },
+    props: { service }
+  }));
+}
+
+const { service } = Astro.props;
+const formattedPrice = new Intl.NumberFormat(client.locale || 'fr', {
+  style: 'currency',
+  currency: client.currency || 'XOF',
+  maximumFractionDigits: 0
+}).format(service.price);
+
+const whatsappMessage = encodeURIComponent(
+  `Bonjour, je souhaite réserver la prestation "${service.name}" (${formattedPrice}).`
+);
+---
+
+<Layout
+  title={`${service.name} — ${client.name}`}
+  description={`${service.name} chez ${client.name}. ${service.description}`}
+>
+  <Header />
+
+  <main class="serviceDetailPage">
+    <div class="serviceDetailPage__container">
+      <nav class="serviceDetailPage__breadcrumb" aria-label="Fil d'Ariane">
+        <a href="/">Accueil</a> &gt; <span>Prestations</span> &gt; <strong>{service.name}</strong>
+      </nav>
+
+      <article class="serviceDetailCard">
+        <span class="serviceDetailCard__category">{service.category}</span>
+        <h1 class="serviceDetailCard__title">{service.name}</h1>
+        <p class="serviceDetailCard__description">{service.description}</p>
+
+        <div class="serviceDetailCard__meta">
+          <div class="metaItem">
+            <span class="metaItem__label">Tarif</span>
+            <span class="metaItem__value">{formattedPrice}</span>
+          </div>
+          {service.duration && (
+            <div class="metaItem">
+              <span class="metaItem__label">Durée estimée</span>
+              <span class="metaItem__value">{service.duration} minutes</span>
+            </div>
+          )}
+        </div>
+
+        <div class="serviceDetailCard__actions">
+          <a
+            href={`https://wa.me/${client.contact.whatsapp.replace(/[^0-9]/g, '')}?text=${whatsappMessage}`}
+            class="bookBtn"
+            target="_blank"
+            rel="noopener"
+          >
+            Réserver sur WhatsApp
+          </a>
+          <a href="/" class="backBtn">Retour au catalogue</a>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <Footer />
+  <FabContact />
+  <FabTools />
+</Layout>
+
+<style lang="scss">
+  .serviceDetailPage {
+    min-height: 70vh;
+    padding: 3rem 1.25rem;
+    background: #f8fafc;
+
+    &__container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    &__breadcrumb {
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+      color: #64748b;
+
+      a {
+        color: var(--color-accent, #2563eb);
+        &:hover { text-decoration: underline; }
+      }
+    }
+  }
+
+  .serviceDetailCard {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-lg, 16px);
+    padding: 2.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+
+    &__category {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-accent, #2563eb);
+      margin-bottom: 0.75rem;
+    }
+
+    &__title {
+      font-size: 2.25rem;
+      margin: 0 0 1rem;
+      color: #0f172a;
+    }
+
+    &__description {
+      font-size: 1.1rem;
+      color: #475569;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    &__meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.5rem;
+      background: #f8fafc;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  }
+
+  .metaItem {
+    display: flex;
+    flex-direction: column;
+
+    &__label {
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-bottom: 0.25rem;
+    }
+
+    &__value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+  }
+
+  .bookBtn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.85rem 1.75rem;
+    background: #25D366;
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform 150ms;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .backBtn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.85rem 1.75rem;
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+
+    &:hover {
+      background: #e2e8f0;
+    }
+  }
+</style>
