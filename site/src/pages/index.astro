@@ -7,6 +7,7 @@ import FabContact from '../components/library/conversion/FabContact/FabContact.a
 import FabTools from '../components/library/conversion/FabTools/FabTools.astro';
 import ServiceCard from '../components/library/contenu/ServiceCard/ServiceCard.astro';
 import Accordion from '../components/library/contenu/Accordion/Accordion.astro';
+import CartDrawer from '../components/library/commerce/Cart/CartDrawer.astro';
 
 const faqs = [
   {
@@ -64,6 +65,57 @@ const faqs = [
       </div>
     </section>
 
+    <!-- Produits Section (si configurés) -->
+    {client.products && client.products.length > 0 && (
+      <section class="section section--alt" id="produits">
+        <div class="section__container">
+          <div class="section__header">
+            <h2 class="section__title">Nos Produits & Soins</h2>
+            <p class="section__subtitle">Prolongez les bienfaits du studio chez vous avec notre sélection.</p>
+          </div>
+
+          <div class="servicesGrid">
+            {client.products.map((product) => (
+              <article class="serviceCard" id={`product-${product.slug}`}>
+                <div class="serviceCard__body">
+                  <div class="serviceCard__header">
+                    <span class="serviceCard__category">{product.category}</span>
+                    <span class="serviceCard__duration">Stock: {product.stock}</span>
+                  </div>
+                  <h3 class="serviceCard__title">{product.name}</h3>
+                  <p class="serviceCard__description">{product.description}</p>
+                  <div class="serviceCard__footer">
+                    <span class="serviceCard__price">
+                      <strong>
+                        {new Intl.NumberFormat(client.locale || 'fr', {
+                          style: 'currency',
+                          currency: client.currency || 'XOF',
+                          maximumFractionDigits: 0
+                        }).format(product.price)}
+                      </strong>
+                    </span>
+                    <div class="serviceCard__actions">
+                      <button
+                        type="button"
+                        class="serviceCard__cartBtn addCartTrigger"
+                        data-slug={product.slug}
+                        data-name={product.name}
+                        data-price={product.price}
+                        title={`Ajouter ${product.name} au panier`}
+                        aria-label={`Ajouter ${product.name} au panier`}
+                      >
+                        + Panier
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
     <!-- FAQ / Accordion Section -->
     <section class="section section--subtle" id="faq">
       <div class="section__container section__container--narrow">
@@ -86,17 +138,21 @@ const faqs = [
       <p id="modalDesc" class="serviceModal__desc"></p>
       <div class="serviceModal__actions">
         <a id="modalWaBtn" href="#" class="btn btn--primary" target="_blank" rel="noopener">Réserver cette prestation</a>
+        <button type="button" id="modalAddCartBtn" class="btn btn--accent">+ Ajouter au panier</button>
         <a id="modalFullLink" href="#" class="btn btn--secondary">Page complète</a>
       </div>
     </div>
   </dialog>
 
+  <CartDrawer />
   <Footer />
   <FabContact />
   <FabTools />
 </Layout>
 
 <script>
+  import { updateStorage } from '@/lib/storage';
+
   // Script d'amélioration progressive pour le pattern lien-modale
   const modal = document.getElementById('serviceModal') as HTMLDialogElement | null;
   const closeBtn = document.getElementById('modalCloseBtn');
@@ -105,6 +161,9 @@ const faqs = [
   const descEl = document.getElementById('modalDesc');
   const waBtn = document.getElementById('modalWaBtn') as HTMLAnchorElement | null;
   const fullLink = document.getElementById('modalFullLink') as HTMLAnchorElement | null;
+  const modalCartBtn = document.getElementById('modalAddCartBtn');
+
+  let currentModalItem = { slug: '', name: '', price: 0 };
 
   document.querySelectorAll('.modalTrigger').forEach((btn) => {
     btn.addEventListener('click', (e) => {
@@ -115,7 +174,10 @@ const faqs = [
         const slug = target.dataset.slug || '';
         const title = target.dataset.title || '';
         const price = target.dataset.price || '';
+        const rawprice = Number(target.dataset.rawprice) || 0;
         const desc = target.dataset.desc || '';
+
+        currentModalItem = { slug, name: title, price: rawprice };
 
         if (titleEl) titleEl.textContent = title;
         if (priceEl) priceEl.textContent = price;
@@ -129,6 +191,47 @@ const faqs = [
         window.history.pushState({ modalOpen: true, slug }, '', `/prestations/${slug}`);
       }
     });
+  });
+
+  modalCartBtn?.addEventListener('click', () => {
+    if (!currentModalItem.slug) return;
+    updateStorage(prev => {
+      const existing = prev.cart.find(i => i.id === currentModalItem.slug);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        prev.cart.push({
+          id: currentModalItem.slug,
+          name: currentModalItem.name,
+          price: currentModalItem.price,
+          quantity: 1,
+        });
+      }
+      return prev;
+    });
+    modal?.close();
+    window.dispatchEvent(new CustomEvent('cart:open'));
+  });
+
+  // Gestion des clics "Ajouter au panier" direct sur les cartes
+  document.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest('.addCartTrigger') as HTMLElement | null;
+    if (!target) return;
+    const slug = target.dataset.slug;
+    const name = target.dataset.name;
+    const price = Number(target.dataset.price);
+    if (!slug || !name) return;
+
+    updateStorage(prev => {
+      const existing = prev.cart.find(i => i.id === slug);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        prev.cart.push({ id: slug, name, price, quantity: 1 });
+      }
+      return prev;
+    });
+    window.dispatchEvent(new CustomEvent('cart:open'));
   });
 
   closeBtn?.addEventListener('click', () => {
@@ -263,6 +366,13 @@ const faqs = [
     &--secondary {
       background: #0f172a;
       color: white;
+    }
+
+    &--accent {
+      background: var(--color-accent, #2563eb);
+      color: white;
+      border: none;
+      cursor: pointer;
     }
   }
 

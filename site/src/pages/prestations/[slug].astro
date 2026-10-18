@@ -5,6 +5,7 @@ import Header from '../../components/library/layout/Header/Header.astro';
 import Footer from '../../components/library/layout/Footer/Footer.astro';
 import FabContact from '../../components/library/conversion/FabContact/FabContact.astro';
 import FabTools from '../../components/library/conversion/FabTools/FabTools.astro';
+import CartDrawer from '../../components/library/commerce/Cart/CartDrawer.astro';
 
 export function getStaticPaths() {
   return client.services.map((service) => ({
@@ -64,16 +65,56 @@ const whatsappMessage = encodeURIComponent(
           >
             Réserver sur WhatsApp
           </a>
+
+          {(client.tier >= 2 || client.modules.includes('panier')) && (
+            <button
+              type="button"
+              id="detailAddCartBtn"
+              class="cartBtn"
+              data-slug={service.slug}
+              data-name={service.name}
+              data-price={service.price}
+            >
+              + Ajouter au panier
+            </button>
+          )}
+
           <a href="/" class="backBtn">Retour au catalogue</a>
         </div>
       </article>
     </div>
   </main>
 
+  <CartDrawer />
   <Footer />
   <FabContact />
   <FabTools />
 </Layout>
+
+<script>
+  import { updateStorage } from '@/lib/storage';
+
+  const cartBtn = document.getElementById('detailAddCartBtn');
+  cartBtn?.addEventListener('click', () => {
+    const slug = cartBtn.dataset.slug;
+    const name = cartBtn.dataset.name;
+    const price = Number(cartBtn.dataset.price);
+
+    if (!slug || !name) return;
+
+    updateStorage(prev => {
+      const existing = prev.cart.find(i => i.id === slug);
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        prev.cart.push({ id: slug, name, price, quantity: 1 });
+      }
+      return prev;
+    });
+
+    window.dispatchEvent(new CustomEvent('cart:open'));
+  });
+</script>
 
 <style lang="scss">
   .serviceDetailPage {
@@ -190,6 +231,24 @@ const whatsappMessage = encodeURIComponent(
 
     &:hover {
       background: #e2e8f0;
+    }
+  }
+
+  .cartBtn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.85rem 1.75rem;
+    background: var(--color-accent, #2563eb);
+    color: white;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: transform 150ms, opacity 150ms;
+
+    &:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
     }
   }
 </style>

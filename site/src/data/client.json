@@ -1,12 +1,17 @@
 {
-  "$comment": "Brief client : copier en client.json et remplir à partir de l'interview. Les champs 'generated' sont calculés automatiquement.",
-  "slug": "nom-du-commerce",
-  "name": "Nom exact du commerce",
+  "$comment": "Brief client : configuration complète du commerce. Les champs 'generated' sont calculés automatiquement.",
+  "slug": "awa-studio-beaute",
+  "name": "Awa Studio Beauté",
   "activity": {
     "type": "HairSalon",
-    "label": "Salon de coiffure et d'esthétique",
-    "pitch": "Phrase d'accroche en une ligne",
-    "differentiators": ["accueil", "rapidité", "spécialité tresses"]
+    "label": "Salon de Coiffure & Soins Esthétiques",
+    "pitch": "L'élégance afro-contemporaine au cœur de Cocody : tresses d'exception, soins capillaires profonds et mise en beauté sur mesure.",
+    "differentiators": [
+      "Accueil chaleureux & rafraîchissement offert",
+      "Expertes certifiées en cheveux naturels & crépus",
+      "Paiement Wave & Orange Money instantané",
+      "Ponctualité garantie sur rendez-vous"
+    ]
   },
   "tier": 3,
   "modules": ["vitrine", "admin", "catalogue", "analytics", "panier", "checkout", "commandes"],
@@ -14,59 +19,148 @@
   "currency": "XOF",
   "timezone": "Africa/Abidjan",
   "contact": {
-    "phone": "+225XXXXXXXXXX",
-    "whatsapp": "+225XXXXXXXXXX",
-    "email": "contact@exemple.com",
+    "phone": "+2250700112233",
+    "whatsapp": "+2250700112233",
+    "email": "contact@awastudiobeaute.ci",
     "address": {
-      "street": "Rue, repère local",
-      "district": "Quartier",
-      "city": "Ville",
+      "street": "Boulevard Latrille, Carrefour Duncan",
+      "district": "Angré 8ème Tranche",
+      "city": "Abidjan",
       "country": "CI"
     },
-    "geo": { "lat": 0, "lng": 0 },
-    "socials": { "facebook": "", "instagram": "", "tiktok": "" }
+    "geo": {
+      "lat": 5.3852,
+      "lng": -3.9856
+    },
+    "socials": {
+      "facebook": "https://facebook.com/awastudiobeaute",
+      "instagram": "https://instagram.com/awastudiobeaute",
+      "tiktok": "https://tiktok.com/@awastudiobeaute"
+    }
   },
   "hours": [
-    { "days": ["Mo", "Tu", "We", "Th", "Fr", "Sa"], "opens": "08:00", "closes": "20:00" },
-    { "days": ["Su"], "opens": null, "closes": null }
+    { "days": ["Mo", "Tu", "We", "Th", "Fr", "Sa"], "opens": "08:30", "closes": "20:00" },
+    { "days": ["Su"], "opens": "13:00", "closes": "19:00" }
   ],
-  "booking": { "mode": "sans-rdv | rdv | les-deux", "channel": "whatsapp" },
+  "booking": {
+    "mode": "les-deux",
+    "channel": "whatsapp"
+  },
   "brand": {
-    "mood": "chaleureux, moderne",
-    "colors": { "primary": "#000000", "secondary": "#000000", "accent": "#000000", "surface": "#ffffff" },
-    "fonts": { "heading": "", "body": "" },
+    "mood": "élégant, chaleureux, haut de gamme",
+    "colors": {
+      "primary": "#d97706",
+      "secondary": "#78350f",
+      "accent": "#b45309",
+      "surface": "#fffbeb"
+    },
+    "fonts": {
+      "heading": "Plus Jakarta Sans, sans-serif",
+      "body": "Inter, sans-serif"
+    },
     "logo": "",
-    "pattern": "description du motif souhaité",
-    "footerVariant": "ticket | carte-visite | devanture | autre"
+    "pattern": "african-geometric-delicate",
+    "footerVariant": "devanture"
   },
   "services": [
-    { "slug": "exemple-prestation", "name": "", "category": "", "price": 0, "priceFrom": false, "duration": 60, "description": "" }
+    {
+      "slug": "tresses-nattes-collees",
+      "name": "Nattes Collées & Cornrows Artistiques",
+      "category": "Coiffure",
+      "price": 8000,
+      "priceFrom": false,
+      "duration": 90,
+      "description": "Nattes fines ou épaisses avec motifs géométriques élégants. Finition soignée à l'huile végétale naturelle pour protéger le cuir chevelu."
+    },
+    {
+      "slug": "soin-profond-capillaire",
+      "name": "Soin Hydratant Profond & Brushing Soie",
+      "category": "Soins",
+      "price": 12000,
+      "priceFrom": false,
+      "duration": 60,
+      "description": "Bain d'huiles tièdes, masque réparateur au beurre de karité pur sous casque vapeur, suivi d'un brushing protecteur sans chaleur excessive."
+    },
+    {
+      "slug": "pose-ongles-gel-uv",
+      "name": "Manucure & Pose d'Ongles en Gel UV",
+      "category": "Esthétique",
+      "price": 15000,
+      "priceFrom": false,
+      "duration": 75,
+      "description": "Préparation complète de l'ongle, capsule ou chablon, vernis semi-permanent longue tenue et design personnalisé au choix."
+    },
+    {
+      "slug": "tissage-bresilien-finitions",
+      "name": "Tissage Brésilien Fermé & Coiffage",
+      "category": "Coiffure",
+      "price": 25000,
+      "priceFrom": false,
+      "duration": 120,
+      "description": "Pose minutieuse de mèches naturelles sans tension, fermeture invisible (closure / frontal) et coiffage professionnel (lissage ou boucles)."
+    }
   ],
   "products": [
-    { "slug": "exemple-produit", "name": "", "category": "", "price": 0, "stock": 0, "description": "" }
+    {
+      "slug": "huile-ricin-karite-250ml",
+      "name": "Élixir Ricin & Karité Bio (250ml)",
+      "category": "Soins Capillaires",
+      "price": 5000,
+      "stock": 25,
+      "description": "Formule fortifiante stimulant la repousse des tempes et nourrissant intensément les pointes sèches."
+    },
+    {
+      "slug": "shampoing-doux-sans-sulfate",
+      "name": "Shampoing Doux Hydratant Sans Sulfate (500ml)",
+      "category": "Hygiène Capillaire",
+      "price": 7500,
+      "stock": 18,
+      "description": "Nettoie en douceur sans agresser la barrière naturelle du cheveu frisé et bouclé."
+    },
+    {
+      "slug": "serum-anti-casse-argan",
+      "name": "Sérum Protecteur Anti-Casse à l'Argan (100ml)",
+      "category": "Finition",
+      "price": 9000,
+      "stock": 14,
+      "description": "Protection thermique efficace avant séchage et brillance miroir sans alourdir la chevelure."
+    }
   ],
   "promotions": [],
   "delivery": {
-    "enabled": false,
-    "zones": [{ "name": "", "fee": 0 }],
-    "homeService": false
+    "enabled": true,
+    "zones": [
+      { "name": "Cocody (Angré, Vallon, 2 Plateaux)", "fee": 1500 },
+      { "name": "Reste d'Abidjan (Marcory, Plateau, Riviera)", "fee": 2500 }
+    ],
+    "homeService": true
   },
   "payments": {
     "wave": true,
-    "paydunya": false,
+    "paydunya": true,
     "whatsappOrder": true,
     "cashOnDelivery": true
   },
-  "primaryAction": "whatsapp | appel | reservation | commande | visite",
+  "primaryAction": "whatsapp",
   "seo": {
-    "city": "",
-    "keywords": [],
-    "description": ""
+    "city": "Abidjan, Cocody",
+    "keywords": [
+      "coiffure abidjan",
+      "salon de beauté cocody",
+      "tresses afro angre",
+      "soin cheveux crepus",
+      "onglerie gel abidjan"
+    ],
+    "description": "Awa Studio Beauté à Cocody Angré : salon de coiffure afro haut de gamme, tresses artistiques, soins capillaires profonds et onglerie. Réservez vite sur WhatsApp !"
   },
-  "analytics": { "plausibleDomain": "" },
-  "features": { "roleSimulator": false },
+  "analytics": {
+    "plausibleDomain": "awastudiobeaute.ci"
+  },
+  "features": {
+    "roleSimulator": true
+  },
   "generated": {
-    "storageKey": "nom-du-commerce:app",
-    "demoDb": "demo_nom-du-commerce"
+    "storageKey": "awa-studio-beaute:app",
+    "demoDb": "demo_awa-studio-beaute"
   }
 }

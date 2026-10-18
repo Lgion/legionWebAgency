@@ -42,17 +42,34 @@ const formattedPrice = new Intl.NumberFormat(client.locale || 'fr', {
         <strong>{formattedPrice}</strong>
       </span>
 
-      <!-- Vrai lien vers la page de détail (SEO), intercepté en modal par progress enhancement -->
-      <a
-        href={`/prestations/${service.slug}`}
-        class="serviceCard__cta modalTrigger"
-        data-slug={service.slug}
-        data-title={service.name}
-        data-price={formattedPrice}
-        data-desc={service.description}
-      >
-        Détails
-      </a>
+      <div class="serviceCard__actions">
+        <!-- Vrai lien vers la page de détail (SEO), intercepté en modal par progressive enhancement -->
+        <a
+          href={`/prestations/${service.slug}`}
+          class="serviceCard__cta modalTrigger"
+          data-slug={service.slug}
+          data-title={service.name}
+          data-price={formattedPrice}
+          data-rawprice={service.price}
+          data-desc={service.description}
+        >
+          Détails
+        </a>
+
+        {(client.tier >= 2 || client.modules.includes('panier')) && (
+          <button
+            type="button"
+            class="serviceCard__cartBtn addCartTrigger"
+            data-slug={service.slug}
+            data-name={service.name}
+            data-price={service.price}
+            title={`Ajouter ${service.name} au panier`}
+            aria-label={`Ajouter ${service.name} au panier`}
+          >
+            + Panier
+          </button>
+        )}
+      </div>
     </div>
   </div>
 </article>
@@ -125,6 +142,12 @@ const formattedPrice = new Intl.NumberFormat(client.locale || 'fr', {
       }
     }
 
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     &__cta {
       display: inline-flex;
       align-items: center;
@@ -140,6 +163,26 @@ const formattedPrice = new Intl.NumberFormat(client.locale || 'fr', {
       &:hover {
         background: #0f172a;
         color: #ffffff;
+      }
+    }
+
+    &__cartBtn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 0.75rem;
+      background: #eff6ff;
+      color: var(--color-accent, #2563eb);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-sm, 4px);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 150ms, border-color 150ms;
+
+      &:hover {
+        background: var(--color-accent, #2563eb);
+        color: #ffffff;
+        border-color: var(--color-accent, #2563eb);
       }
     }
   }

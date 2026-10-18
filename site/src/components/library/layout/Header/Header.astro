@@ -32,6 +32,15 @@ const whatsappClean = client.contact.whatsapp.replace(/[^0-9]/g, '');
     </nav>
 
     <div class="appHeader__actions">
+      <button type="button" id="headerCartBtn" class="appHeader__cartBtn" aria-label="Ouvrir le panier">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"></path>
+        </svg>
+        <span id="headerCartBadge" class="appHeader__cartBadge">0</span>
+      </button>
+
       <a href={`https://wa.me/${whatsappClean}`} class="appHeader__cta" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
           <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
@@ -41,6 +50,28 @@ const whatsappClean = client.contact.whatsapp.replace(/[^0-9]/g, '');
     </div>
   </div>
 </header>
+
+<script>
+  import { getStorage } from '@/lib/storage';
+
+  function updateHeaderBadge() {
+    const data = getStorage();
+    const count = (data.cart || []).reduce((acc, item) => acc + item.quantity, 0);
+    const badge = document.getElementById('headerCartBadge');
+    if (badge) {
+      badge.textContent = count.toString();
+      badge.style.display = count > 0 ? 'flex' : 'none';
+    }
+  }
+
+  window.addEventListener('app:storage:change', updateHeaderBadge);
+
+  document.getElementById('headerCartBtn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('cart:open'));
+  });
+
+  updateHeaderBadge();
+</script>
 
 <style lang="scss">
   .appHeader {

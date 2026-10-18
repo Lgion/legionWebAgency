@@ -1,0 +1,644 @@
+---
+import { client } from '@/lib/client';
+
+const isWaveEnabled = client.payments.wave;
+const isPaydunyaEnabled = client.payments.paydunya;
+const isWhatsappEnabled = client.payments.whatsappOrder;
+const isCodEnabled = client.payments.cashOnDelivery;
+---
+
+<div id="cartDrawer" class="cartDrawer" aria-hidden="true">
+  <div class="cartDrawer__backdrop" id="cartBackdrop"></div>
+  <aside class="cartDrawer__panel" aria-label="Votre panier">
+    <div class="cartDrawer__header">
+      <div class="cartDrawer__titleWrap">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"></path>
+        </svg>
+        <h2 class="cartDrawer__title">Votre Panier (<span id="cartCount">0</span>)</h2>
+      </div>
+      <button type="button" id="cartCloseBtn" class="cartDrawer__close" aria-label="Fermer le panier">✕</button>
+    </div>
+
+    <!-- Étape 1 : Articles du panier -->
+    <div class="cartDrawer__body" id="cartStep1">
+      <div id="cartItemsList" class="cartDrawer__items"></div>
+      <div id="cartEmptyState" class="cartDrawer__empty" style="display: none;">
+        <p>Votre panier est actuellement vide.</p>
+        <a href="#prestations" class="btn btn--secondary" id="browseCatalogBtn">Découvrir nos offres</a>
+      </div>
+    </div>
+
+    <!-- Étape 2 : Coordonnées & Livraison -->
+    <div class="cartDrawer__body" id="cartStep2" style="display: none;">
+      <h3 class="stepTitle">Vos Coordonnées</h3>
+      <form id="checkoutForm" class="checkoutForm">
+        <div class="formGroup">
+          <label for="custName">Nom complet *</label>
+          <input type="text" id="custName" required placeholder="Ex. Awa Koné" />
+        </div>
+        <div class="formGroup">
+          <label for="custPhone">Numéro de téléphone *</label>
+          <input type="tel" id="custPhone" required placeholder="Ex. +225 07 00 00 00 00" />
+        </div>
+        <div class="formGroup">
+          <label>Mode de retrait</label>
+          <div class="radioGroup">
+            <label><input type="radio" name="deliveryMode" value="pickup" checked /> Sur place</label>
+            {client.delivery.enabled && (
+              <label><input type="radio" name="deliveryMode" value="delivery" /> Livraison à domicile</label>
+            )}
+          </div>
+        </div>
+        <div class="formGroup" id="addressGroup" style="display: none;">
+          <label for="custAddress">Adresse de livraison</label>
+          <input type="text" id="custAddress" placeholder="Quartier, repère, rue..." />
+        </div>
+
+        <h3 class="stepTitle" style="margin-top: 1.5rem;">Mode de Règlement</h3>
+        <div class="paymentOptions">
+          {isWaveEnabled && (
+            <label class="payOption">
+              <input type="radio" name="payMethod" value="wave" checked />
+              <div class="payOption__card">
+                <strong>Wave Money</strong>
+                <small>Sans frais • Validation instantanée</small>
+              </div>
+            </label>
+          )}
+          {isPaydunyaEnabled && (
+            <label class="payOption">
+              <input type="radio" name="payMethod" value="paydunya" />
+              <div class="payOption__card">
+                <strong>PayDunya</strong>
+                <small>Orange Money, MTN, Moov, Carte</small>
+              </div>
+            </label>
+          )}
+          {isWhatsappEnabled && (
+            <label class="payOption">
+              <input type="radio" name="payMethod" value="whatsapp" />
+              <div class="payOption__card">
+                <strong>Commande WhatsApp</strong>
+                <small>Finalisation avec notre équipe</small>
+              </div>
+            </label>
+          )}
+          {isCodEnabled && (
+            <label class="payOption">
+              <input type="radio" name="payMethod" value="cash" />
+              <div class="payOption__card">
+                <strong>Paiement à la livraison</strong>
+                <small>Espèces au retrait / réception</small>
+              </div>
+            </label>
+          )}
+        </div>
+      </form>
+    </div>
+
+    <!-- Étape 3 : Confirmation & QR code Wave -->
+    <div class="cartDrawer__body" id="cartStep3" style="display: none;">
+      <div class="paymentPendingBox">
+        <div id="paymentSpinner" class="paymentSpinner"></div>
+        <h3 id="pendingTitle">Finalisation de votre commande</h3>
+        <p id="pendingDesc">Veuillez scanner le QR code ou valider dans votre application Wave.</p>
+        <div id="qrCodeContainer" class="qrCodeContainer"></div>
+        <div class="pendingActions">
+          <a id="deepLinkBtn" href="#" class="btn btn--primary" style="display: none;" target="_blank">Ouvrir dans l'App</a>
+          <button type="button" id="cancelOrderBtn" class="btn btn--secondary">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer du Panier -->
+    <div class="cartDrawer__footer" id="cartFooter">
+      <div class="cartDrawer__totalRow">
+        <span>Total :</span>
+        <strong id="cartTotalPrice">0 XOF</strong>
+      </div>
+      <button type="button" id="cartNextBtn" class="btn btn--primary btn--full">
+        Passer la commande
+      </button>
+      <button type="button" id="cartBackBtn" class="btn btn--secondary btn--full" style="display: none; margin-top: 0.5rem;">
+        Retour au panier
+      </button>
+    </div>
+  </aside>
+</div>
+
+<script>
+  import { getStorage, updateStorage } from '@/lib/storage';
+  import QRCode from 'qrcode';
+
+  const drawer = document.getElementById('cartDrawer');
+  const backdrop = document.getElementById('cartBackdrop');
+  const closeBtn = document.getElementById('cartCloseBtn');
+  const itemsList = document.getElementById('cartItemsList');
+  const emptyState = document.getElementById('cartEmptyState');
+  const countEl = document.getElementById('cartCount');
+  const totalEl = document.getElementById('cartTotalPrice');
+  const nextBtn = document.getElementById('cartNextBtn');
+  const backBtn = document.getElementById('cartBackBtn');
+  const step1 = document.getElementById('cartStep1');
+  const step2 = document.getElementById('cartStep2');
+  const step3 = document.getElementById('cartStep3');
+  const footer = document.getElementById('cartFooter');
+  const addressGroup = document.getElementById('addressGroup');
+
+  let currentStep = 1;
+
+  function formatMoney(amount: number) {
+    return new Intl.NumberFormat('fr', {
+      style: 'currency',
+      currency: 'XOF',
+      maximumFractionDigits: 0
+    }).format(amount);
+  }
+
+  export function renderCart() {
+    const data = getStorage();
+    const cart = data.cart || [];
+    let count = 0;
+    let total = 0;
+
+    if (itemsList && emptyState) {
+      if (cart.length === 0) {
+        itemsList.innerHTML = '';
+        emptyState.style.display = 'block';
+        if (nextBtn) nextBtn.setAttribute('disabled', 'true');
+      } else {
+        emptyState.style.display = 'none';
+        if (nextBtn) nextBtn.removeAttribute('disabled');
+
+        itemsList.innerHTML = cart.map(item => {
+          count += item.quantity;
+          total += item.price * item.quantity;
+          return `
+            <div class="cartItem" data-slug="${item.id}">
+              <div class="cartItem__info">
+                <span class="cartItem__name">${item.name}</span>
+                <span class="cartItem__unit">${formatMoney(item.price)}</span>
+              </div>
+              <div class="cartItem__ctrls">
+                <button type="button" class="qtyBtn qtyBtn--minus" data-slug="${item.id}">-</button>
+                <span class="cartItem__qty">${item.quantity}</span>
+                <button type="button" class="qtyBtn qtyBtn--plus" data-slug="${item.id}">+</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    if (countEl) countEl.textContent = count.toString();
+    if (totalEl) totalEl.textContent = formatMoney(total);
+  }
+
+  // Ouvrir / Fermer le panier
+  export function openCart() {
+    drawer?.classList.add('cartDrawer--open');
+    drawer?.setAttribute('aria-hidden', 'false');
+    renderCart();
+  }
+
+  export function closeCart() {
+    drawer?.classList.remove('cartDrawer--open');
+    drawer?.setAttribute('aria-hidden', 'true');
+    // Réinitialisation de l'étape
+    setStep(1);
+  }
+
+  function setStep(step: number) {
+    currentStep = step;
+    if (step1) step1.style.display = step === 1 ? 'block' : 'none';
+    if (step2) step2.style.display = step === 2 ? 'block' : 'none';
+    if (step3) step3.style.display = step === 3 ? 'block' : 'none';
+
+    if (backBtn) backBtn.style.display = step === 2 ? 'block' : 'none';
+    if (footer) footer.style.display = step === 3 ? 'none' : 'block';
+
+    if (nextBtn) {
+      nextBtn.textContent = step === 1 ? 'Valider les coordonnées' : 'Confirmer et payer';
+    }
+  }
+
+  // Événements d'incrémentation / décrémentation
+  itemsList?.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const slug = target.dataset.slug;
+    if (!slug) return;
+
+    if (target.classList.contains('qtyBtn--plus')) {
+      updateStorage(prev => {
+        const item = prev.cart.find(i => i.id === slug);
+        if (item) item.quantity += 1;
+        return prev;
+      });
+      renderCart();
+    } else if (target.classList.contains('qtyBtn--minus')) {
+      updateStorage(prev => {
+        const idx = prev.cart.findIndex(i => i.id === slug);
+        if (idx !== -1) {
+          if (prev.cart[idx].quantity > 1) {
+            prev.cart[idx].quantity -= 1;
+          } else {
+            prev.cart.splice(idx, 1);
+          }
+        }
+        return prev;
+      });
+      renderCart();
+    }
+  });
+
+  // Changement de mode de livraison
+  document.querySelectorAll('input[name="deliveryMode"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      const mode = (e.target as HTMLInputElement).value;
+      if (addressGroup) {
+        addressGroup.style.display = mode === 'delivery' ? 'block' : 'none';
+      }
+    });
+  });
+
+  // Gestion de la navigation entre étapes
+  nextBtn?.addEventListener('click', async () => {
+    if (currentStep === 1) {
+      setStep(2);
+    } else if (currentStep === 2) {
+      const form = document.getElementById('checkoutForm') as HTMLFormElement;
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const name = (document.getElementById('custName') as HTMLInputElement).value;
+      const phone = (document.getElementById('custPhone') as HTMLInputElement).value;
+      const address = (document.getElementById('custAddress') as HTMLInputElement)?.value || '';
+      const deliveryMode = (document.querySelector('input[name="deliveryMode"]:checked') as HTMLInputElement)?.value as 'pickup' | 'delivery';
+      const payMethod = (document.querySelector('input[name="payMethod"]:checked') as HTMLInputElement)?.value as any;
+
+      const data = getStorage();
+      const items = (data.cart || []).map(i => ({ slug: i.id, quantity: i.quantity }));
+
+      // Appel de création de commande sur l'API Hono
+      try {
+        nextBtn.textContent = 'Création de la commande...';
+        nextBtn.setAttribute('disabled', 'true');
+
+        const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+        const res = await fetch(`${apiUrl}/api/orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items,
+            customer: { name, phone },
+            delivery: { mode: deliveryMode, address },
+            paymentMethod: payMethod,
+          }),
+        });
+
+        const result = await res.json();
+        if (!res.ok) {
+          alert(result.error || 'Erreur lors de la validation');
+          nextBtn.removeAttribute('disabled');
+          nextBtn.textContent = 'Confirmer et payer';
+          return;
+        }
+
+        // Commande créée avec succès
+        setStep(3);
+
+        if (payMethod === 'whatsapp' && result.data?.whatsappUrl) {
+          window.location.href = result.data.whatsappUrl;
+        } else if (payMethod === 'wave' && result.data?.waveLaunchUrl) {
+          const qrContainer = document.getElementById('qrCodeContainer');
+          const deepLink = document.getElementById('deepLinkBtn') as HTMLAnchorElement;
+          
+          if (deepLink) {
+            deepLink.href = result.data.waveLaunchUrl;
+            deepLink.style.display = 'inline-flex';
+          }
+
+          if (qrContainer) {
+            qrContainer.innerHTML = '';
+            const canvas = document.createElement('canvas');
+            await QRCode.toCanvas(canvas, result.data.waveLaunchUrl, { width: 200 });
+            qrContainer.appendChild(canvas);
+          }
+
+          // Polling toutes les 3s du statut de paiement
+          const pollInterval = setInterval(async () => {
+            try {
+              const statusRes = await fetch(`${apiUrl}/api/orders/${result.data.orderId}/status`);
+              const statusData = await statusRes.json();
+              if (statusData.status === 'paid') {
+                clearInterval(pollInterval);
+                alert('Paiement Wave validé ! Merci pour votre confiance.');
+                updateStorage(prev => ({ ...prev, cart: [] }));
+                closeCart();
+              }
+            } catch (err) {}
+          }, 3000);
+        } else {
+          alert('Commande enregistrée ! Notre équipe vous contactera au ' + phone);
+          updateStorage(prev => ({ ...prev, cart: [] }));
+          closeCart();
+        }
+      } catch (err) {
+        alert('Erreur de connexion avec le serveur de paiement');
+      } finally {
+        nextBtn.removeAttribute('disabled');
+        nextBtn.textContent = 'Confirmer et payer';
+      }
+    }
+  });
+
+  backBtn?.addEventListener('click', () => {
+    setStep(1);
+  });
+
+  backdrop?.addEventListener('click', closeCart);
+  closeBtn?.addEventListener('click', closeCart);
+  document.getElementById('browseCatalogBtn')?.addEventListener('click', closeCart);
+
+  window.addEventListener('cart:open', openCart);
+  window.addEventListener('app:storage:change', renderCart);
+
+  // Rendu initial du panier au chargement
+  renderCart();
+</script>
+
+<style lang="scss">
+  .cartDrawer {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal, 500);
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility var(--transition-normal);
+
+    &--open {
+      visibility: visible;
+      pointer-events: auto;
+
+      .cartDrawer__backdrop {
+        opacity: 1;
+      }
+
+      .cartDrawer__panel {
+        transform: translateX(0);
+      }
+    }
+
+    &__backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      transition: opacity var(--transition-normal);
+    }
+
+    &__panel {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      max-width: 440px;
+      background: #ffffff;
+      box-shadow: -4px 0 25px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform var(--transition-normal);
+    }
+
+    &__header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &__titleWrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #0f172a;
+    }
+
+    &__title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    &__close {
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+
+      &:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+      }
+    }
+
+    &__body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    &__empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #64748b;
+    }
+
+    &__footer {
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    &__totalRow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: #0f172a;
+    }
+  }
+
+  .stepTitle {
+    font-size: 1.05rem;
+    margin: 0 0 1rem;
+    color: #0f172a;
+  }
+
+  .checkoutForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    input[type="text"], input[type="tel"] {
+      padding: 0.65rem 0.85rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.95rem;
+
+      &:focus {
+        outline: 2px solid var(--color-accent, #2563eb);
+      }
+    }
+  }
+
+  .radioGroup {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .paymentOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .payOption {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 150ms, border-color 150ms;
+
+    &:has(input:checked) {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    &__card {
+      display: flex;
+      flex-direction: column;
+
+      small {
+        color: #64748b;
+      }
+    }
+  }
+
+  .paymentPendingBox {
+    text-align: center;
+    padding: 2rem 1rem;
+
+    h3 {
+      margin: 1rem 0 0.5rem;
+      color: #0f172a;
+    }
+
+    p {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .qrCodeContainer {
+    display: flex;
+    justify-content: center;
+    margin: 1.5rem 0;
+  }
+
+  .pendingActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn--full {
+    width: 100%;
+  }
+
+  .cartItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
+
+    &__info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__name {
+      font-weight: 600;
+      color: #0f172a;
+      font-size: 0.95rem;
+    }
+
+    &__unit {
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    &__ctrls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    &__qty {
+      font-weight: 600;
+      min-width: 20px;
+      text-align: center;
+    }
+  }
+
+  .qtyBtn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:hover {
+      background: #e2e8f0;
+    }
+  }
+</style>

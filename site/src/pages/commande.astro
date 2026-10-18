@@ -1,0 +1,321 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { client } from '../lib/client';
+import Header from '../components/library/layout/Header/Header.astro';
+import Footer from '../components/library/layout/Footer/Footer.astro';
+import FabContact from '../components/library/conversion/FabContact/FabContact.astro';
+---
+
+<Layout
+  title={`Confirmation de Commande — ${client.name}`}
+  description={`Suivi et confirmation de votre commande chez ${client.name}.`}
+  noindex={true}
+>
+  <Header />
+
+  <main class="orderPage">
+    <div class="orderPage__container">
+      <div class="orderCard" id="orderCard">
+        <div class="orderCard__iconWrap" id="orderIconWrap">
+          <svg class="iconCheck" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+
+        <span class="orderCard__badge" id="orderStatusBadge">Vérification en cours...</span>
+        <h1 class="orderCard__title" id="orderTitle">Confirmation de Commande</h1>
+        <p class="orderCard__subtitle" id="orderSubtitle">Nous synchronisons les détails de votre transaction.</p>
+
+        <div class="receiptBox" id="receiptBox">
+          <div class="receiptRow">
+            <span>Numéro de commande</span>
+            <strong id="receiptOrderId">—</strong>
+          </div>
+          <div class="receiptRow">
+            <span>Statut du paiement</span>
+            <span id="receiptPaymentStatus" class="statusTag">En attente</span>
+          </div>
+          <div class="receiptRow" id="receiptAmountRow" style="display: none;">
+            <span>Montant total</span>
+            <strong id="receiptAmount">—</strong>
+          </div>
+        </div>
+
+        <div class="orderCard__actions">
+          <a
+            id="orderWhatsappBtn"
+            href={`https://wa.me/${client.contact.whatsapp.replace(/[^0-9]/g, '')}`}
+            class="btn btn--primary"
+            target="_blank"
+            rel="noopener"
+          >
+            Contacter le salon sur WhatsApp
+          </a>
+          <a href="/" class="btn btn--secondary">Retour à l'accueil</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+  <FabContact />
+</Layout>
+
+<script>
+  import confetti from 'canvas-confetti';
+  import { updateStorage } from '@/lib/storage';
+
+  const params = new URLSearchParams(window.location.search);
+  const orderId = params.get('id');
+  const urlStatus = params.get('status');
+
+  const orderTitle = document.getElementById('orderTitle');
+  const orderSubtitle = document.getElementById('orderSubtitle');
+  const statusBadge = document.getElementById('orderStatusBadge');
+  const receiptOrderId = document.getElementById('receiptOrderId');
+  const receiptStatus = document.getElementById('receiptPaymentStatus');
+  const receiptAmount = document.getElementById('receiptAmount');
+  const receiptAmountRow = document.getElementById('receiptAmountRow');
+  const waBtn = document.getElementById('orderWhatsappBtn') as HTMLAnchorElement | null;
+  const iconWrap = document.getElementById('orderIconWrap');
+
+  if (receiptOrderId && orderId) {
+    receiptOrderId.textContent = orderId;
+  }
+
+  // Si le statut d'URL est "success" ou "paid", on déclenche les confettis et on vide le panier
+  function triggerCelebration() {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+    // Nettoyage du panier
+    updateStorage(prev => ({ ...prev, cart: [] }));
+  }
+
+  async function checkOrderStatus() {
+    if (!orderId) {
+      if (orderTitle) orderTitle.textContent = "Aucune commande sélectionnée";
+      if (orderSubtitle) orderSubtitle.textContent = "Veuillez passer commande depuis le panier pour voir votre confirmation.";
+      if (statusBadge) statusBadge.style.display = "none";
+      return;
+    }
+
+    if (urlStatus === 'success') {
+      triggerCelebration();
+      if (statusBadge) {
+        statusBadge.textContent = "Paiement Validé";
+        statusBadge.className = "orderCard__badge orderCard__badge--success";
+      }
+      if (receiptStatus) {
+        receiptStatus.textContent = "Payé";
+        receiptStatus.className = "statusTag statusTag--success";
+      }
+      if (orderSubtitle) {
+        orderSubtitle.textContent = "Votre paiement a été validé avec succès ! Notre équipe prépare votre demande.";
+      }
+      if (waBtn) {
+        waBtn.href = `https://wa.me/?text=${encodeURIComponent('Bonjour, je viens de régler la commande #' + orderId)}`;
+      }
+      return;
+    }
+
+    // Interrogation de l'API Hono
+    const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+    try {
+      const res = await fetch(`${apiUrl}/api/orders/${orderId}/status`);
+      if (res.ok) {
+        const data = await res.json();
+
+        if (receiptAmount && data.totalAmount) {
+          receiptAmount.textContent = `${data.totalAmount} ${data.currency || 'XOF'}`;
+          if (receiptAmountRow) receiptAmountRow.style.display = "flex";
+        }
+
+        if (data.status === 'paid') {
+          triggerCelebration();
+          if (statusBadge) {
+            statusBadge.textContent = "Paiement Validé";
+            statusBadge.className = "orderCard__badge orderCard__badge--success";
+          }
+          if (receiptStatus) {
+            receiptStatus.textContent = "Payé";
+            receiptStatus.className = "statusTag statusTag--success";
+          }
+          if (orderSubtitle) {
+            orderSubtitle.textContent = "Votre paiement a été validé avec succès !";
+          }
+        } else {
+          if (statusBadge) {
+            statusBadge.textContent = "En attente de paiement";
+            statusBadge.className = "orderCard__badge orderCard__badge--pending";
+          }
+          if (receiptStatus) {
+            receiptStatus.textContent = "En attente";
+            receiptStatus.className = "statusTag statusTag--pending";
+          }
+          if (orderSubtitle) {
+            orderSubtitle.textContent = "Votre commande est enregistrée. Le règlement sera effectué au retrait ou à la livraison.";
+          }
+        }
+      }
+    } catch (err) {
+      if (statusBadge) {
+        statusBadge.textContent = "Enregistré";
+        statusBadge.className = "orderCard__badge orderCard__badge--pending";
+      }
+    }
+  }
+
+  checkOrderStatus();
+</script>
+
+<style lang="scss">
+  .orderPage {
+    min-height: 75vh;
+    padding: 4rem 1.25rem;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__container {
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+  }
+
+  .orderCard {
+    background: #ffffff;
+    border-radius: var(--radius-lg, 16px);
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    padding: 3rem 2rem;
+    text-align: center;
+
+    &__iconWrap {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 1.5rem;
+      border-radius: 50%;
+      background: #ecfdf5;
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__badge {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-full, 9999px);
+      background: #f1f5f9;
+      color: #475569;
+      margin-bottom: 1rem;
+
+      &--success {
+        background: #ecfdf5;
+        color: #047857;
+      }
+
+      &--pending {
+        background: #fffbeb;
+        color: #b45309;
+      }
+    }
+
+    &__title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 0.5rem;
+    }
+
+    &__subtitle {
+      color: #64748b;
+      margin: 0 0 2rem;
+      line-height: 1.6;
+    }
+
+    &__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  .receiptBox {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+
+  .receiptRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+    color: #334155;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    strong {
+      color: #0f172a;
+    }
+  }
+
+  .statusTag {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+
+    &--success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    &--pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.85rem 1.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: transform 150ms;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &--primary {
+      background: #25D366;
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+    }
+
+    &--secondary {
+      background: #0f172a;
+      color: white;
+    }
+  }
+</style>

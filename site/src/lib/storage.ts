@@ -99,6 +99,7 @@ export function setStorage(data: AppStorageData, slug?: string): boolean {
   try {
     data.v = CURRENT_VERSION;
     localStorage.setItem(getStorageKey(slug), JSON.stringify(data));
+    window.dispatchEvent(new CustomEvent('app:storage:change', { detail: data }));
     return true;
   } catch (error) {
     console.error('[Storage] Impossible d\'écrire dans le localStorage (quota plein ou navigation privée) :', error);
