@@ -1,0 +1,157 @@
+{
+  "$comment": "Configuration client : Business Center Prestige Services / Studio Maria Sococé",
+  "slug": "studio-maria-sococe",
+  "name": "Business Center Prestige Services",
+  "activity": {
+    "type": "LocalBusiness",
+    "label": "Studio Photo Pro & Réparation Tech",
+    "pitch": "Votre pôle d'excellence multiservices au Super U Deux Plateaux : Studio photo d'art, réparation smartphones en 30 min, bureautique & boutique tech.",
+    "differentiators": [
+      "Shooting express & retouches pro en direct",
+      "Réparation écran & batterie en 30 minutes garanties",
+      "Retrait comptoir gratuit au Super U Deux Plateaux",
+      "Paiement Wave, Orange Money et espèces"
+    ]
+  },
+  "tier": 3,
+  "modules": ["vitrine", "admin", "catalogue", "analytics", "panier", "checkout", "commandes"],
+  "locale": "fr",
+  "currency": "XOF",
+  "timezone": "Africa/Abidjan",
+  "contact": {
+    "phone": "+2250789083085",
+    "whatsapp": "+2250544263245",
+    "email": "contact@prestigeservices.ci",
+    "address": {
+      "street": "Au sein du Centre Commercial Super U, Boulevard des Martyrs",
+      "district": "Deux Plateaux (proximité Gare de Sococé)",
+      "city": "Abidjan",
+      "country": "CI"
+    },
+    "geo": {
+      "lat": 5.362692,
+      "lng": -3.998492
+    },
+    "socials": {
+      "facebook": "https://facebook.com/businesscenterprestige",
+      "instagram": "https://instagram.com/businesscenterprestige"
+    }
+  },
+  "hours": [
+    { "days": ["Mo", "Tu", "We", "Th", "Fr", "Sa"], "opens": "09:00", "closes": "20:00" },
+    { "days": ["Su"], "opens": null, "closes": null }
+  ],
+  "booking": {
+    "mode": "les-deux",
+    "channel": "whatsapp"
+  },
+  "brand": {
+    "mood": "prestige, moderne, corporate",
+    "colors": {
+      "primary": "#0f172a",
+      "secondary": "#1e293b",
+      "accent": "#2563eb",
+      "surface": "#ffffff"
+    },
+    "fonts": {
+      "heading": "Plus Jakarta Sans, sans-serif",
+      "body": "Inter, sans-serif"
+    },
+    "logo": "",
+    "pattern": "dots",
+    "footerVariant": "devanture"
+  },
+  "services": [
+    {
+      "slug": "studio-photo-prestige",
+      "name": "Shooting Photo Studio Solo / Portrait",
+      "category": "Studio Photo",
+      "price": 10000,
+      "priceFrom": true,
+      "duration": 30,
+      "description": "Séance studio professionnel avec éclairage de maître, retouche haute définition et tirage express en 5 minutes."
+    },
+    {
+      "slug": "photos-identite-express",
+      "name": "Photos d'Identité Officielles (Lot de 8)",
+      "category": "Studio Photo",
+      "price": 3000,
+      "priceFrom": false,
+      "duration": 10,
+      "description": "Certifiées conformes pour passeport, visa étranger, concours administratifs et permis de conduire."
+    },
+    {
+      "slug": "reparation-ecran-batterie",
+      "name": "Réparation Express Smartphone (Écran & Batterie)",
+      "category": "High-Tech",
+      "price": 15000,
+      "priceFrom": true,
+      "duration": 30,
+      "description": "Remplacement d'écran fissuré ou batterie fatiguée pour iPhone, Samsung, Tecno, Xiaomi avec pièces certifiées."
+    },
+    {
+      "slug": "impression-flyers-pao",
+      "name": "Impression PAO & Tirage Laser HD",
+      "category": "Bureautique",
+      "price": 5000,
+      "priceFrom": true,
+      "duration": 20,
+      "description": "Photocopies laser haute fidélité, conception de flyers, cartes de visite et reliures professionnelles."
+    }
+  ],
+  "products": [
+    {
+      "slug": "manette-ps4-sans-fil",
+      "name": "Manette DualShock sans fil certifiée",
+      "category": "Gaming",
+      "price": 18000,
+      "stock": 10,
+      "description": "Haute précision pour consoles et PC avec câble de charge renforcé inclus."
+    },
+    {
+      "slug": "chargeur-rapide-65w",
+      "name": "Chargeur Ultra Rapide GaN 65W Multi-Ports",
+      "category": "Connectique",
+      "price": 12000,
+      "stock": 15,
+      "description": "Compatible iPhone, Samsung, MacBook et PC portables en recharge express."
+    }
+  ],
+  "promotions": [],
+  "delivery": {
+    "enabled": true,
+    "zones": [
+      { "name": "Cocody (Deux Plateaux, Angré, Riviera)", "fee": 1500 },
+      { "name": "Reste d'Abidjan (Plateau, Marcory, Yopougon)", "fee": 2500 }
+    ],
+    "homeService": false
+  },
+  "payments": {
+    "wave": true,
+    "paydunya": true,
+    "whatsappOrder": true,
+    "cashOnDelivery": true
+  },
+  "primaryAction": "whatsapp",
+  "seo": {
+    "city": "Abidjan, Deux Plateaux",
+    "keywords": [
+      "studio photo abidjan",
+      "reparation telephone super u",
+      "shooting cocody",
+      "impression sococé",
+      "business center prestige services"
+    ],
+    "description": "Business Center Prestige Services au Super U Deux Plateaux (Sococé) : Studio photo pro, tirage express, réparation smartphone en 30 min et boutique high-tech."
+  },
+  "analytics": {
+    "plausibleDomain": "prestigeservices.ci"
+  },
+  "features": {
+    "roleSimulator": true
+  },
+  "generated": {
+    "storageKey": "studio-maria-sococe:app",
+    "demoDb": "demo_studio-maria-sococe"
+  }
+}
