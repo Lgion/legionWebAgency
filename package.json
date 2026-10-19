@@ -16,8 +16,8 @@
     "build:api": "npm run build --workspace=api",
     "preview": "npm run preview --workspace=site",
     "seed": "npm run seed --workspace=api",
-    "seed:demo": "npm run seed:demo --workspace=api",
-    "init:client": "npx tsx scripts/init-client.ts"
+    "init:client": "npx tsx scripts/init-client.ts",
+    "client:use": "npx tsx scripts/use-client.ts"
   },
   "keywords": [
     "astro",

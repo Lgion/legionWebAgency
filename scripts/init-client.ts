@@ -54,9 +54,17 @@ if (!fs.existsSync(siteDataDir)) {
   fs.mkdirSync(siteDataDir, { recursive: true });
 }
 
-// 3. Écriture du nouveau client.json
+// 3. Écriture du nouveau client.json actif et sauvegarde dans clients/
 fs.writeFileSync(targetClientJsonPath, JSON.stringify(clientConfig, null, 2), 'utf-8');
+
+const clientFolder = path.resolve(rootDir, 'clients', cleanSlug);
+if (!fs.existsSync(clientFolder)) {
+  fs.mkdirSync(clientFolder, { recursive: true });
+}
+fs.writeFileSync(path.resolve(clientFolder, 'client.json'), JSON.stringify(clientConfig, null, 2), 'utf-8');
+
 console.log(`✅ Fichier généré : site/src/data/client.json`);
+console.log(`📁 Fichier archivé: clients/${cleanSlug}/client.json`);
 console.log(`   - Nom du commerce   : "${clientConfig.name}"`);
 console.log(`   - Clé LocalStorage  : "${clientConfig.generated.storageKey}"`);
 console.log(`   - Base MongoDB Démo : "${clientConfig.generated.demoDb}"`);
