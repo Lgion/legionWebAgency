@@ -1,0 +1,193 @@
+---
+import './index.scss';
+import { client } from '@/lib/client';
+
+const hub = client.actionHub;
+const whatsappClean = client.contact.whatsapp.replace(/[^0-9]/g, '');
+
+// Liste combinée des prestations et produits pour le simulateur de devis
+const estimableItems = [
+  ...client.services.filter((s) => s.price > 0).map((s) => ({
+    label: `[Prestation] ${s.name}`,
+    name: s.name,
+    price: s.price,
+    priceFrom: Boolean(s.priceFrom),
+  })),
+  ...client.products.filter((p) => p.price > 0).map((p) => ({
+    label: `[Boutique] ${p.name}`,
+    name: p.name,
+    price: p.price,
+    priceFrom: true,
+  })),
+];
+---
+
+{hub && (
+  <section class="actionHub" id="service-hub">
+    <div class="actionHub__container">
+      <header class="actionHub__header">
+        {hub.eyebrow && <span class="actionHub__eyebrow">{hub.eyebrow}</span>}
+        <h2 class="actionHub__title">{hub.title}</h2>
+        <p class="actionHub__subtitle">{hub.subtitle}</p>
+      </header>
+
+      <ul class="actionHub__grid">
+        {hub.cards.map((card) => (
+          <li class="actionHub__card" id={`hub-${card.id}`}>
+            <div>
+              <div class="actionHub__cardTop">
+                <span class="actionHub__icon" aria-hidden="true">{card.icon}</span>
+                <span class="actionHub__badge">{card.badge}</span>
+              </div>
+              <h3 class="actionHub__cardTitle">{card.title}</h3>
+              <p class="actionHub__cardDesc">{card.description}</p>
+              <ul class="actionHub__bullets">
+                {card.bullets.map((b) => (
+                  <li>
+                    <span class="actionHub__bulletDot" aria-hidden="true">✓</span>
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <a
+              href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent(card.whatsappMessage)}`}
+              target="_blank"
+              rel="noopener"
+              class="actionHub__cta"
+            >
+              <span>{card.ctaLabel}</span>
+              <span aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <!-- Simulateur de Devis Express intégré -->
+      <aside class="actionHub__simulator" id="simulateur-devis" aria-labelledby="simTitle">
+        <div class="actionHub__simHeader">
+          <h3 id="simTitle">⚡ Simulateur & Demande de Devis Express</h3>
+          <p>Sélectionnez votre besoin et votre mode de retrait/coursier pour obtenir une estimation immédiate et finaliser sur WhatsApp ou Wave.</p>
+        </div>
+
+        <div class="actionHub__simGrid">
+          <div class="actionHub__field">
+            <label for="simServiceSelect">1. Votre besoin (Prestation ou Article)</label>
+            <select id="simServiceSelect">
+              {estimableItems.map((item, idx) => (
+                <option
+                  value={idx}
+                  data-name={item.name}
+                  data-price={item.price}
+                  data-from={item.priceFrom ? 'true' : 'false'}
+                >
+                  {item.label} — {item.priceFrom ? 'dès ' : ''}{new Intl.NumberFormat('fr-FR').format(item.price)} FCFA
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div class="actionHub__field">
+            <label for="simDeliverySelect">2. Retrait Super U ou Coursier Yango</label>
+            <select id="simDeliverySelect">
+              {client.delivery.zones.map((z) => (
+                <option value={z.fee} data-zone={z.name}>
+                  {z.name} ({z.fee === 0 ? 'Gratuit' : `+${new Intl.NumberFormat('fr-FR').format(z.fee)} F`})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div class="actionHub__field">
+            <label for="simNoteInput">3. Précision (modèle téléphone, format, date...)</label>
+            <input
+              type="text"
+              id="simNoteInput"
+              placeholder="Ex: iPhone 13, format 2m×2m, cachet SARL..."
+            />
+          </div>
+        </div>
+
+        <div class="actionHub__simResult">
+          <div class="actionHub__simEstimate">
+            <small>Estimation indicative (hors options sur mesure) :</small>
+            <strong id="simTotalDisplay">Dès 2 500 FCFA</strong>
+          </div>
+
+          <div class="actionHub__simActions">
+            <a
+              id="simWhatsappBtn"
+              href={`https://wa.me/${whatsappClean}`}
+              target="_blank"
+              rel="noopener"
+              class="actionHub__simWaBtn"
+            >
+              <span>Valider ce devis sur WhatsApp</span>
+            </a>
+            {client.payments?.wave && (
+              <button
+                type="button"
+                id="simWaveBtn"
+                class="actionHub__simWaveBtn openWaveModalTrigger"
+                data-amount="2500"
+              >
+                <span>💳 Régler par Wave QR</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+)}
+
+<script>
+  const serviceSelect = document.getElementById('simServiceSelect') as HTMLSelectElement | null;
+  const deliverySelect = document.getElementById('simDeliverySelect') as HTMLSelectElement | null;
+  const noteInput = document.getElementById('simNoteInput') as HTMLInputElement | null;
+  const totalDisplay = document.getElementById('simTotalDisplay');
+  const waBtn = document.getElementById('simWhatsappBtn') as HTMLAnchorElement | null;
+  const waveBtn = document.getElementById('simWaveBtn') as HTMLElement | null;
+
+  function updateSimulator() {
+    if (!serviceSelect || !deliverySelect) return;
+    const selectedOpt = serviceSelect.options[serviceSelect.selectedIndex];
+    const deliveryOpt = deliverySelect.options[deliverySelect.selectedIndex];
+    if (!selectedOpt || !deliveryOpt) return;
+
+    const itemName = selectedOpt.dataset.name || '';
+    const itemPrice = Number(selectedOpt.dataset.price) || 0;
+    const isFrom = selectedOpt.dataset.from === 'true';
+    const deliveryFee = Number(deliveryOpt.value) || 0;
+    const zoneName = deliveryOpt.dataset.zone || '';
+    const note = noteInput?.value.trim() || '';
+
+    const total = itemPrice + deliveryFee;
+    const formattedTotal = new Intl.NumberFormat('fr-FR').format(total);
+
+    if (totalDisplay) {
+      totalDisplay.textContent = `${isFrom ? 'À partir de ' : ''}${formattedTotal} FCFA`;
+    }
+    if (waveBtn) {
+      waveBtn.dataset.amount = String(total);
+    }
+    if (waBtn) {
+      const baseWa = waBtn.href.split('?')[0];
+      const msg = [
+        `Bonjour, je souhaite un devis / réservation depuis votre simulateur :`,
+        `• Prestation/Article : ${itemName}`,
+        `• Mode : ${zoneName}`,
+        note ? `• Précision : ${note}` : '',
+        `• Estimation affichée : ${formattedTotal} FCFA`
+      ].filter(Boolean).join('\n');
+      waBtn.href = `${baseWa}?text=${encodeURIComponent(msg)}`;
+    }
+  }
+
+  serviceSelect?.addEventListener('change', updateSimulator);
+  deliverySelect?.addEventListener('change', updateSimulator);
+  noteInput?.addEventListener('input', updateSimulator);
+  updateSimulator();
+</script>
+

@@ -1,0 +1,354 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO Optimized — LegionUI)
+=========================================================
+Squelette attendu (Emmet) :
+section.actionHub > div.actionHub__container > header.actionHub__header + ul.actionHub__grid + aside.actionHub__simulator
+=========================================================
+*/
+
+@use 'sass:map';
+
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function actionHub($defaultValues: "") {
+  @return ($defaultValues);
+}
+
+/******VARIABLES******/
+$actionHub: (
+  navy-bg: #0B192C,
+  navy-card: #132742,
+  gold-accent: #D4AF37,
+  gold-soft: rgba(212, 175, 55, 0.16),
+  text-light: #f8fafc,
+  text-muted: #cbd5e1
+);
+
+/************************************************************/
+/**************************PLACEHOLDER**************************/
+/************************************************************/
+%actionHub {
+  --template: "section.actionHub > div.actionHub__container > header.actionHub__header + ul.actionHub__grid + aside.actionHub__simulator";
+  padding: 4rem 1.25rem;
+
+  &__container {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  &__header {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto 2.5rem;
+  }
+
+  &__grid {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+    gap: 1.35rem;
+  }
+
+  &__simulator {
+    border-radius: 18px;
+    padding: 2rem;
+  }
+}
+
+/************************************************************/
+/**************************MIXIN**************************/
+/************************************************************/
+@mixin actionHub($paramMixi_: (), $block: ".actionHub") {
+  $paramMixi: actionHub(map.merge($actionHub, $paramMixi_));
+
+  @extend %actionHub;
+  background-color: #ffffff;
+
+  &__container,
+  > div {
+    @extend %actionHub__container;
+  }
+
+  &__header,
+  > div > header {
+    @extend %actionHub__header;
+  }
+
+  &__eyebrow {
+    display: inline-block;
+    padding: 0.3rem 0.85rem;
+    border-radius: 9999px;
+    background: map.get($paramMixi, gold-soft);
+    color: #8a680d;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+  }
+
+  &__title {
+    font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+    font-weight: 800;
+    color: map.get($paramMixi, navy-bg);
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    font-size: 1.02rem;
+    color: #475569;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  &__grid,
+  > div > ul {
+    @extend %actionHub__grid;
+  }
+
+  &__card {
+    background: #faf8f5;
+    border: 1px solid rgba(11, 25, 44, 0.1);
+    border-top: 4px solid map.get($paramMixi, navy-bg);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 30px -10px rgba(11, 25, 44, 0.12);
+      border-top-color: map.get($paramMixi, gold-accent);
+    }
+  }
+
+  &__cardTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+  }
+
+  &__icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: map.get($paramMixi, navy-bg);
+    color: map.get($paramMixi, gold-accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+  }
+
+  &__badge {
+    font-size: 0.73rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    background: map.get($paramMixi, gold-soft);
+    color: #8a680d;
+  }
+
+  &__cardTitle {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: map.get($paramMixi, navy-bg);
+    margin: 0 0 0.55rem;
+    line-height: 1.3;
+  }
+
+  &__cardDesc {
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.55;
+    margin: 0 0 1rem;
+  }
+
+  &__bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.4;
+    }
+  }
+
+  &__bulletDot {
+    color: #8a680d;
+    flex-shrink: 0;
+  }
+
+  &__cta {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1rem;
+    border-radius: 10px;
+    background: map.get($paramMixi, navy-bg);
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 150ms ease;
+
+    &:hover {
+      background: #25D366;
+    }
+  }
+
+  /* Simulateur de Devis Express */
+  &__simulator,
+  > div > aside {
+    @extend %actionHub__simulator;
+    background: linear-gradient(135deg, map.get($paramMixi, navy-bg) 0%, map.get($paramMixi, navy-card) 100%);
+    color: map.get($paramMixi, text-light);
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    box-shadow: 0 20px 40px -15px rgba(11, 25, 44, 0.35);
+  }
+
+  &__simHeader {
+    margin-bottom: 1.5rem;
+
+    h3 {
+      margin: 0 0 0.35rem;
+      font-size: 1.4rem;
+      color: map.get($paramMixi, gold-accent);
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.92rem;
+      color: map.get($paramMixi, text-muted);
+    }
+  }
+
+  &__simGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    align-items: end;
+
+    @media (min-width: 860px) {
+      grid-template-columns: 1.2fr 0.9fr 1fr auto;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #F3E5AB;
+    }
+
+    select,
+    input {
+      padding: 0.7rem 0.85rem;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      outline: none;
+
+      option {
+        background: map.get($paramMixi, navy-bg);
+        color: #ffffff;
+      }
+    }
+  }
+
+  &__simResult {
+    margin-top: 1.35rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__simEstimate {
+    display: flex;
+    flex-direction: column;
+
+    small {
+      font-size: 0.78rem;
+      color: map.get($paramMixi, text-muted);
+    }
+
+    strong {
+      font-size: 1.45rem;
+      color: map.get($paramMixi, gold-accent);
+      font-weight: 900;
+    }
+  }
+
+  &__simActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  &__simWaBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    background: #25D366;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-decoration: none;
+  }
+
+  &__simWaveBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.75rem 1.15rem;
+    border-radius: 10px;
+    background: #1898e8;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+  }
+}
+
+/************************************************************/
+/**************************NATIVE SEMANTIC MAPPING**************************/
+/************************************************************/
+section.actionHub {
+  @include actionHub();
+}
+

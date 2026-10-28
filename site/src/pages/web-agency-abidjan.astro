@@ -1,0 +1,4920 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CartDrawer from '../components/Cart/CartDrawer.astro';
+import BrandIdentity from '../components/BrandIdentity/BrandIdentity.astro';
+import NavMenu from '../components/NavMenu/NavMenu.astro';
+import StatusBadge from '../components/StatusBadge/StatusBadge.astro';
+import ActionGroup from '../components/ActionGroup/ActionGroup.astro';
+import { agencyData } from '../data/agencyData';
+
+const canonicalURL = new URL('/web-agency-abidjan', Astro.site || 'https://localhost:4321');
+const whatsappClean = agencyData.contact.whatsapp.replace(/[^0-9]/g, '');
+const phoneClean = agencyData.contact.phone.replace(/[^0-9+]/g, '');
+const addressQuery = encodeURIComponent(
+  `${agencyData.contact.address.street}, ${agencyData.contact.address.district}, ${agencyData.contact.address.city}, ${agencyData.contact.address.country}`
+);
+const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${addressQuery}`;
+
+const schemaData = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: agencyData.name,
+  alternateName: agencyData.brandName,
+  description: agencyData.shortDescription,
+  url: canonicalURL.toString(),
+  telephone: agencyData.contact.phone,
+  email: agencyData.contact.email,
+  priceRange: '$$',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: agencyData.contact.address.street,
+    addressLocality: agencyData.contact.address.district,
+    addressRegion: agencyData.contact.address.city,
+    addressCountry: agencyData.contact.address.country,
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: agencyData.contact.geo.lat,
+    longitude: agencyData.contact.geo.lng,
+  },
+  sameAs: [
+    agencyData.contact.socials.linkedin,
+    agencyData.contact.socials.instagram,
+    agencyData.contact.socials.facebook,
+    agencyData.contact.socials.twitter,
+    agencyData.contact.socials.github,
+  ]
+};
+---
+
+<Layout
+  title="WebAgency Abidjan — Création de Sites Web B2C & E-Commerce à Abidjan"
+  description="Agence web à Abidjan experte en sites B2C ultra-rapides pour commerces de proximité, salons, maquis et PME. Vitesse < 1s, WhatsApp 1-clic et paiement Wave intégré."
+  image="/images/agency/agency_showcase.jpg"
+>
+  <script type="application/ld+json" set:html={JSON.stringify(schemaData)} />
+
+  <div class="agencyPortfolio" id="agencyPortfolio">
+    <!-- BARRE D'ADMINISTRATION IN-SITU (VISIBLE SI RÔLE ADMIN ACTIF) -->
+    <div class="agencyAdminBar" id="agencyAdminBar" style="display: none;">
+      <div class="agencyAdminBar__container">
+        <div class="agencyAdminBar__roleInfo">
+          <span class="agencyAdminBar__badge">👑 Rôle Admin Actif</span>
+          <span class="agencyAdminBar__hint">Édition de texte directe sur la page</span>
+        </div>
+
+        <div class="agencyAdminBar__controls">
+          <label class="agencyAdminBar__toggle">
+            <input type="checkbox" id="toggleInSituEdit" />
+            <span>Mode Édition [ON/OFF]</span>
+          </label>
+          <button type="button" class="agencyAdminBar__saveBtn" id="saveInSituChangesBtn" style="display: none;">
+            💾 Enregistrer Textes
+          </button>
+          <button type="button" class="agencyAdminBar__resetBtn" id="resetInSituChangesBtn">
+            ↺ Réinitialiser
+          </button>
+          <a href="/admin-agency" class="agencyAdminBar__portalBtn">
+            📊 Tableau de Bord
+          </a>
+          <button type="button" class="agencyAdminBar__exitBtn" id="exitAdminModeBtn">
+            Quitter
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. STICKY HEADER AVEC COMPOSANTS LEGIONUI -->
+    <header class="agencyHeader" id="agencyHeader">
+      <div class="agencyHeader__container">
+        <!-- Composant 1 : BrandIdentity (Identité visuelle & Logo) -->
+        <BrandIdentity
+          name={agencyData.brandName}
+          tagline="Abidjan • Cocody"
+          href="/web-agency-abidjan"
+        />
+
+        <!-- Composant 2 : StatusBadge (Indicateur disponibilité temps réel) -->
+        <StatusBadge
+          label="Disponible pour vos projets"
+          status="online"
+          pulse={true}
+          className="agencyHeader__statusBadge"
+        />
+
+        <!-- Composant 3 : NavMenu (Navigation sémantique & a11y) -->
+        <NavMenu
+          items={[
+            { label: 'Notre Métier', href: '#metier' },
+            { label: 'Packs & Services', href: '#services' },
+            { label: 'Réalisations', href: '#realisations' },
+            { label: 'Simulateur Devis', isButton: true, triggerClass: 'openSimulatorTrigger' },
+            { label: 'Paiement Wave', isButton: true, triggerClass: 'openWaveModalTrigger', dataAttrs: { 'data-amount': '50000' } },
+            { label: 'Contact', href: '#contact' },
+          ]}
+          ariaLabel="Navigation principale de l'agence"
+        />
+
+        <!-- Composant 4 : ActionGroup (Micro-actions directes & conversion) -->
+        <ActionGroup>
+          <!-- BOUTON WAVE QR (ICON-ONLY SANS TEXTE, GRAND ET VISIBLE) -->
+          <button
+            type="button"
+            class="actionGroup__btn --wave openWaveModalTrigger"
+            data-amount="50000"
+            aria-label="Payer un acompte via Wave QR Code"
+            title="Paiement par Wave QR Code"
+          >
+            <img src="/wave.png" style="width:50px;max-width:unset;" />
+          </button>
+
+          <!-- BOUTON PANIER (AVEC BADGE ET SVG) -->
+          <button
+            type="button"
+            id="headerCartBtn"
+            class="actionGroup__btn --cart"
+            aria-label="Ouvrir le panier"
+            title="Votre panier"
+          >
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"></path>
+            </svg>
+            <span id="headerCartBadge" class="actionGroup__badge" data-type="cart">0</span>
+          </button>
+
+          <!-- BOUTON WHATSAPP DIRECT (ICON-ONLY SANS TEXTE, GRAND ET VISIBLE) -->
+          <a
+            href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent("Bonjour WebAgency Abidjan, je souhaite créer un site web pour mon commerce.")}`}
+            class="actionGroup__btn --whatsapp"
+            target="_blank"
+            rel="noopener"
+            aria-label="Contacter l'agence sur WhatsApp"
+            title="Discussion WhatsApp directe"
+          >
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
+            </svg>
+          </a>
+
+          <!-- LIEN PORTAIL ADMIN / RÔLES -->
+          <a
+            href="/admin-agency"
+            class="actionGroup__btn --admin"
+            title="Espace Administration & Partenaires"
+            aria-label="Accès espace administration"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </a>
+        </ActionGroup>
+      </div>
+    </header>
+
+    <main>
+      <!-- 2. HERO SECTION -->
+      <section class="agencyHero" id="accueil">
+        <div class="agencyHero__container">
+          <div class="agencyHero__grid">
+            <div class="agencyHero__content">
+              <div class="agencyHero__badgeGroup">
+                <span class="agencyHero__badge --cyan">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  <span>Sites Web B2C Ultra-Rapides</span>
+                </span>
+                <span class="agencyHero__badge --emerald">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                  </svg>
+                  <span>100% Mobile 3G/4G Côte d'Ivoire</span>
+                </span>
+              </div>
+
+              <h1 class="agencyHero__title editableText" data-text-id="hero_title">
+                Le web à forte conversion pour les <span class="agencyHero__titleHighlight">commerces de proximité</span> à Abidjan
+              </h1>
+
+              <p class="agencyHero__pitch editableText" data-text-id="hero_pitch">{agencyData.heroPitch}</p>
+
+              <div class="agencyHero__actions">
+                <a
+                  href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent("Bonjour WebAgency Abidjan, j'aimerais échanger sur la création de mon site web.")}`}
+                  class="agencyHero__btnPrimary"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
+                  </svg>
+                  <span>Discuter de mon projet</span>
+                </a>
+
+                <button type="button" class="agencyHero__btnSecondary openSimulatorTrigger">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                    <line x1="8" y1="6" x2="16" y2="6"></line>
+                    <line x1="16" y1="14" x2="16" y2="18"></line>
+                    <path d="M16 10h.01"></path>
+                    <path d="M12 10h.01"></path>
+                    <path d="M8 10h.01"></path>
+                    <path d="M12 14h.01"></path>
+                    <path d="M8 14h.01"></path>
+                    <path d="M12 18h.01"></path>
+                    <path d="M8 18h.01"></path>
+                  </svg>
+                  <span>Calculer mon devis</span>
+                </button>
+
+                <button type="button" class="agencyHero__btnWave openWaveModalTrigger" data-amount="50000">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" fill="#1898E8"/>
+                    <path d="M8 12l3 3 5-5" stroke="#fff" stroke-width="2" fill="none"/>
+                  </svg>
+                  <span>Payer Acompte Wave</span>
+                </button>
+              </div>
+
+              <!-- Stats bar -->
+              <div class="agencyHero__stats">
+                {agencyData.stats.map((stat) => (
+                  <div class="agencyHero__statCard">
+                    <span class="agencyHero__statVal">{stat.value}</span>
+                    <span class="agencyHero__statLabel">{stat.label}</span>
+                    <span class="agencyHero__statSub">{stat.sub}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <!-- Hero Visual Banner -->
+            <div class="agencyHero__visual">
+              <div class="agencyHero__visualFrame">
+                <img
+                  src="/images/agency/agency_showcase.jpg"
+                  alt="Portfolio de sites web B2C créés à Abidjan sur ordinateurs et smartphones"
+                  width="1280"
+                  height="720"
+                  class="agencyHero__image"
+                  loading="eager"
+                />
+                <div class="agencyHero__visualOverlay">
+                  <span class="agencyHero__visualTag">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span>Livrables réels déployés à Abidjan</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSITION HERO -> VALUES (VIBRANT EMERALD / GOLD / WAVE BLUE) -->
+      <div class="agencyWaveDivider" aria-hidden="true">
+        <svg class="agencyWaveDivider__svg" viewBox="0 0 1440 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="vividWave1" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#10B981" />
+              <stop offset="35%" stop-color="#D4AF37" />
+              <stop offset="70%" stop-color="#F59E0B" />
+              <stop offset="100%" stop-color="#1898E8" />
+            </linearGradient>
+          </defs>
+          <path class="agencyWaveDivider__wave --layer1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,100L0,100Z" fill="url(#vividWave1)" opacity="0.85"/>
+          <path class="agencyWaveDivider__wave --layer2" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28L1440,100L0,100Z" fill="#0B1120"/>
+          <path class="agencyWaveDivider__crest" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28" fill="none" stroke="url(#vividWave1)" stroke-width="2.5" opacity="0.95"/>
+        </svg>
+      </div>
+
+      <!-- 3. NOTRE MÉTIER & VALEURS CLÉS (AVEC PARALLAX SUBTIL DE FOND) -->
+      <section class="agencyValues" id="metier" data-parallax-block="true">
+        <div class="agencySectionParallaxBg --metier" aria-hidden="true"></div>
+        <div class="agencySectionParallaxFloat --metier" aria-hidden="true"></div>
+        <div class="agencyValues__container">
+          <header class="agencySectionHeader">
+            <span class="agencySectionHeader__eyebrow">Notre Philosophie & Coeur de Métier</span>
+            <h2 class="agencySectionHeader__title editableText" data-text-id="values_title">Pourquoi les sites classiques échouent à Abidjan</h2>
+            <p class="agencySectionHeader__subtitle editableText" data-text-id="values_sub">
+              90% des sites créés sous WordPress ou constructeurs lourds perdent la moitié de leurs visiteurs ivoiriens à cause de temps de chargement trop longs et d'un manque de call-to-action adaptés aux réalités locales.
+            </p>
+          </header>
+
+          <!-- Comparatif Choc -->
+          <div class="agencyComparison">
+            <article class="agencyComparison__card --old">
+              <div class="agencyComparison__header">
+                <span class="agencyComparison__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                  </svg>
+                </span>
+                <h3>Sites d'Agence Traditionnels</h3>
+              </div>
+              <ul class="agencyComparison__list">
+                <li>Temps de chargement de 4 à 8 secondes sur réseau 3G/4G</li>
+                <li>Formulaires email complexes que les clients locaux n'utilisent jamais</li>
+                <li>Frais récurrents d'hébergement et de maintenance (20 000 à 50 000 F/mois)</li>
+                <li>Pannes de plugins, lenteurs et bugs après mises à jour</li>
+                <li>Impossible de modifier un simple prix sans payer un technicien</li>
+              </ul>
+            </article>
+
+            <article class="agencyComparison__card --new">
+              <div class="agencyComparison__header">
+                <span class="agencyComparison__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="9 12 11 14 15 10"></polyline>
+                  </svg>
+                </span>
+                <h3>La Méthode WebAgency Abidjan</h3>
+              </div>
+              <ul class="agencyComparison__list">
+                <li>Ouverture instantanée en moins d'1 seconde (Astro + BEM SCSS pur)</li>
+                <li>Prise de contact 100% WhatsApp & Appel 1-clic intégrés</li>
+                <li>Zéro abonnement obligatoire : hébergement CDN mondial gratuit</li>
+                <li>Paiement direct Wave QR Code & Mobile Money sans carte bancaire</li>
+                <li>Espace d'administration simple pour changer ses prix depuis smartphone</li>
+              </ul>
+            </article>
+          </div>
+
+          <!-- 6 Piliers d'Excellence -->
+          <div class="agencyValues__grid">
+            {agencyData.coreValues.map((val) => (
+              <article class="agencyValueCard">
+                <div class="agencyValueCard__top">
+                  <span class="agencyValueCard__icon" aria-hidden="true">
+                    {val.iconSvg === 'lightning' && (
+                      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                      </svg>
+                    )}
+                    {val.iconSvg === 'target' && (
+                      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                      </svg>
+                    )}
+                    {val.iconSvg === 'mobile' && (
+                      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="5" y="2" width="14" height="20" rx="2"></rect>
+                        <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                      </svg>
+                    )}
+                    {val.iconSvg === 'shield' && (
+                      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                      </svg>
+                    )}
+                    {val.iconSvg === 'dashboard' && (
+                      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="9"></rect>
+                        <rect x="14" y="3" width="7" height="5"></rect>
+                        <rect x="14" y="12" width="7" height="9"></rect>
+                        <rect x="3" y="16" width="7" height="5"></rect>
+                      </svg>
+                    )}
+                    {val.iconSvg === 'map-pin' && (
+                      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                      </svg>
+                    )}
+                  </span>
+                  <span class="agencyValueCard__badge">{val.highlight}</span>
+                </div>
+                <h3 class="agencyValueCard__title">{val.title}</h3>
+                <p class="agencyValueCard__desc">{val.description}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSITION VALUES -> REALISATIONS (VIBRANT WAVE BLUE / EMERALD / GOLD) -->
+      <div class="agencyWaveDivider --inverted" aria-hidden="true">
+        <svg class="agencyWaveDivider__svg" viewBox="0 0 1440 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="vividWave2" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#1898E8" />
+              <stop offset="35%" stop-color="#10B981" />
+              <stop offset="70%" stop-color="#F59E0B" />
+              <stop offset="100%" stop-color="#D4AF37" />
+            </linearGradient>
+          </defs>
+          <path class="agencyWaveDivider__wave --layer1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,100L0,100Z" fill="url(#vividWave2)" opacity="0.85"/>
+          <path class="agencyWaveDivider__wave --layer2" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28L1440,100L0,100Z" fill="#080C16"/>
+          <path class="agencyWaveDivider__crest" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28" fill="none" stroke="url(#vividWave2)" stroke-width="2.5" opacity="0.95"/>
+        </svg>
+      </div>
+
+      <!-- 4. RÉALISATIONS CLIENTS (PORTFOLIO PROJETS AVEC PARALLAX SUBTIL DE FOND) -->
+      <section class="agencyProjects" id="realisations" data-parallax-block="true">
+        <div class="agencySectionParallaxBg --projects" aria-hidden="true"></div>
+        <div class="agencySectionParallaxFloat --projects" aria-hidden="true"></div>
+        <div class="agencyProjects__container">
+          <header class="agencySectionHeader">
+            <span class="agencySectionHeader__eyebrow">Nos Réalisations Concrètes</span>
+            <h2 class="agencySectionHeader__title editableText" data-text-id="projects_title">Projets Déployés & En Cours de Livraison</h2>
+            <p class="agencySectionHeader__subtitle editableText" data-text-id="projects_sub">
+              Découvrez les sites créés pour nos clients commerçants et PME à Abidjan. Chaque livrable embarque nos composants standards : sticky header, boutons d'action rapide fixes, et paiement Wave QR.
+            </p>
+          </header>
+
+          <!-- Filtres interactifs par catégorie -->
+          <div class="agencyProjects__filterBar" role="tablist" aria-label="Filtrer les réalisations">
+            <button type="button" class="agencyFilterBtn --active" data-filter="all" role="tab" aria-selected="true">
+              <span>Tous les projets ({agencyData.projects.length})</span>
+            </button>
+            <button type="button" class="agencyFilterBtn" data-filter="Beauté" role="tab" aria-selected="false">
+              <span>Beauté & Soins (3)</span>
+            </button>
+            <button type="button" class="agencyFilterBtn" data-filter="Multiservices" role="tab" aria-selected="false">
+              <span>Multiservices & Studio (1)</span>
+            </button>
+            <button type="button" class="agencyFilterBtn" data-filter="AgriTech" role="tab" aria-selected="false">
+              <span>AgriTech & Écologie (1)</span>
+            </button>
+            <button type="button" class="agencyFilterBtn" data-filter="Santé" role="tab" aria-selected="false">
+              <span>Santé & MedTech (1)</span>
+            </button>
+            <button type="button" class="agencyFilterBtn" data-filter="Artisanat" role="tab" aria-selected="false">
+              <span>Artisanat d'Art (1)</span>
+            </button>
+          </div>
+
+          <!-- Grille des projets -->
+          <div class="agencyProjects__grid" id="projectsGrid">
+            {agencyData.projects.map((proj) => (
+              <article class="agencyProjectCard" data-category={proj.category}>
+                <div class="agencyProjectCard__media">
+                  <img
+                    src={proj.image}
+                    alt={proj.name}
+                    width="640"
+                    height="360"
+                    class="agencyProjectCard__image"
+                    loading="lazy"
+                  />
+                  <div class="agencyProjectCard__statusBadge">
+                    <span class="agencyProjectCard__statusDot"></span>
+                    <span>{proj.status}</span>
+                  </div>
+                </div>
+
+                <div class="agencyProjectCard__body">
+                  <div class="agencyProjectCard__header">
+                    <span class="agencyProjectCard__category">{proj.category}</span>
+                    <span class="agencyProjectCard__location">
+                      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                      </svg>
+                      <span>{proj.location}</span>
+                    </span>
+                  </div>
+
+                  <h3 class="agencyProjectCard__title">{proj.name}</h3>
+                  <p class="agencyProjectCard__desc">{proj.description}</p>
+
+                  <div class="agencyProjectCard__metrics">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    <span>{proj.metrics}</span>
+                  </div>
+
+                  <div class="agencyProjectCard__tags">
+                    {proj.tags.map((t) => (
+                      <span class="agencyProjectCard__tag">{t}</span>
+                    ))}
+                  </div>
+
+                  <div class="agencyProjectCard__footer">
+                    {proj.demoUrl && (
+                      <a href={proj.demoUrl} class="agencyProjectCard__link" target="_blank" rel="noopener noreferrer">
+                        <span>Visiter le site en direct</span>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                          <polyline points="15 3 21 3 21 9"></polyline>
+                          <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                      </a>
+                    )}
+                    <button
+                      type="button"
+                      class="agencyProjectCard__quoteBtn openSimulatorTrigger"
+                    >
+                      <span>Simuler un projet similaire</span>
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSITION REALISATIONS -> PARALLAX (VIBRANT GOLD / EMERALD / CYAN) -->
+      <div class="agencyWaveDivider" aria-hidden="true">
+        <svg class="agencyWaveDivider__svg" viewBox="0 0 1440 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="vividWave3" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#F59E0B" />
+              <stop offset="35%" stop-color="#10B981" />
+              <stop offset="70%" stop-color="#1898E8" />
+              <stop offset="100%" stop-color="#D4AF37" />
+            </linearGradient>
+          </defs>
+          <path class="agencyWaveDivider__wave --layer1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,100L0,100Z" fill="url(#vividWave3)" opacity="0.85"/>
+          <path class="agencyWaveDivider__wave --layer2" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28L1440,100L0,100Z" fill="#0B1120"/>
+          <path class="agencyWaveDivider__crest" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28" fill="none" stroke="url(#vividWave3)" stroke-width="2.5" opacity="0.95"/>
+        </svg>
+      </div>
+
+      <!-- 5. BLOC PARALLAX SHOWCASE (EFFET DE PROFONDEUR TRÈS VISIBLE AU DÉFILEMENT) -->
+      <section class="agencyParallax" id="parallaxSection" aria-label="Vitrine d'innovation technologique">
+        <div class="agencyParallax__bg" id="parallaxBg"></div>
+        <div class="agencyParallax__mesh" id="parallaxMesh" aria-hidden="true"></div>
+
+        <!-- Badges flottants multi-profondeurs -->
+        <div class="agencyParallax__floatingBadge --topRight" id="parallaxBadge1" aria-hidden="true">
+          <span class="agencyParallax__badgeIcon">⚡</span>
+          <div class="agencyParallax__badgeText">
+            <strong>0.8 seconde</strong>
+            <small>Vitesse 4G Abidjan</small>
+          </div>
+        </div>
+
+        <div class="agencyParallax__floatingBadge --bottomLeft" id="parallaxBadge2" aria-hidden="true">
+          <span class="agencyParallax__badgeIcon">🏆</span>
+          <div class="agencyParallax__badgeText">
+            <strong>99 / 100</strong>
+            <small>Score Lighthouse</small>
+          </div>
+        </div>
+
+        <div class="agencyParallax__floatingBadge --bottomRight" id="parallaxBadge3" aria-hidden="true">
+          <span class="agencyParallax__badgeIcon">💎</span>
+          <div class="agencyParallax__badgeText">
+            <strong>Wave 1-Clic</strong>
+            <small>Acompte instantané</small>
+          </div>
+        </div>
+
+        <div class="agencyParallax__container">
+          <div class="agencyParallax__card" id="parallaxContent">
+            <span class="agencyParallax__eyebrow">⚡ Technologie & Performance Ivoirienne</span>
+            <h2 class="agencyParallax__title editableText" data-text-id="parallax_title">
+              Une Vitesse Inégalée sur Tous les Réseaux Mobiles d'Abidjan
+            </h2>
+            <p class="agencyParallax__text editableText" data-text-id="parallax_desc">
+              Pendant que vos concurrents perdent 53% de leurs prospects à cause de sites lents, nos architectures légères propulsent vos pages en 0.8 seconde chrono sur Orange, MTN et Moov.
+            </p>
+
+            <div class="agencyParallax__floatingChips">
+              <span class="parallaxChip --chip1">⚡ 99/100 Google Lighthouse</span>
+              <span class="parallaxChip --chip2">📱 Zéro Bug Mobile</span>
+              <span class="parallaxChip --chip3">💳 Wave Checkout 1-Clic</span>
+            </div>
+
+            <div class="agencyParallax__action">
+              <button type="button" class="agencyParallax__btn openSimulatorTrigger">
+                Lancer mon projet maintenant
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSITION PARALLAX -> SERVICES (VIBRANT CYAN / EMERALD / GOLD) -->
+      <div class="agencyWaveDivider --inverted" aria-hidden="true">
+        <svg class="agencyWaveDivider__svg" viewBox="0 0 1440 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="vividWave4" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#1898E8" />
+              <stop offset="35%" stop-color="#10B981" />
+              <stop offset="70%" stop-color="#D4AF37" />
+              <stop offset="100%" stop-color="#F59E0B" />
+            </linearGradient>
+          </defs>
+          <path class="agencyWaveDivider__wave --layer1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,100L0,100Z" fill="url(#vividWave4)" opacity="0.85"/>
+          <path class="agencyWaveDivider__wave --layer2" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28L1440,100L0,100Z" fill="#080C16"/>
+          <path class="agencyWaveDivider__crest" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28" fill="none" stroke="url(#vividWave4)" stroke-width="2.5" opacity="0.95"/>
+        </svg>
+      </div>
+
+      <!-- 6. SERVICES & PACKS B2C (DÉPLIABLE & REPLIÉ PAR DÉFAUT, AVEC PARALLAX SUBTIL DE FOND) -->
+      <section class="agencyServices" id="services" data-parallax-block="true">
+        <div class="agencySectionParallaxBg --services" aria-hidden="true"></div>
+        <div class="agencySectionParallaxFloat --services" aria-hidden="true"></div>
+        <div class="agencyServices__container">
+          <header class="agencySectionHeader">
+            <span class="agencySectionHeader__eyebrow">Nos Solutions Clé-En-Main</span>
+            <h2 class="agencySectionHeader__title editableText" data-text-id="services_title">Packs & Tarifs Transparents en FCFA</h2>
+            <p class="agencySectionHeader__subtitle editableText" data-text-id="services_sub">
+              Tarification claire et sans surprise. Acompte de 30% au lancement des travaux et solde à la livraison finale de votre site.
+            </p>
+
+            <!-- BOUTON DÉPLIER / REPLIER SERVICES (STANDARD WEB AVEC FLÈCHE ET TEXTE) -->
+            <div class="agencySectionFoldToggle">
+              <button
+                type="button"
+                class="agencyFoldBtn"
+                id="toggleServicesFoldBtn"
+                aria-expanded="false"
+                aria-controls="servicesFoldableBody"
+              >
+                <span id="servicesFoldLabel">Voir plus</span>
+                <svg class="agencyFoldBtn__arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+            </div>
+          </header>
+
+          <!-- CONTENU DÉPLIABLE DES SERVICES (REPLIÉ PAR DÉFAUT) -->
+          <div class="agencyFoldableBody" id="servicesFoldableBody">
+            <div class="agencyFoldableBody__inner">
+              <div class="agencyServices__grid">
+                {agencyData.services.map((svc) => (
+                  <article class={`agencyServiceCard ${svc.isPopular ? '--popular' : ''}`}>
+                    {svc.isPopular && (
+                      <div class="agencyServiceCard__ribbon">Recommandé</div>
+                    )}
+                    <div class="agencyServiceCard__head">
+                      <span class="agencyServiceCard__badge">{svc.badge}</span>
+                      <h3 class="agencyServiceCard__title">{svc.name}</h3>
+                      <div class="agencyServiceCard__priceBox">
+                        <span class="agencyServiceCard__price editableText" data-text-id={`price_${svc.id}`}>{svc.priceFormatted}</span>
+                        <span class="agencyServiceCard__pricePeriod">Paiement unique • 0 FCFA/mois</span>
+                      </div>
+                      <div class="agencyServiceCard__meta">
+                        <span>⏱️ Délai : <strong>{svc.deliveryTime}</strong></span>
+                        <span>💳 Acompte 30% : <strong>{new Intl.NumberFormat('fr-FR').format(svc.depositAmount)} FCFA</strong></span>
+                      </div>
+                      <p class="agencyServiceCard__target"><strong>Pour qui ?</strong> {svc.target}</p>
+                    </div>
+
+                    <div class="agencyServiceCard__body">
+                      <p class="agencyServiceCard__desc">{svc.description}</p>
+                      <ul class="agencyServiceCard__features">
+                        {svc.features.map((feat) => (
+                          <li>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                            <span>{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div class="agencyServiceCard__actions">
+                      <button
+                        type="button"
+                        class="agencyServiceCard__btnCart addPackToCartBtn"
+                        data-id={svc.id}
+                        data-name={svc.name}
+                        data-price={svc.price}
+                      >
+                        <span>Ajouter au Panier</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="agencyServiceCard__btnWave openWaveModalTrigger"
+                        data-amount={svc.depositAmount}
+                        data-pack-name={svc.name}
+                      >
+                        <span>Payer Acompte Wave ({new Intl.NumberFormat('fr-FR').format(svc.depositAmount)} F)</span>
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSITION SERVICES -> FAQ (VIBRANT EMERALD / GOLD / WAVE BLUE) -->
+      <div class="agencyWaveDivider" aria-hidden="true">
+        <svg class="agencyWaveDivider__svg" viewBox="0 0 1440 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="vividWave5" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#10B981" />
+              <stop offset="35%" stop-color="#F59E0B" />
+              <stop offset="70%" stop-color="#D4AF37" />
+              <stop offset="100%" stop-color="#1898E8" />
+            </linearGradient>
+          </defs>
+          <path class="agencyWaveDivider__wave --layer1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,100L0,100Z" fill="url(#vividWave5)" opacity="0.85"/>
+          <path class="agencyWaveDivider__wave --layer2" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28L1440,100L0,100Z" fill="#0B1120"/>
+          <path class="agencyWaveDivider__crest" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28" fill="none" stroke="url(#vividWave5)" stroke-width="2.5" opacity="0.95"/>
+        </svg>
+      </div>
+
+      <!-- 7. FAQ ACCORDÉON (DÉPLIABLE & REPLIÉ PAR DÉFAUT, AVEC PARALLAX SUBTIL DE FOND) -->
+      <section class="agencyFaq" id="faq" data-parallax-block="true">
+        <div class="agencySectionParallaxBg --faq" aria-hidden="true"></div>
+        <div class="agencySectionParallaxFloat --faq" aria-hidden="true"></div>
+        <div class="agencyFaq__container">
+          <header class="agencySectionHeader">
+            <span class="agencySectionHeader__eyebrow">Foire Aux Questions</span>
+            <h2 class="agencySectionHeader__title editableText" data-text-id="faq_title">Tout Ce Que Vous Devez Savoir</h2>
+            <p class="agencySectionHeader__subtitle editableText" data-text-id="faq_sub">
+              Des réponses directes et sans jargon technique pour réussir votre transition digitale à Abidjan.
+            </p>
+
+            <!-- BOUTON DÉPLIER / REPLIER FAQ (STANDARD WEB AVEC FLÈCHE ET TEXTE) -->
+            <div class="agencySectionFoldToggle">
+              <button
+                type="button"
+                class="agencyFoldBtn"
+                id="toggleFaqFoldBtn"
+                aria-expanded="false"
+                aria-controls="faqFoldableBody"
+              >
+                <span id="faqFoldLabel">Voir plus</span>
+                <svg class="agencyFoldBtn__arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+            </div>
+          </header>
+
+          <!-- CONTENU DÉPLIABLE DE LA FAQ (REPLIÉ PAR DÉFAUT) -->
+          <div class="agencyFoldableBody" id="faqFoldableBody">
+            <div class="agencyFoldableBody__inner">
+              <div class="agencyFaq__list">
+                {agencyData.faqs.map((faq, index) => (
+                  <details class="agencyFaqItem" name="agency-faq" open={faq.defaultOpen}>
+                    <summary class="agencyFaqItem__summary">
+                      <span class="agencyFaqItem__num">{String(index + 1).padStart(2, '0')}</span>
+                      <span class="agencyFaqItem__question">{faq.question}</span>
+                      <span class="agencyFaqItem__chevron" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
+                          <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                      </span>
+                    </summary>
+                    <div class="agencyFaqItem__panel">
+                      <p>{faq.answer}</p>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TRANSITION FAQ -> FOOTER (VIBRANT SUNSET PURPLE / GOLD / WAVE BLUE) -->
+      <div class="agencyWaveDivider --inverted" aria-hidden="true">
+        <svg class="agencyWaveDivider__svg" viewBox="0 0 1440 100" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="vividWave6" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#8B5CF6" />
+              <stop offset="35%" stop-color="#F59E0B" />
+              <stop offset="70%" stop-color="#10B981" />
+              <stop offset="100%" stop-color="#1898E8" />
+            </linearGradient>
+          </defs>
+          <path class="agencyWaveDivider__wave --layer1" d="M0,32L48,42.7C96,53,192,75,288,80C384,85,480,75,576,58.7C672,43,768,21,864,21.3C960,21,1056,43,1152,53.3C1248,64,1344,64,1392,64L1440,64L1440,100L0,100Z" fill="url(#vividWave6)" opacity="0.9"/>
+          <path class="agencyWaveDivider__wave --layer2" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28L1440,100L0,100Z" fill="#05070D"/>
+          <path class="agencyWaveDivider__crest" d="M0,50L48,56C96,62,192,72,288,68C384,64,480,48,576,44C672,40,768,48,864,58C960,68,1056,76,1152,72C1248,68,1344,48,1392,38L1440,28" fill="none" stroke="url(#vividWave6)" stroke-width="2.5" opacity="0.95"/>
+        </svg>
+      </div>
+    </main>
+
+    <!-- 8. FOOTER D'AGENCE OFFICIEL PLEINE LARGEUR (AVEC ARRIÈRE-PLAN PANORAMA URBAIN BD ANIME & PARALLAX) -->
+    <footer class="agencyFooter" id="contact">
+      <div class="agencyFooter__bg" id="footerParallaxBg" aria-hidden="true"></div>
+      <!-- PALIER 1 : PRE-FOOTER CTA BANDEAU PLEINE LARGEUR -->
+      <div class="agencyFooterPreCta">
+        <div class="agencyFooterPreCta__inner">
+          <div class="agencyFooterPreCta__lead">
+            <span class="agencyFooterPreCta__badge">DIGITALISATION COMMERCES ABIDJAN</span>
+            <h2 class="agencyFooterPreCta__title">Prêt à moderniser votre présence en ligne ?</h2>
+            <p class="agencyFooterPreCta__text">
+              Discutez directement de vos objectifs avec nos architectes web. Audit d'audience et proposition sur-mesure sous 48h.
+            </p>
+          </div>
+          <div class="agencyFooterPreCta__actions">
+            <a
+              href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent("Bonjour WebAgency Abidjan, je souhaite obtenir un devis et démarrer mon projet de site web.")}`}
+              class="agencyFooterPreCtaBtn --whatsapp"
+              target="_blank"
+              rel="noopener"
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
+              </svg>
+              <span>Devis WhatsApp Direct</span>
+            </a>
+
+            <button
+              type="button"
+              class="agencyFooterPreCtaBtn --wave openWaveModalTrigger"
+              data-amount="50000"
+              aria-label="Payer un acompte via Wave QR Code"
+            >
+              <img src="/wave.png" alt="Wave" style="width: 24px; height: 24px; object-fit: contain;" />
+              <span>Acompte Wave (50 000 FCFA)</span>
+            </button>
+
+            <a href={`tel:${phoneClean}`} class="agencyFooterPreCtaBtn --phone">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+              </svg>
+              <span>{agencyData.contact.phoneDisplay}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- PALIER 2 : CORPS MULTI-COLONNES (GRILLE 4 COLONNES PLEINE LARGEUR) -->
+      <div class="agencyFooterBody">
+        <div class="agencyFooterBody__inner">
+          <!-- COL 1 : IDENTITÉ & STATUT EN TEMPS RÉEL -->
+          <div class="agencyFooterCol --brand">
+            <div class="agencyFooterCol__brandHeader">
+              <div class="agencyFooterCol__logoMark" aria-hidden="true">
+                <svg viewBox="0 0 36 36" width="30" height="30" fill="none">
+                  <rect width="36" height="36" rx="8" fill="#0D1322" stroke="rgba(212, 175, 55, 0.4)" stroke-width="1.2"/>
+                  <path d="M10 25L16 11L20 20L23 14L26 25" stroke="#D4AF37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <h3 class="agencyFooterCol__brandName">{agencyData.brandName}</h3>
+            </div>
+            <p class="agencyFooterCol__tagline">{agencyData.tagline}</p>
+            <p class="agencyFooterCol__desc">
+              Conception de plateformes web rapides, convertissantes et optimisées pour les réseaux mobiles de Côte d'Ivoire.
+            </p>
+
+            <!-- Statut en direct Abidjan (préservation des IDs agencyOpeningDot et agencyOpeningText) -->
+            <div class="agencyFooterOpeningStatus">
+              <span class="agencyFooterOpeningStatus__dot" id="agencyOpeningDot"></span>
+              <span class="agencyFooterOpeningStatus__text" id="agencyOpeningText">Vérification horaires Abidjan...</span>
+            </div>
+
+            <!-- Médailles réseaux sociaux -->
+            <div class="agencyFooterSocials">
+              <span class="agencyFooterSocials__label">Réseaux Officiels :</span>
+              <div class="agencyFooterSocials__list">
+                <a href={agencyData.contact.socials.linkedin} target="_blank" rel="noopener" class="agencyFooterSocials__link" aria-label="LinkedIn WebAgency Abidjan">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                  </svg>
+                </a>
+                <a href={agencyData.contact.socials.instagram} target="_blank" rel="noopener" class="agencyFooterSocials__link" aria-label="Instagram WebAgency Abidjan">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                </a>
+                <a href={agencyData.contact.socials.facebook} target="_blank" rel="noopener" class="agencyFooterSocials__link" aria-label="Facebook WebAgency Abidjan">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.324 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+                  </svg>
+                </a>
+                <a href={agencyData.contact.socials.twitter} target="_blank" rel="noopener" class="agencyFooterSocials__link" aria-label="X Twitter WebAgency Abidjan">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- COL 2 : NOS SOLUTIONS & SERVICES -->
+          <div class="agencyFooterCol">
+            <h4 class="agencyFooterCol__heading">Solutions & Métiers</h4>
+            <ul class="agencyFooterNav">
+              <li class="agencyFooterNav__item">
+                <a href="#services" class="agencyFooterNav__link">Sites Vitrines Commerces B2C</a>
+              </li>
+              <li class="agencyFooterNav__item">
+                <a href="#services" class="agencyFooterNav__link">Boutiques E-Commerce Wave Direct</a>
+              </li>
+              <li class="agencyFooterNav__item">
+                <a href="#services" class="agencyFooterNav__link">Tunnels Click & Collect & WhatsApp</a>
+              </li>
+              <li class="agencyFooterNav__item">
+                <a href="#metier" class="agencyFooterNav__link">Optimisation Vitesse Mobile 3G/4G</a>
+              </li>
+              <li class="agencyFooterNav__item">
+                <a href="#realisations" class="agencyFooterNav__link">Portfolio & Réalisations Livrées</a>
+              </li>
+              <li class="agencyFooterNav__item">
+                <a href="/admin-agency" class="agencyFooterNav__link">Espace Administration Partenaire</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- COL 3 : CONTACT DIRECT & CONCIERGERIE -->
+          <div class="agencyFooterCol">
+            <h4 class="agencyFooterCol__heading">Contact Direct & VIP</h4>
+            <div class="agencyFooterContacts">
+              <a href={`tel:${phoneClean}`} class="agencyFooterContactItem">
+                <div class="agencyFooterContactItem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="agencyFooterContactItem__label">Hotline Prioritaire</span>
+                  <strong class="agencyFooterContactItem__val">{agencyData.contact.phoneDisplay}</strong>
+                </div>
+              </a>
+
+              <a href={`https://wa.me/${whatsappClean}`} class="agencyFooterContactItem" target="_blank" rel="noopener">
+                <div class="agencyFooterContactItem__icon --wa" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="agencyFooterContactItem__label">WhatsApp Instantané</span>
+                  <strong class="agencyFooterContactItem__val">{agencyData.contact.whatsappDisplay}</strong>
+                </div>
+              </a>
+
+              <a href={`mailto:${agencyData.contact.email}`} class="agencyFooterContactItem">
+                <div class="agencyFooterContactItem__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                </div>
+                <div>
+                  <span class="agencyFooterContactItem__label">Desk Direction</span>
+                  <strong class="agencyFooterContactItem__val">{agencyData.contact.email}</strong>
+                </div>
+              </a>
+
+              <div class="agencyFooterAstreinteNote">
+                <div class="agencyFooterAstreinteNote__dot"></div>
+                <span>Astreinte E-Commerce 24/7 pour nos commerçants partenaires</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- COL 4 : SIÈGE COCODY & PLAN LEAFLET -->
+          <div class="agencyFooterCol">
+            <h4 class="agencyFooterCol__heading">Atelier & Siège Cocody</h4>
+            <address class="agencyFooterAddress">
+              <span class="agencyFooterAddress__pin" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#D4AF37" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </span>
+              <div>
+                <strong>{agencyData.name}</strong>
+                <p>{agencyData.contact.address.street}</p>
+                <p>{agencyData.contact.address.district}, {agencyData.contact.address.city}</p>
+              </div>
+            </address>
+
+            <!-- Façade de Carte Interactive Leaflet -->
+            <div class="agencyMapFacade" id="agencyMapFacade">
+              <div class="agencyMapFacade__preview" id="mapPreview">
+                <div class="agencyMapFacade__pin">
+                  <svg viewBox="0 0 24 24" width="28" height="28" fill="#D4AF37">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                </div>
+                <span class="agencyMapFacade__label">Cocody Deux Plateaux • Carrefour Duncan</span>
+                <button type="button" class="agencyMapFacade__btn" id="loadMapBtn">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                  </svg>
+                  <span>Afficher la Carte Interactive</span>
+                </button>
+              </div>
+              <div class="agencyMapFacade__frame" id="mapFrame" style="display: none;"></div>
+            </div>
+
+            <a href={mapsUrl} target="_blank" rel="noopener" class="agencyFooterGpsLink">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+              </svg>
+              <span>Guidage GPS (Google Maps / Waze)</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- PALIER 3 : SOUS-FOOTER PLEINE LARGEUR (COLOPHON & RÉASSURANCE) -->
+      <div class="agencyFooterBottom">
+        <div class="agencyFooterBottom__inner">
+          <p class="agencyFooterBottom__copy">
+            © {new Date().getFullYear()} {agencyData.name}. Tous droits réservés. Conçu et déployé à Abidjan, Côte d'Ivoire.
+          </p>
+
+          <div class="agencyFooterBottom__badges">
+            <span class="agencyFooterBottom__badge">
+              <img src="/wave.png" alt="Wave" style="width: 16px; height: 16px; object-fit: contain;" />
+              <span>Paiements Wave Sécurisés</span>
+            </span>
+            <span class="agencyFooterBottom__badge">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#10B981" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span>Haute Disponibilité 99.9%</span>
+            </span>
+          </div>
+
+          <div class="agencyFooterBottom__links">
+            <a href="#accueil" class="agencyFooterBottom__link">Haut de page ↑</a>
+            <span class="agencyFooterBottom__sep">•</span>
+            <a href="#services" class="agencyFooterBottom__link">Nos Solutions</a>
+            <span class="agencyFooterBottom__sep">•</span>
+            <a href="/admin-agency" class="agencyFooterBottom__link --admin">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0110 0v4"></path>
+              </svg>
+              <span>Portail Partenaire</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 9. MODALE SIMULATEUR DE DEVIS EXPRESS (<dialog>) -->
+    <dialog id="agencySimulatorModal" class="agencySimModal" closedby="any" aria-labelledby="simModalTitle">
+      <article class="agencySimModal__card">
+        <header class="agencySimModal__header">
+          <div>
+            <span class="agencySimModal__eyebrow">Calculateur Immédiat</span>
+            <h2 id="simModalTitle" class="agencySimModal__title">Estimez votre Devis en 3 Clics</h2>
+          </div>
+          <button type="button" id="closeSimModalBtn" class="agencySimModal__close" aria-label="Fermer la fenêtre du simulateur">✕</button>
+        </header>
+
+        <section class="agencySimModal__body">
+          <!-- Étape 1 : Type d'activité -->
+          <fieldset class="agencySimStep">
+            <legend class="agencySimStep__legend">
+              <span class="agencySimStep__num">1</span>
+              <span>Votre type d'activité à Abidjan</span>
+            </legend>
+            <div class="agencySimStep__options" id="simActivityGroup">
+              <label class="agencySimOption --active">
+                <input type="radio" name="simActivity" value="Salon / Beauté" checked />
+                <span>Salon de Coiffure & Esthétique</span>
+              </label>
+              <label class="agencySimOption">
+                <input type="radio" name="simActivity" value="Restaurant / Maquis" />
+                <span>Maquis, Restaurant & Traiteur</span>
+              </label>
+              <label class="agencySimOption">
+                <input type="radio" name="simActivity" value="Boutique / Commerce" />
+                <span>Boutique de Mode & Tech</span>
+              </label>
+              <label class="agencySimOption">
+                <input type="radio" name="simActivity" value="Multiservices / Artisan" />
+                <span>Multiservices & Artisan</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Étape 2 : Choix du pack de base -->
+          <fieldset class="agencySimStep">
+            <legend class="agencySimStep__legend">
+              <span class="agencySimStep__num">2</span>
+              <span>Choisissez votre formule de base</span>
+            </legend>
+            <div class="agencySimStep__packs" id="simPackGroup">
+              <label class="agencySimPack --active">
+                <input type="radio" name="simPack" value="150000" data-name="Pack Vitrine Commerce B2C" data-deposit="50000" checked />
+                <div class="agencySimPack__content">
+                  <span class="agencySimPack__title">Pack Vitrine B2C</span>
+                  <span class="agencySimPack__desc">Site rapide, WhatsApp & Appel 1-clic</span>
+                  <span class="agencySimPack__price">150 000 FCFA</span>
+                </div>
+              </label>
+
+              <label class="agencySimPack">
+                <input type="radio" name="simPack" value="250000" data-name="Pack Vitrine + Admin Dynamique" data-deposit="75000" />
+                <div class="agencySimPack__content">
+                  <span class="agencySimPack__title">Vitrine + Espace Admin</span>
+                  <span class="agencySimPack__desc">Modifiez vos prix depuis votre téléphone</span>
+                  <span class="agencySimPack__price">250 000 FCFA</span>
+                </div>
+              </label>
+
+              <label class="agencySimPack">
+                <input type="radio" name="simPack" value="380000" data-name="Pack E-Commerce & Wave" data-deposit="120000" />
+                <div class="agencySimPack__content">
+                  <span class="agencySimPack__title">E-Commerce & Wave</span>
+                  <span class="agencySimPack__desc">Catalogue, panier, Wave QR Code</span>
+                  <span class="agencySimPack__price">380 000 FCFA</span>
+                </div>
+              </label>
+
+              <label class="agencySimPack">
+                <input type="radio" name="simPack" value="95000" data-name="Refonte Express & Accélération" data-deposit="40000" />
+                <div class="agencySimPack__content">
+                  <span class="agencySimPack__title">Refonte de site existant</span>
+                  <span class="agencySimPack__desc">Accélération d'un vieux site lent</span>
+                  <span class="agencySimPack__price">95 000 FCFA</span>
+                </div>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Étape 3 : Options additionnelles -->
+          <fieldset class="agencySimStep">
+            <legend class="agencySimStep__legend">
+              <span class="agencySimStep__num">3</span>
+              <span>Options recommandées pour votre commerce</span>
+            </legend>
+            <div class="agencySimStep__addons">
+              <label class="agencySimAddon">
+                <input type="checkbox" name="simAddon" value="35000" data-name="Shooting photo professionnel à Abidjan" />
+                <div class="agencySimAddon__info">
+                  <span class="agencySimAddon__title">Shooting Photo Pro à Abidjan (+35 000 FCFA)</span>
+                  <span class="agencySimAddon__sub">Déplacement d'un photographe pour des photos HD éclatantes</span>
+                </div>
+              </label>
+
+              <label class="agencySimAddon">
+                <input type="checkbox" name="simAddon" value="20000" data-name="Fiche Google My Business optimisée" />
+                <div class="agencySimAddon__info">
+                  <span class="agencySimAddon__title">Fiche Google My Business Clé-En-Main (+20 000 FCFA)</span>
+                  <span class="agencySimAddon__sub">Création et référencement complet de votre établissement sur Google Maps</span>
+                </div>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Résumé & Action Devis -->
+          <div class="agencySimSummary">
+            <div class="agencySimSummary__breakdown">
+              <div class="agencySimSummary__row">
+                <span>Formule :</span>
+                <strong id="modalSummaryPackName">Pack Vitrine B2C</strong>
+              </div>
+              <div class="agencySimSummary__row">
+                <span>Délai estimé :</span>
+                <strong id="modalSummaryTimeline">3 à 5 jours ouvrés</strong>
+              </div>
+              <div class="agencySimSummary__row --total">
+                <span>Total :</span>
+                <strong id="modalSummaryTotal">150 000 FCFA</strong>
+              </div>
+              <div class="agencySimSummary__row --deposit">
+                <span>Acompte 30% :</span>
+                <strong id="modalSummaryDeposit">50 000 FCFA</strong>
+              </div>
+            </div>
+
+            <div class="agencySimSummary__buttons">
+              <button type="button" class="agencySimSummary__btnWa" id="modalSimSendWhatsappBtn">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                  <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
+                </svg>
+                <span>Valider mon devis sur WhatsApp</span>
+              </button>
+
+              <button type="button" class="agencySimSummary__btnWave" id="modalSimPayWaveBtn">
+                <span>Régler l'acompte par Wave</span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </article>
+    </dialog>
+
+    <!-- 10. MODALE TUNNEL WAVE MOBILE MONEY (<dialog>) -->
+    <dialog id="agencyWaveModal" class="agencyWaveModal" closedby="any" aria-labelledby="waveModalHeading">
+      <article class="agencyWaveModal__card">
+        <header class="agencyWaveModal__header">
+          <div class="agencyWaveModal__brandGroup">
+            <span class="agencyWaveModal__penguin" aria-hidden="true">
+              <svg viewBox="0 0 40 40" width="34" height="34" fill="none">
+                <rect width="40" height="40" rx="10" fill="#1898E8"/>
+                <ellipse cx="21" cy="24" rx="10" ry="12" fill="#0B192C"/>
+                <ellipse cx="21" cy="25" rx="6.5" ry="8.5" fill="#FFFFFF"/>
+                <circle cx="19" cy="18" r="1.6" fill="#FFFFFF"/>
+                <circle cx="24" cy="18" r="1.6" fill="#FFFFFF"/>
+                <path d="M19.5 21.5L23.5 21.5L21.5 24Z" fill="#F59E0B"/>
+                <path d="M11 21C9 17 11 14 14 16L13 23Z" fill="#0B192C"/>
+              </svg>
+            </span>
+            <div>
+              <h2 id="waveModalHeading" class="agencyWaveModal__title">Règlement Wave Côte d'Ivoire</h2>
+              <p class="agencyWaveModal__sub">{agencyData.name} • Compte Marchand Abidjan</p>
+            </div>
+          </div>
+          <button type="button" id="closeWaveModalBtn" class="agencyWaveModal__close" aria-label="Fermer la fenêtre Wave">✕</button>
+        </header>
+
+        <section class="agencyWaveModal__body">
+          <label for="waveModalAmountInput" class="agencyWaveModal__label">Montant à régler (FCFA)</label>
+          <div class="agencyWaveModal__inputWrap">
+            <input
+              type="number"
+              id="waveModalAmountInput"
+              class="agencyWaveModal__input"
+              value="50000"
+              min="1000"
+              step="5000"
+              inputmode="numeric"
+            />
+            <span class="agencyWaveModal__currency">FCFA</span>
+          </div>
+
+          <div class="agencyWaveModal__presets" role="group" aria-label="Acomptes rapides">
+            <button type="button" class="agencyWaveModalPreset --active" data-amount="50000">50 000 F (Acompte Vitrine)</button>
+            <button type="button" class="agencyWaveModalPreset" data-amount="75000">75 000 F (Acompte Admin)</button>
+            <button type="button" class="agencyWaveModalPreset" data-amount="120000">120 000 F (Acompte E-Com)</button>
+            <button type="button" class="agencyWaveModalPreset" data-amount="150000">150 000 F (Solde Vitrine)</button>
+          </div>
+
+          <div class="agencyWaveModal__qrCard">
+            <p class="agencyWaveModal__qrHeading">Payez avec <strong>wave</strong></p>
+            <div class="agencyWaveModal__qrFrame">
+              <img id="waveModalQrImg" alt="QR Code de paiement Wave pour WebAgency Abidjan" width="180" height="180" />
+            </div>
+            <span id="waveModalAmountPill" class="agencyWaveModal__amountPill">50 000 FCFA</span>
+            <p class="agencyWaveModal__partners">PARTENAIRES AGRÉÉS EN CÔTE D'IVOIRE : UBA • ORABANK</p>
+          </div>
+
+          <div class="agencyWaveModal__actions">
+            <a
+              id="waveModalDeepLinkBtn"
+              href={`https://pay.wave.com/m/${whatsappClean}?amount=50000`}
+              target="_blank"
+              rel="noopener"
+              class="agencyWaveModal__openBtn"
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span>Ouvrir dans l'application Wave</span>
+            </a>
+
+            <button type="button" id="waveModalCopyLinkBtn" class="agencyWaveModal__copyBtn">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="waveModalCopyText">Copier le lien Wave</span>
+            </button>
+          </div>
+        </section>
+      </article>
+    </dialog>
+
+    <!-- 11. BOUTONS FIXES (BAS GAUCHE ET BAS DROIT - SVG UNIQUEMENT) -->
+
+    <!-- BAS GAUCHE : OUTILS RAPIDES (RETOUR EN HAUT, SIMULATEUR, WAVE, ADMIN) -->
+    <aside class="agencyFabTools" aria-label="Outils rapides et raccourcis">
+      <details class="agencyFabTools__details">
+        <summary class="agencyFabTools__trigger" aria-label="Ouvrir le menu des outils rapides">
+          <svg class="agencyFabTools__icon --main" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <svg class="agencyFabTools__icon --close" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </summary>
+
+        <div class="agencyFabTools__menu">
+          <button type="button" class="agencyFabTools__item openSimulatorTrigger">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+              <line x1="8" y1="6" x2="16" y2="6"></line>
+              <line x1="16" y1="14" x2="16" y2="18"></line>
+            </svg>
+            <span>Simulateur Devis</span>
+          </button>
+
+          <button type="button" class="agencyFabTools__item openWaveModalTrigger" data-amount="50000">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <circle cx="12" cy="12" r="10" fill="#1898E8"/>
+              <path d="M8 12l3 3 5-5" stroke="#fff" stroke-width="2" fill="none"/>
+            </svg>
+            <span>Paiement Wave QR</span>
+          </button>
+
+          <a href="/admin-agency" class="agencyFabTools__item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>Espace Partenaire & Admin</span>
+          </a>
+
+          <button type="button" class="agencyFabTools__item" id="agencyScrollTopBtn">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+            <span>Haut de page</span>
+          </button>
+        </div>
+      </details>
+    </aside>
+
+    <!-- BAS DROIT : CONTACT SPEED-DIAL (WHATSAPP + TÉLÉPHONE - SVG UNIQUEMENT) -->
+    <aside class="agencyFabContact" aria-label="Contact rapide agence">
+      <details class="agencyFabContact__details">
+        <summary class="agencyFabContact__trigger" aria-label="Ouvrir les options de contact rapide">
+          <svg class="agencyFabContact__icon --chat" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+          </svg>
+          <svg class="agencyFabContact__icon --close" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </summary>
+
+        <div class="agencyFabContact__menu">
+          <a
+            href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent("Bonjour WebAgency Abidjan, je vous écris depuis votre portfolio pour des informations.")}`}
+            class="agencyFabContact__btn --wa"
+            target="_blank"
+            rel="noopener"
+            aria-label="Discussion directe sur WhatsApp"
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
+            </svg>
+            <span>WhatsApp Direct</span>
+          </a>
+
+          <a
+            href={`tel:${phoneClean}`}
+            class="agencyFabContact__btn --phone"
+            aria-label={`Appeler le ${agencyData.contact.phoneDisplay}`}
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
+            </svg>
+            <span>Appeler l'Agence</span>
+          </a>
+        </div>
+      </details>
+    </aside>
+
+    <!-- Panier d'achat coulissant -->
+    <CartDrawer />
+  </div>
+</Layout>
+
+<script>
+  import QRCode from 'qrcode';
+  import { getStorage, updateStorage } from '../lib/storage';
+  import { agencyData } from '../data/agencyData';
+
+  const whatsappClean = agencyData.contact.whatsapp.replace(/[^0-9]/g, '');
+
+  // 1. Sticky Header & Parallax Multi-Profondeurs au défilement
+  const header = document.getElementById('agencyHeader');
+  const parallaxBg = document.getElementById('parallaxBg');
+  const parallaxContent = document.getElementById('parallaxContent');
+  const parallaxMesh = document.getElementById('parallaxMesh');
+  const parallaxBadge1 = document.getElementById('parallaxBadge1');
+  const parallaxBadge2 = document.getElementById('parallaxBadge2');
+  const parallaxBadge3 = document.getElementById('parallaxBadge3');
+  const parallaxSection = document.getElementById('parallaxSection');
+
+  function updateStickyHeader() {
+    if (header) {
+      if (window.scrollY > 20) {
+        header.classList.add('--stuck');
+      } else {
+        header.classList.remove('--stuck');
+      }
+    }
+  }
+
+  updateStickyHeader();
+
+  window.addEventListener('scroll', () => {
+    const scrollY = window.scrollY;
+    const winHeight = window.innerHeight;
+
+    // Sticky header transform (réduction au défilement)
+    updateStickyHeader();
+
+    // Parallax multi-profondeurs sur la section vitrine
+    if (parallaxSection && parallaxBg && parallaxContent) {
+      const rect = parallaxSection.getBoundingClientRect();
+      if (rect.top < winHeight && rect.bottom > 0) {
+        const centerOffset = ((rect.top + rect.height / 2) - winHeight / 2) / (winHeight / 2);
+
+        parallaxBg.style.transform = `translateY(${centerOffset * 75}px) scale(1.12)`;
+
+        if (parallaxMesh) {
+          parallaxMesh.style.transform = `translateY(${centerOffset * 40}px)`;
+        }
+
+        parallaxContent.style.transform = `translateY(${-centerOffset * 35}px)`;
+
+        if (parallaxBadge1) {
+          parallaxBadge1.style.transform = `translateY(${-centerOffset * 60}px) rotate(2deg)`;
+        }
+        if (parallaxBadge2) {
+          parallaxBadge2.style.transform = `translateY(${centerOffset * 50}px) rotate(-2.5deg)`;
+        }
+        if (parallaxBadge3) {
+          parallaxBadge3.style.transform = `translateY(${-centerOffset * 45}px) rotate(1.5deg)`;
+        }
+      }
+    }
+
+    // Parallax visible et immersif sur TOUS les blocs de contenu (même comportement multi-profondeurs)
+    const parallaxBlocks = document.querySelectorAll<HTMLElement>('[data-parallax-block]');
+    parallaxBlocks.forEach((block) => {
+      const rect = block.getBoundingClientRect();
+      if (rect.top < winHeight && rect.bottom > 0) {
+        const centerOffset = ((rect.top + rect.height / 2) - winHeight / 2) / (winHeight / 2);
+        const bg = block.querySelector<HTMLElement>('.agencySectionParallaxBg');
+        const container = block.querySelector<HTMLElement>('.agencyValues__container, .agencyProjects__container, .agencyServices__container, .agencyFaq__container');
+        const floatEl = block.querySelector<HTMLElement>('.agencySectionParallaxFloat');
+
+        // 1. Fond image : translation dynamique
+        if (bg) {
+          bg.style.transform = `translateY(${centerOffset * 80}px) scale(1.12)`;
+        }
+        // 2. Contenu au premier plan : contre-mouvement subtil accentuant le relief 3D
+        if (container) {
+          container.style.transform = `translateY(${-centerOffset * 30}px)`;
+        }
+        // 3. Éléments flottants : vitesse décalée
+        if (floatEl) {
+          floatEl.style.transform = `translateY(${-centerOffset * 55}px) rotate(${centerOffset * 6}deg)`;
+        }
+      }
+    });
+
+    // Parallax sur l'arrière-plan anime BD du footer
+    const footerEl = document.getElementById('contact');
+    const footerBg = document.getElementById('footerParallaxBg');
+    if (footerEl && footerBg) {
+      const rect = footerEl.getBoundingClientRect();
+      if (rect.top < winHeight && rect.bottom > 0) {
+        const centerOffset = ((rect.top + rect.height / 2) - winHeight / 2) / (winHeight / 2);
+        footerBg.style.transform = `translateY(${centerOffset * 75}px) scale(1.12)`;
+        const footerBody = footerEl.querySelector<HTMLElement>('.agencyFooterBody');
+        if (footerBody) {
+          footerBody.style.transform = `translateY(${-centerOffset * 25}px)`;
+        }
+      }
+    }
+  }, { passive: true });
+
+  // 1.b. Blocs Foldables (Repliés par défaut) : Services et FAQ
+  const toggleServicesBtn = document.getElementById('toggleServicesFoldBtn');
+  const servicesFoldable = document.getElementById('servicesFoldableBody');
+  const servicesFoldLabel = document.getElementById('servicesFoldLabel');
+
+  toggleServicesBtn?.addEventListener('click', () => {
+    const isExpanded = servicesFoldable?.classList.toggle('--expanded');
+    toggleServicesBtn.setAttribute('aria-expanded', String(isExpanded));
+    toggleServicesBtn.classList.toggle('--active', isExpanded);
+    if (servicesFoldLabel) {
+      servicesFoldLabel.textContent = isExpanded ? 'Voir moins' : 'Voir plus';
+    }
+  });
+
+  const toggleFaqBtn = document.getElementById('toggleFaqFoldBtn');
+  const faqFoldable = document.getElementById('faqFoldableBody');
+  const faqFoldLabel = document.getElementById('faqFoldLabel');
+
+  toggleFaqBtn?.addEventListener('click', () => {
+    const isExpanded = faqFoldable?.classList.toggle('--expanded');
+    toggleFaqBtn.setAttribute('aria-expanded', String(isExpanded));
+    toggleFaqBtn.classList.toggle('--active', isExpanded);
+    if (faqFoldLabel) {
+      faqFoldLabel.textContent = isExpanded ? 'Voir moins' : 'Voir plus';
+    }
+  });
+
+  // 2. Gestion du Panier & Badge Header
+  function updateHeaderCartBadge() {
+    const data = getStorage();
+    const count = (data.cart || []).reduce((acc, item) => acc + item.quantity, 0);
+    const badge = document.getElementById('headerCartBadge');
+    if (badge) {
+      badge.textContent = String(count);
+      badge.style.display = count > 0 ? 'flex' : 'none';
+    }
+  }
+
+  window.addEventListener('app:storage:change', updateHeaderCartBadge);
+  document.getElementById('headerCartBtn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('cart:open'));
+  });
+  updateHeaderCartBadge();
+
+  // Boutons "Ajouter au Panier" sur les cartes de packs
+  document.querySelectorAll('.addPackToCartBtn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLElement;
+      const id = target.dataset.id || 'pack';
+      const name = target.dataset.name || 'Pack Web';
+      const price = Number(target.dataset.price) || 150000;
+
+      const current = getStorage();
+      const existing = (current.cart || []).find((it) => it.id === id);
+      let newCart;
+      if (existing) {
+        newCart = current.cart.map((it) => it.id === id ? { ...it, quantity: it.quantity + 1 } : it);
+      } else {
+        newCart = [...(current.cart || []), { id, name, price, quantity: 1 }];
+      }
+
+      updateStorage((prev) => ({ ...prev, cart: newCart }));
+      window.dispatchEvent(new CustomEvent('cart:open'));
+    });
+  });
+
+  // 3. Filtrage interactif des Réalisations
+  const filterBtns = document.querySelectorAll('.agencyFilterBtn');
+  const projectCards = document.querySelectorAll('.agencyProjectCard');
+
+  filterBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach((b) => {
+        b.classList.remove('--active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('--active');
+      btn.setAttribute('aria-selected', 'true');
+
+      const filter = (btn as HTMLElement).dataset.filter || 'all';
+      projectCards.forEach((card) => {
+        const cat = (card as HTMLElement).dataset.category || '';
+        if (filter === 'all' || cat.toLowerCase().includes(filter.toLowerCase())) {
+          (card as HTMLElement).style.display = 'flex';
+        } else {
+          (card as HTMLElement).style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // 4. Modale Simulateur de Devis (<dialog>)
+  const simModal = document.getElementById('agencySimulatorModal') as HTMLDialogElement | null;
+  const closeSimModalBtn = document.getElementById('closeSimModalBtn');
+
+  document.querySelectorAll('.openSimulatorTrigger').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      simModal?.showModal();
+    });
+  });
+
+  closeSimModalBtn?.addEventListener('click', () => {
+    simModal?.close();
+  });
+
+  // Calcul du Simulateur
+  const simActivityInputs = document.querySelectorAll<HTMLInputElement>('input[name="simActivity"]');
+  const simPackInputs = document.querySelectorAll<HTMLInputElement>('input[name="simPack"]');
+  const simAddonInputs = document.querySelectorAll<HTMLInputElement>('input[name="simAddon"]');
+  const modalSummaryPackName = document.getElementById('modalSummaryPackName');
+  const modalSummaryTimeline = document.getElementById('modalSummaryTimeline');
+  const modalSummaryTotal = document.getElementById('modalSummaryTotal');
+  const modalSummaryDeposit = document.getElementById('modalSummaryDeposit');
+
+  function calculateModalSimulation() {
+    let basePrice = 150000;
+    let packName = 'Pack Vitrine Commerce B2C';
+    let timeline = '3 à 5 jours ouvrés';
+    let activity = 'Salon / Beauté';
+
+    simActivityInputs.forEach((inp) => {
+      if (inp.checked) {
+        activity = inp.value;
+        document.querySelectorAll('.agencySimOption').forEach((el) => el.classList.remove('--active'));
+        inp.closest('.agencySimOption')?.classList.add('--active');
+      }
+    });
+
+    simPackInputs.forEach((inp) => {
+      if (inp.checked) {
+        basePrice = Number(inp.value);
+        packName = inp.dataset.name || 'Pack Vitrine B2C';
+        if (basePrice === 150000) timeline = '3 à 5 jours ouvrés';
+        if (basePrice === 250000) timeline = '5 à 7 jours ouvrés';
+        if (basePrice === 380000) timeline = '7 à 10 jours ouvrés';
+        if (basePrice === 95000) timeline = '48 heures';
+
+        document.querySelectorAll('.agencySimPack').forEach((el) => el.classList.remove('--active'));
+        inp.closest('.agencySimPack')?.classList.add('--active');
+      }
+    });
+
+    let addonsTotal = 0;
+    const selectedAddons: string[] = [];
+    simAddonInputs.forEach((chk) => {
+      if (chk.checked) {
+        addonsTotal += Number(chk.value);
+        selectedAddons.push(chk.dataset.name || '');
+      }
+    });
+
+    const totalPrice = basePrice + addonsTotal;
+    const depositPrice = Math.round(totalPrice * 0.3);
+
+    if (modalSummaryPackName) modalSummaryPackName.textContent = packName;
+    if (modalSummaryTimeline) modalSummaryTimeline.textContent = timeline;
+    if (modalSummaryTotal) modalSummaryTotal.textContent = `${new Intl.NumberFormat('fr-FR').format(totalPrice)} FCFA`;
+    if (modalSummaryDeposit) modalSummaryDeposit.textContent = `${new Intl.NumberFormat('fr-FR').format(depositPrice)} FCFA`;
+
+    return { activity, packName, timeline, totalPrice, depositPrice, selectedAddons };
+  }
+
+  simActivityInputs.forEach((inp) => inp.addEventListener('change', calculateModalSimulation));
+  simPackInputs.forEach((inp) => inp.addEventListener('change', calculateModalSimulation));
+  simAddonInputs.forEach((chk) => chk.addEventListener('change', calculateModalSimulation));
+
+  document.getElementById('modalSimSendWhatsappBtn')?.addEventListener('click', () => {
+    const data = calculateModalSimulation();
+    const text = `*DEMANDE DE DEVIS — WEBAGENCY ABIDJAN*
+• Activité : ${data.activity}
+• Formule : ${data.packName}
+• Options : ${data.selectedAddons.length > 0 ? data.selectedAddons.join(', ') : 'Aucune option supplémentaire'}
+• Total estimé : ${new Intl.NumberFormat('fr-FR').format(data.totalPrice)} FCFA
+• Acompte 30% : ${new Intl.NumberFormat('fr-FR').format(data.depositPrice)} FCFA
+• Délai : ${data.timeline}
+
+Bonjour, je souhaite valider ce devis et planifier mon site web.`;
+
+    const url = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'noopener');
+  });
+
+  document.getElementById('modalSimPayWaveBtn')?.addEventListener('click', () => {
+    const data = calculateModalSimulation();
+    simModal?.close();
+    openWaveModal(data.depositPrice);
+  });
+
+  // 5. Modale Tunnel Wave (<dialog>)
+  const waveModal = document.getElementById('agencyWaveModal') as HTMLDialogElement | null;
+  const closeWaveModalBtn = document.getElementById('closeWaveModalBtn');
+  const waveAmountInput = document.getElementById('waveModalAmountInput') as HTMLInputElement | null;
+  const waveAmountPill = document.getElementById('waveModalAmountPill');
+  const waveQrImg = document.getElementById('waveModalQrImg') as HTMLImageElement | null;
+  const waveDeepLinkBtn = document.getElementById('waveModalDeepLinkBtn') as HTMLAnchorElement | null;
+  const waveCopyBtn = document.getElementById('waveModalCopyLinkBtn');
+  const waveCopyText = document.getElementById('waveModalCopyText');
+  const wavePresets = document.querySelectorAll('.agencyWaveModalPreset');
+
+  function getWaveUrl(amount: number) {
+    return `https://pay.wave.com/m/${whatsappClean}?amount=${amount}`;
+  }
+
+  async function updateWaveModal(amount: number) {
+    const validAmount = Math.max(500, Number(amount) || 50000);
+    const formatted = new Intl.NumberFormat('fr-FR').format(validAmount);
+
+    if (waveAmountPill) waveAmountPill.textContent = `${formatted} FCFA`;
+    const url = getWaveUrl(validAmount);
+    if (waveDeepLinkBtn) waveDeepLinkBtn.href = url;
+
+    if (waveQrImg) {
+      try {
+        const qrDataUrl = await QRCode.toDataURL(url, {
+          width: 180,
+          margin: 1,
+          color: { dark: '#000000', light: '#ffffff' }
+        });
+        waveQrImg.src = qrDataUrl;
+      } catch (err) {
+        console.error('Erreur QR Wave:', err);
+      }
+    }
+
+    wavePresets.forEach((btn) => {
+      const btnAmt = Number((btn as HTMLElement).dataset.amount);
+      btn.classList.toggle('--active', btnAmt === validAmount);
+    });
+  }
+
+  function openWaveModal(amount: number = 50000) {
+    if (waveAmountInput) waveAmountInput.value = String(amount);
+    updateWaveModal(amount);
+    waveModal?.showModal();
+  }
+
+  document.querySelectorAll('.openWaveModalTrigger').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const amt = Number((e.currentTarget as HTMLElement).dataset.amount) || 50000;
+      openWaveModal(amt);
+    });
+  });
+
+  closeWaveModalBtn?.addEventListener('click', () => {
+    waveModal?.close();
+  });
+
+  waveAmountInput?.addEventListener('input', () => {
+    updateWaveModal(Number(waveAmountInput.value));
+  });
+
+  wavePresets.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const val = Number((btn as HTMLElement).dataset.amount) || 50000;
+      if (waveAmountInput) waveAmountInput.value = String(val);
+      updateWaveModal(val);
+    });
+  });
+
+  waveCopyBtn?.addEventListener('click', async () => {
+    const url = waveDeepLinkBtn?.href || '';
+    try {
+      await navigator.clipboard.writeText(url);
+      if (waveCopyText) {
+        waveCopyText.textContent = 'Lien Wave copié !';
+        setTimeout(() => { waveCopyText.textContent = 'Copier le lien Wave'; }, 2500);
+      }
+    } catch {
+      // Fallback
+    }
+  });
+
+  // 6. Façade de Carte Interactive (OpenStreetMap / Leaflet chargée au clic)
+  const loadMapBtn = document.getElementById('loadMapBtn');
+  const mapPreview = document.getElementById('mapPreview');
+  const mapFrame = document.getElementById('mapFrame');
+
+  loadMapBtn?.addEventListener('click', () => {
+    if (mapPreview && mapFrame) {
+      mapPreview.style.display = 'none';
+      mapFrame.style.display = 'block';
+      // Chargement de la vue OpenStreetMap centrée sur Cocody Deux Plateaux
+      mapFrame.innerHTML = `
+        <iframe
+          width="100%"
+          height="220"
+          frameborder="0"
+          scrolling="no"
+          marginheight="0"
+          marginwidth="0"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=-4.008492%2C5.352692%2C-3.988492%2C5.372692&amp;layer=mapnik&amp;marker=5.362692%2C-3.998492"
+          style="border: 0; border-radius: 10px;"
+          title="Carte interactive des bureaux WebAgency Abidjan"
+        ></iframe>
+      `;
+    }
+  });
+
+  // 7. Horaires de l'Agence en direct (Abidjan UTC+0)
+  function checkAgencyHours() {
+    const dot = document.getElementById('agencyOpeningDot');
+    const text = document.getElementById('agencyOpeningText');
+    if (!dot || !text) return;
+
+    const now = new Date();
+    const day = now.getUTCDay();
+    const hour = now.getUTCHours();
+    const minute = now.getUTCMinutes();
+    const currentMin = hour * 60 + minute;
+
+    let isOpen = false;
+    if (day >= 1 && day <= 5) {
+      if (currentMin >= 510 && currentMin <= 1110) isOpen = true;
+    } else if (day === 6) {
+      if (currentMin >= 540 && currentMin <= 900) isOpen = true;
+    }
+
+    if (isOpen) {
+      dot.style.backgroundColor = '#10B981';
+      text.textContent = 'Agence Ouverte actuellement à Abidjan (08h30 – 18h30)';
+    } else {
+      dot.style.backgroundColor = '#F59E0B';
+      text.textContent = 'Fermé actuellement • Permanence WhatsApp 24/7 active';
+    }
+  }
+  checkAgencyHours();
+
+  // 8. Gestion du Mode Administrateur & Édition In-Situ de Texte
+  const adminBar = document.getElementById('agencyAdminBar');
+  const toggleInSituEdit = document.getElementById('toggleInSituEdit') as HTMLInputElement | null;
+  const saveInSituChangesBtn = document.getElementById('saveInSituChangesBtn');
+  const resetInSituChangesBtn = document.getElementById('resetInSituChangesBtn');
+  const exitAdminModeBtn = document.getElementById('exitAdminModeBtn');
+  const editableElements = document.querySelectorAll<HTMLElement>('.editableText');
+
+  // Chargement des textes personnalisés s'ils existent en localStorage
+  function loadSavedTexts() {
+    try {
+      const raw = localStorage.getItem('agency_custom_content');
+      if (raw) {
+        const texts = JSON.parse(raw);
+        editableElements.forEach((el) => {
+          const id = el.dataset.textId;
+          if (id && texts[id]) {
+            el.innerHTML = texts[id];
+          }
+        });
+      }
+    } catch {
+      // Fallback
+    }
+  }
+
+  function setInSituEditing(enabled: boolean) {
+    editableElements.forEach((el) => {
+      el.contentEditable = enabled ? 'true' : 'false';
+      el.classList.toggle('--is-editing', enabled);
+    });
+    if (saveInSituChangesBtn) {
+      saveInSituChangesBtn.style.display = enabled ? 'inline-flex' : 'none';
+    }
+  }
+
+  toggleInSituEdit?.addEventListener('change', () => {
+    setInSituEditing(Boolean(toggleInSituEdit.checked));
+  });
+
+  saveInSituChangesBtn?.addEventListener('click', () => {
+    const textsToSave: Record<string, string> = {};
+    editableElements.forEach((el) => {
+      const id = el.dataset.textId;
+      if (id) {
+        textsToSave[id] = el.innerHTML;
+      }
+    });
+    localStorage.setItem('agency_custom_content', JSON.stringify(textsToSave));
+    saveInSituChangesBtn.textContent = '✓ Textes Enregistrés !';
+    setTimeout(() => {
+      if (saveInSituChangesBtn) saveInSituChangesBtn.textContent = '💾 Enregistrer Textes';
+    }, 2000);
+  });
+
+  resetInSituChangesBtn?.addEventListener('click', () => {
+    if (confirm('Voulez-vous réinitialiser tous les textes personnalisés ?')) {
+      localStorage.removeItem('agency_custom_content');
+      window.location.reload();
+    }
+  });
+
+  exitAdminModeBtn?.addEventListener('click', () => {
+    updateStorage((prev) => ({ ...prev, sim: { role: 'public' } }));
+    window.location.href = '/web-agency-abidjan';
+  });
+
+  // Vérification de l'état Admin
+  const storageData = getStorage();
+  const urlParams = new URLSearchParams(window.location.search);
+  const isAdminRole = storageData?.sim?.role === 'admin' || urlParams.get('admin_edit') === 'true';
+
+  if (isAdminRole && adminBar) {
+    adminBar.style.display = 'block';
+    if (urlParams.get('admin_edit') === 'true' && toggleInSituEdit) {
+      toggleInSituEdit.checked = true;
+      setInSituEditing(true);
+    }
+  }
+
+  loadSavedTexts();
+
+  // 9. Retour en haut
+  document.getElementById('agencyScrollTopBtn')?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>
+
+<style lang="scss">
+  // PALETTE & VARIABLES DE L'AGENCE (LUXE OBSIDIENNE & OR DE CHAMPAGNE, AMBRE SOLAIRE, ÉMERAUDE)
+  .agencyPortfolio {
+    --ag-bg-dark: #0A0E17;
+    --ag-bg-card: rgba(16, 22, 36, 0.85);
+    --ag-bg-card-hover: rgba(26, 36, 58, 0.95);
+    --ag-border: rgba(212, 175, 55, 0.18);
+    --ag-border-accent: rgba(212, 175, 55, 0.38);
+    --ag-gold: #D4AF37;
+    --ag-gold-light: #FDE68A;
+    --ag-amber: #F59E0B;
+    --ag-amber-dark: #D97706;
+    --ag-wave-blue: #1898E8;
+    --ag-wave-blue-dark: #0D84D1;
+    --ag-emerald: #10B981;
+    --ag-emerald-dark: #059669;
+    --ag-text: #F8FAFC;
+    --ag-text-muted: #94A3B8;
+    --ag-radius-sm: 8px;
+    --ag-radius-md: 14px;
+    --ag-radius-lg: 24px;
+    --ag-radius-full: 9999px;
+
+    background-color: var(--ag-bg-dark);
+    // Motifs texturés chaleureux : micro-grille géométrique or et halos d'ambiance
+    background-image:
+      radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
+      radial-gradient(circle at 90% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 10% 70%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='48' height='48' viewBox='0 0 48 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24 0 L48 24 L24 48 L0 24 Z' fill='none' stroke='rgba(212,175,55,0.035)' stroke-width='1'/%3E%3C/svg%3E");
+    color: var(--ag-text);
+    min-height: 100vh;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow-x: clip;
+  }
+
+  // BARRE D'ADMINISTRATION IN-SITU
+  .agencyAdminBar {
+    position: sticky;
+    top: 0;
+    z-index: 300;
+    background: #F59E0B;
+    color: #070D18;
+    padding: 0.5rem 1.25rem;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+
+    &__container {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    &__roleInfo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    &__badge {
+      font-size: 0.82rem;
+      font-weight: 900;
+      background: #070D18;
+      color: #F59E0B;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    &__hint {
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    &__controls {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    &__toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+
+      input {
+        accent-color: #070D18;
+      }
+    }
+
+    &__saveBtn {
+      padding: 0.35rem 0.75rem;
+      background: #10B981;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+
+    &__resetBtn, &__portalBtn, &__exitBtn {
+      padding: 0.35rem 0.65rem;
+      background: rgba(0, 0, 0, 0.15);
+      color: #070D18;
+      font-weight: 700;
+      font-size: 0.78rem;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      text-decoration: none;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+
+  // Éléments de texte éditables in-situ
+  .editableText.--is-editing {
+    outline: 2px dashed #F59E0B !important;
+    outline-offset: 4px;
+    cursor: text;
+    background: rgba(245, 158, 11, 0.08);
+    border-radius: 4px;
+    padding: 2px 4px;
+
+    &:hover, &:focus {
+      outline-color: #D4AF37 !important;
+      background: rgba(212, 175, 55, 0.15);
+    }
+  }
+
+  // 1. HEADER STICKY (FORME INITIALE AÉRÉE ET FORME RÉDUITE AU DÉFILEMENT)
+  .agencyHeader {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 500;
+    background: rgba(7, 13, 24, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--ag-border);
+    transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+
+    // FORME INITIALE (HAUT DE PAGE : AÉRÉE & HAUTEUR PRÉSTIGIEUSE)
+    &__container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 1.25rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+      transition: padding 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    &__brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: #ffffff;
+      transition: gap 0.25s ease;
+    }
+
+    &__emblem {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--ag-gold) 0%, var(--ag-amber) 100%);
+      color: #0A0E17;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.35);
+      flex-shrink: 0;
+      transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+
+      svg {
+        width: 24px;
+        height: 24px;
+        transition: width 0.25s ease, height 0.25s ease;
+      }
+    }
+
+    &__brandText {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__name {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      transition: font-size 0.25s ease;
+    }
+
+    &__city {
+      font-size: 0.75rem;
+      color: var(--ag-gold);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: font-size 0.25s ease;
+    }
+
+    &__nav {
+      display: none;
+
+      @media (min-width: 1024px) {
+        display: block;
+      }
+    }
+
+    &__navList {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    &__link, &__navBtn {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ag-text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: color 0.15s ease, font-size 0.25s ease;
+
+      &:hover {
+        color: var(--ag-gold);
+      }
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    // BOUTONS D'ACTION DU HEADER
+    &__iconBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), height 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.15s ease, box-shadow 0.15s ease;
+      position: relative;
+      text-decoration: none;
+
+      &:hover {
+        transform: translateY(-2px) scale(1.05);
+      }
+
+      &.--wave {
+        background: #1898E8;
+        box-shadow: 0 4px 14px rgba(24, 152, 232, 0.35);
+      }
+
+      &.--cart {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--ag-border);
+        color: #ffffff;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.15);
+        }
+      }
+
+      &.--whatsapp {
+        background: var(--ag-emerald);
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+      }
+    }
+
+    &__cartBadge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 4px;
+      border-radius: 9999px;
+      background: var(--ag-gold);
+      color: #0A0E17;
+      font-size: 0.7rem;
+      font-weight: 900;
+      display: none;
+      align-items: center;
+    }
+
+    &__adminLink {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748B;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--ag-border);
+      transition: color 0.15s, background 0.15s;
+
+      &:hover {
+        color: var(--ag-gold);
+        background: rgba(212, 175, 55, 0.12);
+      }
+    }
+
+    &__statusBadge {
+      display: none;
+      @media (min-width: 1280px) {
+        display: inline-flex;
+      }
+    }
+
+    // FORME RÉDUITE LORSQUE LA PAGE SCROLL (COMPACTE, ÉPURÉE & ULTRA-LISIBLE)
+    &.--stuck {
+      background: rgba(6, 10, 18, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 1px 0 rgba(212, 175, 55, 0.3);
+      border-color: rgba(212, 175, 55, 0.35);
+
+      .agencyHeader__container {
+        padding: 0.45rem 1.25rem; // HAUTEUR VISIBLEMENT RÉDUITE
+      }
+
+      // Adaptation BrandIdentity
+      .brandIdentity,
+      .agencyHeader__brand {
+        gap: 0.55rem;
+      }
+
+      .brandIdentity__emblem,
+      .agencyHeader__emblem {
+        width: 32px; // LOGO RÉDUIT
+        height: 32px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
+
+        svg {
+          width: 17px;
+          height: 17px;
+        }
+      }
+
+      .brandIdentity__name,
+      .agencyHeader__name {
+        font-size: 0.95rem; // TYPO COMPACTE
+      }
+
+      .brandIdentity__tagline,
+      .agencyHeader__city {
+        font-size: 0.65rem;
+      }
+
+      // Adaptation NavMenu
+      .navMenu__link,
+      .navMenu__btn,
+      .agencyHeader__link,
+      .agencyHeader__navBtn {
+        font-size: 0.82rem;
+      }
+
+      // Adaptation ActionGroup
+      .actionGroup__btn,
+      .agencyHeader__iconBtn {
+        width: 36px; // BOUTONS RÉDUITS
+        height: 36px;
+        border-radius: 10px;
+
+        img {
+          width: 36px !important;
+        }
+
+        svg {
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+
+  // TRANSITIONS DÉCORATIVES SVG ARCHITECTURALES (MATTES & ÉLÉGANTES)
+  @keyframes waveDrift1 {
+    0% { transform: translateX(0) scaleY(1); }
+    50% { transform: translateX(-25px) scaleY(1.04); }
+    100% { transform: translateX(0) scaleY(1); }
+  }
+
+  @keyframes waveDrift2 {
+    0% { transform: translateX(0) scaleY(1); }
+    50% { transform: translateX(25px) scaleY(0.96); }
+    100% { transform: translateX(0) scaleY(1); }
+  }
+
+  .agencyWaveDivider {
+    position: relative;
+    width: 100%;
+    height: 60px;
+    overflow: hidden;
+    line-height: 0;
+    pointer-events: none;
+    z-index: 6;
+
+    &__svg {
+      display: block;
+      width: calc(100% + 40px);
+      margin-left: -20px;
+      height: 100%;
+    }
+
+    &__wave {
+      &.--layer1 {
+        animation: waveDrift1 12s ease-in-out infinite alternate;
+        transform-origin: center;
+      }
+      &.--layer2 {
+        animation: waveDrift2 10s ease-in-out infinite alternate;
+        transform-origin: center;
+      }
+    }
+
+    &.--inverted {
+      transform: rotate(180deg);
+    }
+  }
+
+  // BOUTONS & CONTENEURS DÉPLIABLES (FOLDABLE SECTIONS)
+  .agencySectionFoldToggle {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .agencyFoldBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.35rem;
+    border-radius: var(--ag-radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    &__arrow {
+      color: var(--ag-gold);
+      transition: transform 0.25s ease;
+    }
+
+    &.--active, &[aria-expanded="true"] {
+      border-color: rgba(212, 175, 55, 0.45);
+      background: rgba(212, 175, 55, 0.08);
+      color: #f8fafc;
+
+      .agencyFoldBtn__arrow {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .agencyFoldableBody {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, margin 0.35s ease;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+
+    &.--expanded {
+      grid-template-rows: 1fr;
+      opacity: 1;
+      visibility: visible;
+      margin-top: 2.5rem;
+    }
+
+    &__inner {
+      min-height: 0;
+    }
+  }
+
+  // EN-TÊTE DE SECTION
+  .agencySectionHeader {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 3rem auto;
+
+    &__eyebrow {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ag-gold);
+      margin-bottom: 0.75rem;
+    }
+
+    &__title {
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1.2;
+      color: #ffffff;
+      margin: 0 0 1rem 0;
+
+      @media (min-width: 768px) {
+        font-size: 2.5rem;
+      }
+    }
+
+    &__subtitle {
+      font-size: 1.05rem;
+      color: var(--ag-text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  // 2. HERO SECTION
+  .agencyHero {
+    position: relative;
+    padding: 3.5rem 1.25rem 4rem 1.25rem;
+    background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 60%);
+
+    &__container {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: center;
+
+      @media (min-width: 1024px) {
+        grid-template-columns: 1.15fr 0.85fr;
+      }
+    }
+
+    &__badgeGroup {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-bottom: 1.5rem;
+    }
+
+    &__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--ag-radius-full);
+      font-size: 0.78rem;
+      font-weight: 700;
+
+      &.--cyan, &.--gold {
+        background: rgba(212, 175, 55, 0.12);
+        color: var(--ag-gold);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+      }
+
+      &.--emerald {
+        background: rgba(16, 185, 129, 0.12);
+        color: var(--ag-emerald);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+      }
+    }
+
+    &__title {
+      font-size: 2.35rem;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin: 0 0 1.25rem 0;
+
+      @media (min-width: 768px) {
+        font-size: 3.25rem;
+      }
+    }
+
+    &__titleHighlight {
+      background: linear-gradient(135deg, #FDE68A 0%, var(--ag-gold) 50%, var(--ag-amber) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    &__pitch {
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin: 0 0 2rem 0;
+      max-width: 620px;
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-bottom: 2.75rem;
+    }
+
+    &__btnPrimary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.65rem;
+      background: var(--ag-emerald);
+      color: #ffffff;
+      border-radius: var(--ag-radius-md);
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+
+      &:hover {
+        background: #0ea371;
+        transform: translateY(-2px);
+      }
+    }
+
+    &__btnSecondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.45rem;
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      border: 1px solid var(--ag-border);
+      border-radius: var(--ag-radius-md);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+      }
+    }
+
+    &__btnWave {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1.45rem;
+      background: rgba(24, 152, 232, 0.12);
+      color: var(--ag-wave-blue);
+      border: 1px solid rgba(24, 152, 232, 0.35);
+      border-radius: var(--ag-radius-md);
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(24, 152, 232, 0.22);
+        transform: translateY(-2px);
+      }
+    }
+
+    &__stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+
+      @media (min-width: 640px) {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    &__statCard {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--ag-border);
+      border-radius: var(--ag-radius-md);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__statVal {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--ag-gold);
+      margin-bottom: 0.2rem;
+    }
+
+    &__statLabel {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    &__statSub {
+      font-size: 0.72rem;
+      color: var(--ag-text-muted);
+      margin-top: 0.2rem;
+    }
+
+    &__visualFrame {
+      position: relative;
+      border-radius: var(--ag-radius-lg);
+      overflow: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+    }
+
+    &__image {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      display: block;
+    }
+
+    &__visualOverlay {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      right: 1rem;
+    }
+
+    &__visualTag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(10, 14, 23, 0.92);
+      backdrop-filter: blur(12px);
+      padding: 0.5rem 1.15rem;
+      border-radius: var(--ag-radius-full);
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #FDE68A;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  // COUCHES DE PARALLAX IMMERSIF SUR TOUS LES BLOCS DE CONTENU (IMAGES CONTEXTUELLES)
+  .agencySectionParallaxBg {
+    position: absolute;
+    top: -35%;
+    bottom: -35%;
+    left: -5%;
+    right: -5%;
+    pointer-events: none;
+    z-index: 0;
+    will-change: transform;
+    opacity: 0.85;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.05s linear;
+
+    &.--metier {
+      background-image:
+        linear-gradient(180deg, rgba(8, 12, 22, 0.80) 0%, rgba(8, 12, 22, 0.35) 50%, rgba(8, 12, 22, 0.85) 100%),
+        url('/images/agency/parallax_metier.jpg');
+    }
+
+    &.--projects {
+      background-image:
+        linear-gradient(180deg, rgba(8, 12, 22, 0.80) 0%, rgba(8, 12, 22, 0.35) 50%, rgba(8, 12, 22, 0.85) 100%),
+        url('/images/agency/parallax_realisations.jpg');
+    }
+
+    &.--services {
+      background-image:
+        linear-gradient(180deg, rgba(8, 12, 22, 0.80) 0%, rgba(8, 12, 22, 0.35) 50%, rgba(8, 12, 22, 0.85) 100%),
+        url('/images/agency/parallax_services.jpg');
+    }
+
+    &.--faq {
+      background-image:
+        linear-gradient(180deg, rgba(8, 12, 22, 0.80) 0%, rgba(8, 12, 22, 0.35) 50%, rgba(8, 12, 22, 0.85) 100%),
+        url('/images/agency/parallax_faq.jpg');
+    }
+  }
+
+  .agencySectionParallaxFloat {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+    will-change: transform;
+    transition: transform 0.08s linear;
+
+    &.--metier {
+      top: 15%;
+      right: 5%;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+      border: 1px dashed rgba(212, 175, 55, 0.25);
+      border-radius: 50%;
+      filter: blur(0.5px);
+    }
+
+    &.--projects {
+      bottom: 20%;
+      left: 3%;
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      border: 1px dashed rgba(16, 185, 129, 0.2);
+      border-radius: 50%;
+    }
+
+    &.--services {
+      top: 10%;
+      left: 6%;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+      border: 1px dashed rgba(245, 158, 11, 0.25);
+      border-radius: 50%;
+    }
+
+    &.--faq {
+      bottom: 12%;
+      right: 4%;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+      border: 1px dashed rgba(212, 175, 55, 0.2);
+      border-radius: 50%;
+    }
+  }
+
+  // 3. NOTRE MÉTIER
+  .agencyValues {
+    padding: 5rem 1.25rem;
+    background: #0B1120;
+    position: relative;
+    overflow: hidden;
+
+    &__container {
+      max-width: 1240px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 3;
+      will-change: transform;
+      transition: transform 0.05s linear;
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+
+      @media (min-width: 640px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (min-width: 1024px) {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  }
+
+  .agencyComparison {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 1050px;
+    margin: 0 auto;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &__card {
+      border-radius: var(--ag-radius-md);
+      padding: 2rem;
+
+      &.--old {
+        background: rgba(239, 68, 68, 0.05);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+
+        .agencyComparison__icon {
+          background: rgba(239, 68, 68, 0.15);
+          color: #EF4444;
+        }
+
+        h3 { color: #FCA5A5; }
+
+        li::before {
+          content: "✕";
+          color: #EF4444;
+          font-weight: 900;
+        }
+      }
+
+      &.--new {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(16, 185, 129, 0.05) 100%);
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.5);
+
+        .agencyComparison__icon {
+          background: rgba(212, 175, 55, 0.18);
+          color: var(--ag-gold);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        h3 { color: #ffffff; }
+
+        li::before {
+          content: "✓";
+          color: var(--ag-emerald);
+          font-weight: 900;
+        }
+      }
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+
+      h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 800;
+      }
+    }
+
+    &__icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    &__list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+
+      li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.65rem;
+        font-size: 0.92rem;
+        color: #e2e8f0;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .agencyValueCard {
+    background: var(--ag-bg-card);
+    border: 1px solid var(--ag-border);
+    border-radius: var(--ag-radius-md);
+    padding: 1.75rem;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      border-color: var(--ag-border-accent);
+    }
+
+    &__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    &__icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--ag-gold);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--ag-emerald);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--ag-radius-full);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    &__title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 0.65rem 0;
+    }
+
+    &__desc {
+      font-size: 0.9rem;
+      color: var(--ag-text-muted);
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  // 4. RÉALISATIONS
+  .agencyProjects {
+    padding: 5rem 1.25rem;
+    background: #070D18;
+    position: relative;
+    overflow: hidden;
+
+    &__container {
+      max-width: 1240px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 3;
+      will-change: transform;
+      transition: transform 0.05s linear;
+    }
+
+    &__filterBar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.65rem;
+      margin-bottom: 3rem;
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+
+      @media (min-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  }
+
+  .agencyFilterBtn {
+    padding: 0.55rem 1.2rem;
+    border-radius: var(--ag-radius-full);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--ag-border);
+    color: var(--ag-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &.--active {
+      background: linear-gradient(135deg, #D4AF37 0%, #F59E0B 100%);
+      border-color: #D4AF37;
+      color: #0A0E17;
+      font-weight: 800;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
+    }
+  }
+
+  .agencyProjectCard {
+    background: var(--ag-bg-card);
+    border: 1px solid var(--ag-border);
+    border-radius: var(--ag-radius-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    &__media {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: #0B192C;
+      overflow: hidden;
+    }
+
+    &__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover &__image {
+      transform: scale(1.03);
+    }
+
+    &__statusBadge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(7, 13, 24, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--ag-radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #ffffff;
+      border: 1px solid var(--ag-border);
+    }
+
+    &__statusDot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ag-emerald);
+    }
+
+    &__body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
+    }
+
+    &__category {
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--ag-gold);
+    }
+
+    &__location {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      color: var(--ag-text-muted);
+    }
+
+    &__title {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0 0 0.65rem 0;
+      line-height: 1.3;
+    }
+
+    &__desc {
+      font-size: 0.9rem;
+      color: var(--ag-text-muted);
+      line-height: 1.6;
+      margin: 0 0 1rem 0;
+      flex: 1;
+    }
+
+    &__metrics {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--ag-gold);
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--ag-radius-sm);
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    &__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1.5rem;
+    }
+
+    &__tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--ag-border);
+      color: #cbd5e1;
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--ag-radius-sm);
+    }
+
+    &__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--ag-border);
+    }
+
+    &__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--ag-gold);
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: #FDE68A;
+      }
+    }
+
+    &__quoteBtn {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--ag-text-muted);
+      background: none;
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--ag-radius-sm);
+      border: 1px solid var(--ag-border);
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+      }
+    }
+  }
+
+  // 5. BLOC PARALLAX SHOWCASE (EFFET MULTI-PROFONDEURS HAUTE VISIBILITÉ)
+  .agencyParallax {
+    position: relative;
+    padding: 7.5rem 1.25rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #080D18;
+    border-top: 1px solid var(--ag-border);
+    border-bottom: 1px solid var(--ag-border);
+
+    &__bg {
+      position: absolute;
+      top: -35%;
+      left: -5%;
+      right: -5%;
+      bottom: -35%;
+      background-image:
+        linear-gradient(180deg, rgba(10, 14, 23, 0.82) 0%, rgba(10, 14, 23, 0.35) 50%, rgba(10, 14, 23, 0.88) 100%),
+        url('/images/agency/parallax_bg.jpg');
+      background-size: cover;
+      background-position: center;
+      pointer-events: none;
+      will-change: transform;
+      z-index: 1;
+    }
+
+    &__mesh {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(212, 175, 55, 0.18) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      opacity: 0.7;
+      z-index: 2;
+      will-change: transform;
+    }
+
+    // Badges flottants multi-profondeurs
+    &__floatingBadge {
+      position: absolute;
+      display: none;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--ag-radius-md);
+      background: rgba(16, 22, 36, 0.88);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55);
+      z-index: 3;
+      will-change: transform;
+      pointer-events: none;
+
+      @media (min-width: 1024px) {
+        display: flex;
+      }
+
+      &.--topRight {
+        top: 16%;
+        right: 8%;
+      }
+
+      &.--bottomLeft {
+        bottom: 18%;
+        left: 7%;
+      }
+
+      &.--bottomRight {
+        bottom: 14%;
+        right: 9%;
+      }
+    }
+
+    &__badgeIcon {
+      font-size: 1.5rem;
+    }
+
+    &__badgeText {
+      display: flex;
+      flex-direction: column;
+
+      strong {
+        font-size: 0.95rem;
+        font-weight: 900;
+        color: #ffffff;
+      }
+
+      small {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--ag-gold);
+      }
+    }
+
+    &__container {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 4;
+    }
+
+    &__card {
+      background: rgba(16, 22, 36, 0.88);
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      border-radius: var(--ag-radius-lg);
+      padding: 3.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(16px);
+      will-change: transform;
+    }
+
+    &__eyebrow {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--ag-gold);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.85rem;
+    }
+
+    &__title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      line-height: 1.2;
+      color: #ffffff;
+      margin: 0 0 1.25rem 0;
+
+      @media (min-width: 768px) {
+        font-size: 2.85rem;
+      }
+    }
+
+    &__text {
+      font-size: 1.1rem;
+      color: #cbd5e1;
+      line-height: 1.7;
+      max-width: 720px;
+      margin: 0 auto 2.5rem auto;
+    }
+
+    &__floatingChips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.85rem;
+      margin-bottom: 2.5rem;
+    }
+
+    &__btn {
+      padding: 0.95rem 2.25rem;
+      background: linear-gradient(135deg, var(--ag-gold) 0%, var(--ag-amber) 100%);
+      color: #0A0E17;
+      font-size: 1rem;
+      font-weight: 900;
+      border-radius: var(--ag-radius-md);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(245, 158, 11, 0.5);
+      }
+    }
+  }
+
+  .parallaxChip {
+    padding: 0.5rem 1.15rem;
+    border-radius: var(--ag-radius-full);
+    font-size: 0.82rem;
+    font-weight: 800;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--ag-border);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    &.--chip1 { border-color: rgba(212, 175, 55, 0.6); color: var(--ag-gold); }
+    &.--chip2 { border-color: rgba(16, 185, 129, 0.6); color: var(--ag-emerald); }
+    &.--chip3 { border-color: rgba(24, 152, 232, 0.6); color: var(--ag-wave-blue); }
+  }
+
+  // 6. SERVICES & PACKS
+  .agencyServices {
+    padding: 5rem 1.25rem;
+    background: #0B1120;
+    position: relative;
+    overflow: hidden;
+
+    &__container {
+      max-width: 1240px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 3;
+      will-change: transform;
+      transition: transform 0.05s linear;
+    }
+
+    &__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+
+      @media (min-width: 640px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      @media (min-width: 1100px) {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  }
+
+  .agencyServiceCard {
+    background: var(--ag-bg-card);
+    border: 1px solid var(--ag-border);
+    border-radius: var(--ag-radius-lg);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    &.--popular {
+      background: linear-gradient(180deg, rgba(212, 175, 55, 0.12) 0%, rgba(16, 22, 36, 0.95) 100%);
+      border-color: rgba(212, 175, 55, 0.55);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    &__ribbon {
+      position: absolute;
+      top: -12px;
+      right: 1.5rem;
+      background: linear-gradient(135deg, var(--ag-gold) 0%, var(--ag-amber) 100%);
+      color: #0A0E17;
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      padding: 0.25rem 0.85rem;
+      border-radius: var(--ag-radius-full);
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    }
+
+    &__badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--ag-gold);
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--ag-radius-full);
+      margin-bottom: 0.75rem;
+    }
+
+    &__title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0 0 1rem 0;
+    }
+
+    &__priceBox { margin-bottom: 1.25rem; }
+
+    &__price {
+      display: block;
+      font-size: 1.85rem;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    &__pricePeriod {
+      font-size: 0.75rem;
+      color: var(--ag-emerald);
+      font-weight: 600;
+    }
+
+    &__meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.75rem;
+      border-radius: var(--ag-radius-sm);
+      font-size: 0.8rem;
+      color: #e2e8f0;
+      margin-bottom: 1rem;
+    }
+
+    &__target {
+      font-size: 0.8rem;
+      color: var(--ag-text-muted);
+      line-height: 1.5;
+      margin: 0 0 1.25rem 0;
+    }
+
+    &__body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__desc {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin: 0 0 1.25rem 0;
+    }
+
+    &__features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.75rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+
+      li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        font-size: 0.82rem;
+        color: #e2e8f0;
+
+        svg {
+          color: var(--ag-gold);
+          flex-shrink: 0;
+          margin-top: 0.15rem;
+        }
+      }
+    }
+
+    &__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    &__btnCart {
+      padding: 0.75rem 1rem;
+      background: var(--ag-emerald);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.88rem;
+      border-radius: var(--ag-radius-md);
+      border: none;
+      cursor: pointer;
+    }
+
+    &__btnWave {
+      padding: 0.65rem 1rem;
+      background: rgba(24, 152, 232, 0.15);
+      border: 1px solid rgba(24, 152, 232, 0.4);
+      color: var(--ag-wave-blue);
+      font-weight: 700;
+      font-size: 0.82rem;
+      border-radius: var(--ag-radius-md);
+      cursor: pointer;
+    }
+  }
+
+  // BANNIÈRE CTA SIMULATEUR
+  .agencySimCtaBanner {
+    margin-top: 3.5rem;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(16, 22, 36, 0.95) 100%);
+    border: 1.5px solid rgba(212, 175, 55, 0.4);
+    border-radius: var(--ag-radius-lg);
+    padding: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+
+    &__content {
+      max-width: 650px;
+
+       h3 {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0 0 0.5rem 0;
+      }
+
+      p {
+        font-size: 0.95rem;
+        color: var(--ag-text-muted);
+        margin: 0;
+      }
+    }
+
+    &__btn {
+      padding: 0.85rem 1.65rem;
+      background: linear-gradient(135deg, var(--ag-gold) 0%, var(--ag-amber) 100%);
+      color: #0A0E17;
+      font-weight: 800;
+      font-size: 0.92rem;
+      border-radius: var(--ag-radius-md);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+      }
+    }
+  }
+
+  // 7. FAQ
+  .agencyFaq {
+    padding: 5rem 1.25rem;
+    background: #070D18;
+    position: relative;
+    overflow: hidden;
+
+    &__container {
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 3;
+      will-change: transform;
+      transition: transform 0.05s linear;
+    }
+
+    &__list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  .agencyFaqItem {
+    background: var(--ag-bg-card);
+    border: 1px solid var(--ag-border);
+    border-radius: var(--ag-radius-md);
+    overflow: hidden;
+
+    &[open] {
+      border-color: rgba(212, 175, 55, 0.45);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+
+      .agencyFaqItem__chevron { transform: rotate(180deg); color: var(--ag-gold); }
+      .agencyFaqItem__num {
+        background: linear-gradient(135deg, var(--ag-gold) 0%, var(--ag-amber) 100%);
+        color: #0A0E17;
+        border-color: transparent;
+      }
+    }
+
+    &__summary {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker { display: none; }
+    }
+
+    &__num {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      color: var(--ag-gold);
+      font-size: 0.85rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    &__question {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      flex: 1;
+    }
+
+    &__chevron {
+      color: var(--ag-text-muted);
+      transition: transform 0.2s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    &__panel {
+      padding: 0 1.5rem 1.5rem 4.5rem;
+      font-size: 0.95rem;
+      color: var(--ag-text-muted);
+      line-height: 1.6;
+
+      p { margin: 0; }
+    }
+  }
+
+  // 8. FOOTER D'AGENCE OFFICIEL PLEINE LARGEUR (AVEC ARRIÈRE-PLAN PANORAMA URBAIN BD ANIME & PARALLAX)
+  .agencyFooter {
+    width: 100%;
+    background: #04060A;
+    border-top: 2px solid rgba(212, 175, 55, 0.35);
+    position: relative;
+    overflow: hidden;
+    color: var(--ag-text);
+    margin: 0;
+    padding: 0;
+
+    &__bg {
+      position: absolute;
+      top: -25%;
+      bottom: -25%;
+      left: -2%;
+      right: -2%;
+      background-image:
+        linear-gradient(180deg,
+          rgba(4, 6, 10, 0.45) 0%,
+          rgba(4, 6, 10, 0.15) 20%,
+          rgba(4, 6, 10, 0.40) 55%,
+          rgba(4, 6, 10, 0.92) 100%),
+        url('/images/agency/footer_abidjan_comic.jpg');
+      background-size: cover;
+      background-position: center 30%;
+      will-change: transform;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.94;
+      transition: transform 0.05s linear;
+    }
+  }
+
+  // PALIER 1 : PRE-FOOTER CTA BANDEAU PLEINE LARGEUR
+  .agencyFooterPreCta {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    background: rgba(6, 10, 18, 0.62);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 3.5rem 1.5rem;
+
+    &__inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    &__lead {
+      max-width: 640px;
+    }
+
+    &__badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ag-gold);
+      background: rgba(212, 175, 55, 0.1);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--ag-radius-full);
+      margin-bottom: 0.75rem;
+    }
+
+    &__title {
+      font-size: 1.85rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin: 0 0 0.5rem 0;
+      line-height: 1.25;
+
+      @media (min-width: 768px) {
+        font-size: 2.2rem;
+      }
+    }
+
+    &__text {
+      font-size: 0.95rem;
+      color: var(--ag-text-muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+  }
+
+  .agencyFooterPreCtaBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.35rem;
+    border-radius: var(--ag-radius-full);
+    font-size: 0.88rem;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &.--whatsapp {
+      background: #10B981;
+      color: #042416;
+      border: 1px solid #10B981;
+      box-shadow: 0 6px 18px -4px rgba(16, 185, 129, 0.4);
+
+      &:hover {
+        transform: translateY(-2px);
+        background: #059669;
+        color: #ffffff;
+      }
+    }
+
+    &.--wave {
+      background: rgba(24, 152, 232, 0.12);
+      color: #ffffff;
+      border: 1px solid rgba(24, 152, 232, 0.4);
+
+      &:hover {
+        transform: translateY(-2px);
+        background: rgba(24, 152, 232, 0.22);
+        border-color: #1898E8;
+      }
+    }
+
+    &.--phone {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+
+      &:hover {
+        transform: translateY(-2px);
+        background: rgba(212, 175, 55, 0.12);
+        border-color: var(--ag-gold);
+        color: #FDE68A;
+      }
+    }
+  }
+
+  // PALIER 2 : CORPS MULTI-COLONNES (GRILLE 4 COLONNES PLEINE LARGEUR)
+  .agencyFooterBody {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 4.5rem 1.5rem 3.5rem 1.5rem;
+    will-change: transform;
+    transition: transform 0.05s linear;
+
+    &__inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.25fr 0.9fr 1.05fr 1.15fr;
+      gap: 2rem;
+
+      @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+      }
+
+      @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
+      }
+    }
+  }
+
+  .agencyFooterCol {
+    display: flex;
+    flex-direction: column;
+    background: rgba(8, 12, 22, 0.84);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: var(--ag-radius-lg);
+    padding: 1.85rem 1.6rem;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+
+    &:hover {
+      border-color: rgba(212, 175, 55, 0.45);
+      transform: translateY(-2px);
+    }
+
+    &.--brand {
+      gap: 0.5rem;
+    }
+
+    &__brandHeader {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    &__logoMark {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      flex-shrink: 0;
+    }
+
+    &__brandName {
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    &__tagline {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #FDE68A;
+      margin: 0 0 0.5rem 0;
+    }
+
+    &__desc {
+      font-size: 0.85rem;
+      color: var(--ag-text-muted);
+      line-height: 1.6;
+      margin: 0 0 1.25rem 0;
+    }
+
+    &__heading {
+      font-size: 1rem;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #ffffff;
+      margin: 0 0 1.5rem 0;
+      position: relative;
+      padding-bottom: 0.65rem;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 28px;
+        height: 2px;
+        background: var(--ag-gold);
+      }
+    }
+  }
+
+  .agencyFooterOpeningStatus {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--ag-radius-full);
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.28);
+    margin-bottom: 1.5rem;
+    width: fit-content;
+
+    &__dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #10B981;
+      flex-shrink: 0;
+      animation: pulse 2s infinite;
+    }
+
+    &__text {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 0.01em;
+    }
+  }
+
+  .agencyFooterSocials {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+    &__label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ag-text-muted);
+      margin-bottom: 0.65rem;
+    }
+
+    &__list {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    &__link {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      color: #FDE68A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: var(--ag-gold);
+        color: #07090E;
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  .agencyFooterNav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    &__link {
+      font-size: 0.88rem;
+      color: var(--ag-text-muted);
+      text-decoration: none;
+      transition: color 0.15s ease, transform 0.15s ease;
+      display: inline-block;
+
+      &:hover {
+        color: #FDE68A;
+        transform: translateX(3px);
+      }
+    }
+  }
+
+  .agencyFooterContacts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .agencyFooterContactItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(212, 175, 55, 0.08);
+      border-color: rgba(212, 175, 55, 0.35);
+      transform: translateX(3px);
+    }
+
+    &__icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--ag-gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      &.--wa {
+        background: rgba(16, 185, 129, 0.12);
+        color: #10B981;
+      }
+    }
+
+    &__label {
+      display: block;
+      font-size: 0.7rem;
+      color: var(--ag-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    &__val {
+      font-size: 0.86rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+  }
+
+  .agencyFooterAstreinteNote {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.75rem 0.85rem;
+    border-radius: 8px;
+    background: rgba(212, 175, 55, 0.06);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    font-size: 0.75rem;
+    color: #FDE68A;
+    line-height: 1.45;
+    margin-top: 0.5rem;
+
+    &__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--ag-gold);
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+  }
+
+  .agencyFooterAddress {
+    font-style: normal;
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+
+    &__pin {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    strong {
+      display: block;
+      color: #ffffff;
+      font-size: 0.92rem;
+      margin-bottom: 0.2rem;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  // Façade Leaflet de la carte (Sobre et biseautée)
+  .agencyMapFacade {
+    background: #080C14;
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    min-height: 160px;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+
+    &__preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.08) 0%, #080C14 85%);
+    }
+
+    &__pin {
+      animation: bounce 1.8s infinite;
+      margin-bottom: 0.35rem;
+    }
+
+    &__label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 0.75rem;
+    }
+
+    &__btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.55rem 1.15rem;
+      border-radius: var(--ag-radius-full);
+      background: linear-gradient(135deg, #D4AF37 0%, #F59E0B 100%);
+      color: #07090E;
+      font-weight: 800;
+      font-size: 0.78rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        opacity: 0.95;
+      }
+    }
+  }
+
+  .agencyFooterGpsLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.65rem 0.85rem;
+    border-radius: 8px;
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    color: #FDE68A;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    margin-top: 0.75rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(212, 175, 55, 0.16);
+      color: #ffffff;
+    }
+  }
+
+  // PALIER 3 : SOUS-FOOTER PLEINE LARGEUR (COLOPHON & RÉASSURANCE)
+  .agencyFooterBottom {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(3, 4, 7, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1.35rem 1.5rem;
+    font-size: 0.82rem;
+    color: var(--ag-text-muted);
+
+    &__inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+    }
+
+    &__copy {
+      margin: 0;
+    }
+
+    &__badges {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    &__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.75rem;
+      color: #cbd5e1;
+    }
+
+    &__links {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    &__link {
+      color: var(--ag-text-muted);
+      text-decoration: none;
+      transition: color 0.15s ease;
+
+      &:hover {
+        color: #FDE68A;
+      }
+
+      &.--admin {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--ag-gold);
+        font-weight: 700;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        background: rgba(212, 175, 55, 0.08);
+        border: 1px solid rgba(212, 175, 55, 0.25);
+
+        &:hover {
+          background: rgba(212, 175, 55, 0.18);
+          color: #ffffff;
+        }
+      }
+    }
+
+    &__sep {
+      color: rgba(212, 175, 55, 0.3);
+    }
+  }
+
+  @keyframes rotateSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  // 9. MODALE SIMULATEUR DE DEVIS (<dialog>)
+  .agencySimModal {
+    border: none;
+    background: transparent;
+    padding: 0;
+    max-width: 900px;
+    width: 92vw;
+    color: var(--ag-text);
+
+    &::backdrop {
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+    }
+
+    &__card {
+      background: #0F172A;
+      border: 1.5px solid rgba(212, 175, 55, 0.4);
+      border-radius: var(--ag-radius-lg);
+      padding: 2.25rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      max-height: 88vh;
+      overflow-y: auto;
+    }
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--ag-border);
+      padding-bottom: 1rem;
+    }
+
+    &__eyebrow {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--ag-gold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    &__title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0.25rem 0 0 0;
+    }
+
+    &__close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-size: 1.1rem;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  .agencySimStep {
+    border: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+
+    &__legend {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 1rem;
+    }
+
+    &__num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ag-gold) 0%, var(--ag-amber) 100%);
+      color: #0A0E17;
+      font-size: 0.8rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.65rem;
+
+      @media (min-width: 600px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    &__packs {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+
+      @media (min-width: 640px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    &__addons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+  }
+
+  .agencySimOption {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--ag-radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--ag-border);
+    cursor: pointer;
+    font-size: 0.85rem;
+
+    &.--active {
+      background: rgba(212, 175, 55, 0.15);
+      border-color: var(--ag-gold);
+      color: #ffffff;
+      font-weight: 700;
+    }
+  }
+
+  .agencySimPack {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: var(--ag-radius-md);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--ag-border);
+    cursor: pointer;
+
+    &.--active {
+      background: rgba(212, 175, 55, 0.12);
+      border-color: var(--ag-gold);
+    }
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 0.2rem;
+    }
+
+    &__desc {
+      font-size: 0.75rem;
+      color: var(--ag-text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    &__price {
+      font-size: 1.05rem;
+      font-weight: 900;
+      color: var(--ag-gold);
+    }
+  }
+
+  .agencySimAddon {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--ag-radius-sm);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--ag-border);
+    cursor: pointer;
+
+    &__info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    &__sub {
+      font-size: 0.75rem;
+      color: var(--ag-text-muted);
+    }
+  }
+
+  .agencySimSummary {
+    margin-top: 2rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--ag-border);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+
+    @media (min-width: 680px) {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+
+    &__breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    &__row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+
+      &.--total {
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid var(--ag-border);
+        font-size: 1.15rem;
+        font-weight: 900;
+        color: var(--ag-gold);
+      }
+
+      &.--deposit {
+        font-size: 0.92rem;
+        font-weight: 800;
+        color: var(--ag-emerald);
+      }
+    }
+
+    &__buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    &__btnWa {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1rem;
+      border-radius: var(--ag-radius-md);
+      background: var(--ag-emerald);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.88rem;
+      border: none;
+      cursor: pointer;
+    }
+
+    &__btnWave {
+      padding: 0.75rem 1rem;
+      border-radius: var(--ag-radius-md);
+      background: var(--ag-wave-blue);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  // 10. MODALE TUNNEL WAVE (<dialog>)
+  .agencyWaveModal {
+    border: none;
+    background: transparent;
+    padding: 0;
+    max-width: 520px;
+    width: 90vw;
+    color: var(--ag-text);
+
+    &::backdrop {
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+    }
+
+    &__card {
+      background: #0F172A;
+      border: 1px solid rgba(24, 152, 232, 0.4);
+      border-radius: var(--ag-radius-lg);
+      padding: 2rem;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75);
+    }
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--ag-border);
+    }
+
+    &__brandGroup {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    &__title {
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    &__sub {
+      font-size: 0.75rem;
+      color: #94A3B8;
+      margin: 0;
+    }
+
+    &__close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border: none;
+      cursor: pointer;
+    }
+
+    &__label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 0.35rem;
+    }
+
+    &__inputWrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.85rem;
+    }
+
+    &__input {
+      width: 100%;
+      padding: 0.75rem 4.5rem 0.75rem 1rem;
+      font-size: 1.25rem;
+      font-weight: 900;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--ag-border);
+      border-radius: var(--ag-radius-md);
+      color: #ffffff;
+    }
+
+    &__currency {
+      position: absolute;
+      right: 1.25rem;
+      font-weight: 800;
+      color: var(--ag-wave-blue);
+    }
+
+    &__presets {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.45rem;
+      margin-bottom: 1.5rem;
+    }
+
+    &__qrCard {
+      background: #ffffff;
+      border-radius: var(--ag-radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #070D18;
+      margin-bottom: 1.5rem;
+    }
+
+    &__qrHeading {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      strong { color: #1898E8; font-size: 1.1rem; }
+    }
+
+    &__amountPill {
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: #0B192C;
+      background: #eff6ff;
+      padding: 0.25rem 0.85rem;
+      border-radius: var(--ag-radius-full);
+      margin: 0.5rem 0;
+    }
+
+    &__partners {
+      font-size: 0.65rem;
+      color: #64748b;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    &__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    &__openBtn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.85rem 1rem;
+      background: var(--ag-wave-blue);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border-radius: var(--ag-radius-md);
+      text-decoration: none;
+    }
+
+    &__copyBtn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1rem;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--ag-border);
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border-radius: var(--ag-radius-md);
+      cursor: pointer;
+    }
+  }
+
+  .agencyWaveModalPreset {
+    padding: 0.45rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: var(--ag-radius-sm);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--ag-border);
+    color: #cbd5e1;
+    cursor: pointer;
+
+    &.--active {
+      background: rgba(24, 152, 232, 0.25);
+      border-color: var(--ag-wave-blue);
+      color: #ffffff;
+    }
+  }
+
+  // 11. BOUTONS FIXES BAS GAUCHE & BAS DROIT (100% SVG, ZÉRO EMOJI)
+  .agencyFabTools {
+    position: fixed;
+    left: 1.25rem;
+    bottom: max(1.25rem, env(safe-area-inset-bottom, 1.25rem));
+    z-index: 300;
+
+    &__details {
+      position: relative;
+
+      &[open] {
+        .agencyFabTools__icon.--main { display: none; }
+        .agencyFabTools__icon.--close { display: block; }
+        .agencyFabTools__menu {
+          display: flex;
+          animation: fabPop 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+      }
+    }
+
+    &__trigger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #0A0E17;
+      color: var(--ag-gold);
+      border: 1.5px solid rgba(212, 175, 55, 0.45);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker { display: none; }
+    }
+
+    &__icon {
+      &.--close { display: none; }
+    }
+
+    &__menu {
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+      position: absolute;
+      left: 0;
+      bottom: 58px;
+      min-width: 210px;
+      background: #0F172A;
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: var(--ag-radius-md);
+      padding: 0.75rem;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75);
+    }
+
+    &__item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      width: 100%;
+      padding: 0.55rem 0.85rem;
+      border-radius: var(--ag-radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: left;
+
+      &:hover {
+        background: rgba(212, 175, 55, 0.12);
+        color: var(--ag-gold);
+      }
+    }
+  }
+
+  .agencyFabContact {
+    position: fixed;
+    right: 1.25rem;
+    bottom: max(1.25rem, env(safe-area-inset-bottom, 1.25rem));
+    z-index: 300;
+
+    &__details {
+      position: relative;
+
+      &[open] {
+        .agencyFabContact__icon.--chat { display: none; }
+        .agencyFabContact__icon.--close { display: block; }
+        .agencyFabContact__menu {
+          display: flex;
+          animation: fabPop 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+      }
+    }
+
+    &__trigger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--ag-emerald);
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.45);
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker { display: none; }
+
+      &:hover {
+        transform: scale(1.08);
+        box-shadow: 0 6px 22px rgba(16, 185, 129, 0.6);
+      }
+    }
+
+    &__icon {
+      &.--close { display: none; }
+    }
+
+    &__menu {
+      display: none;
+      flex-direction: column;
+      gap: 0.65rem;
+      position: absolute;
+      right: 0;
+      bottom: 68px;
+      min-width: 180px;
+    }
+
+    &__btn {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.8rem 1.15rem;
+      border-radius: var(--ag-radius-full);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+
+      &:hover { transform: translateX(-4px); }
+      &.--wa { background-color: var(--ag-emerald); }
+      &.--phone { background-color: #0F172A; border: 1px solid var(--ag-border); }
+    }
+  }
+
+  @keyframes fabPop {
+    from { opacity: 0; transform: translateY(10px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+</style>

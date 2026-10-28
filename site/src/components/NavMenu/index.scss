@@ -1,0 +1,14 @@
+@use 'scss/default';
+@use 'scss/pills';
+
+.navMenu {
+  $block: &;
+
+  // Mixin de base BEM
+  @include default.navMenu($block: $block);
+
+  // Modificateur autonome .--pills
+  &.--pills {
+    @include pills.pills($block: $block);
+  }
+}

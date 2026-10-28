@@ -1,0 +1,150 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO & LegionUI Optimized)
+=========================================================
+Pattern 2 : Instance Unique
+Composant d'identité visuelle de marque (logo/emblème + titre et sous-titre).
+
+Squelette attendu (Emmet) :
+a.brandIdentity[.--modifier]
+ ├── span.brandIdentity__emblem
+ └── div.brandIdentity__text
+      ├── span.brandIdentity__name
+      └── span.brandIdentity__tagline
+=========================================================
+*/
+@use 'sass:map';
+
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function brandIdentity($defaultValues: "") {
+  @return ($defaultValues);
+}
+
+/************************************************************/
+/**************************VARIABLES*************************/
+/************************************************************/
+$brandIdentity: (
+  emblem-size: 42px,
+  emblem-radius: 12px,
+  emblem-bg: linear-gradient(135deg, #e6c875 0%, #C59B27 50%, #9A7B1C 100%),
+  emblem-color: #0b192c,
+  emblem-shadow: 0 4px 14px rgba(197, 155, 39, 0.35),
+  text-color: #ffffff,
+  tagline-color: #94a3b8,
+  font-size-name: 1.15rem,
+  font-size-tagline: 0.72rem,
+  gap: 0.85rem
+);
+
+/************************************************************/
+/*************************PLACEHOLDER************************/
+/************************************************************/
+%brandIdentity {
+  --template: "a.brandIdentity > span.brandIdentity__emblem + div.brandIdentity__text > span.brandIdentity__name + span.brandIdentity__tagline";
+
+  display: inline-flex;
+  align-items: center;
+  gap: map.get($brandIdentity, gap);
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+
+  &__emblem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: map.get($brandIdentity, emblem-size);
+    height: map.get($brandIdentity, emblem-size);
+    border-radius: map.get($brandIdentity, emblem-radius);
+    background: map.get($brandIdentity, emblem-bg);
+    color: map.get($brandIdentity, emblem-color);
+    box-shadow: map.get($brandIdentity, emblem-shadow);
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+
+    svg, img {
+      width: 58%;
+      height: 58%;
+      object-fit: contain;
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+
+  &__name {
+    font-weight: 800;
+    font-size: map.get($brandIdentity, font-size-name);
+    color: map.get($brandIdentity, text-color);
+    letter-spacing: -0.02em;
+    transition: color 0.2s ease;
+  }
+
+  &__tagline {
+    font-size: map.get($brandIdentity, font-size-tagline);
+    color: map.get($brandIdentity, tagline-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+}
+
+/************************************************************/
+/****************************MIXIN***************************/
+/************************************************************/
+@mixin brandIdentity($paramMixi_: (), $block: "") {
+  $paramMixi: brandIdentity(map.merge($brandIdentity, $paramMixi_));
+
+  @extend %brandIdentity;
+
+  gap: map.get($paramMixi, gap);
+
+  // Mappage mixte dynamique sémantique
+  > span:first-child,
+  > #{$block}__emblem {
+    @extend %brandIdentity__emblem;
+    width: map.get($paramMixi, emblem-size);
+    height: map.get($paramMixi, emblem-size);
+    border-radius: map.get($paramMixi, emblem-radius);
+    background: map.get($paramMixi, emblem-bg);
+    color: map.get($paramMixi, emblem-color);
+    box-shadow: map.get($paramMixi, emblem-shadow);
+  }
+
+  > div,
+  > #{$block}__text {
+    @extend %brandIdentity__text;
+
+    > span:first-child,
+    > #{$block}__name {
+      @extend %brandIdentity__name;
+      color: map.get($paramMixi, text-color);
+      font-size: map.get($paramMixi, font-size-name);
+    }
+
+    > span:last-child,
+    > #{$block}__tagline {
+      @extend %brandIdentity__tagline;
+      color: map.get($paramMixi, tagline-color);
+      font-size: map.get($paramMixi, font-size-tagline);
+    }
+  }
+
+  // Règle absolue des pseudo-classes : rallonger le sélecteur
+  &:hover > span:first-child,
+  &:hover #{$block}__emblem {
+    transform: scale(1.06) rotate(-2deg);
+    box-shadow: 0 6px 20px rgba(197, 155, 39, 0.55);
+  }
+
+  &:hover > div > span:first-child,
+  &:hover #{$block}__name {
+    color: #e6c875;
+  }
+}

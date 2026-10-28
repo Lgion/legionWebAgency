@@ -1,0 +1,95 @@
+---
+import './index.scss';
+import { client } from '@/lib/client';
+
+const seasonal = client.seasonal;
+const whatsappClean = client.contact.whatsapp.replace(/[^0-9]/g, '');
+---
+
+{seasonal && seasonal.items.length > 0 && (
+  <section class="seasonalShowcase" id="saison">
+    <div class="seasonalShowcase__container">
+      <header class="seasonalShowcase__header">
+        {seasonal.eyebrow && <span class="seasonalShowcase__eyebrow">{seasonal.eyebrow}</span>}
+        <h2 class="seasonalShowcase__title">{seasonal.title}</h2>
+        <p class="seasonalShowcase__subtitle">{seasonal.subtitle}</p>
+      </header>
+
+      {seasonal.bannerText && (
+        <div class="seasonalShowcase__banner">
+          <p>{seasonal.bannerText}</p>
+          <a
+            href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent('Bonjour, je souhaite profiter de vos offres de la Vitrine Saisonnière au Super U Deux Plateaux.')}`}
+            target="_blank"
+            rel="noopener"
+            class="seasonalShowcase__bannerBtn"
+          >
+            <span>Profiter de l'Offre sur WhatsApp</span>
+            <span aria-hidden="true">→</span>
+          </a>
+        </div>
+      )}
+
+      <ul class="seasonalShowcase__grid">
+        {seasonal.items.map((item) => {
+          const formattedPrice = new Intl.NumberFormat(client.locale || 'fr', {
+            style: 'currency',
+            currency: client.currency || 'XOF',
+            maximumFractionDigits: 0
+          }).format(item.price);
+
+          const waMsg = encodeURIComponent(
+            `Bonjour, je souhaite commander l'article de la vitrine saisonnière : ${item.name} (${formattedPrice}).`
+          );
+
+          return (
+            <li class="seasonalShowcase__card">
+              {item.image && (
+                <div class="seasonalShowcase__media">
+                  <img src={item.image} alt={item.name} width="380" height="200" loading="lazy" />
+                  <span class="seasonalShowcase__tag">{item.seasonTag}</span>
+                </div>
+              )}
+
+              <div class="seasonalShowcase__body">
+                <h3 class="seasonalShowcase__itemTitle">{item.name}</h3>
+                <p class="seasonalShowcase__itemDesc">{item.description}</p>
+
+                <div class="seasonalShowcase__footer">
+                  <span class="seasonalShowcase__price">
+                    {item.priceFrom && <small>Dès </small>}
+                    <strong>{formattedPrice}</strong>
+                  </span>
+
+                  <div class="seasonalShowcase__actions">
+                    {(client.tier >= 2 || client.modules.includes('panier')) && (
+                      <button
+                        type="button"
+                        class="seasonalShowcase__cartBtn addCartTrigger"
+                        data-slug={item.slug}
+                        data-name={item.name}
+                        data-price={item.price}
+                        aria-label={`Ajouter ${item.name} au panier`}
+                      >
+                        + Panier
+                      </button>
+                    )}
+                    <a
+                      href={`https://wa.me/${whatsappClean}?text=${waMsg}`}
+                      target="_blank"
+                      rel="noopener"
+                      class="seasonalShowcase__waBtn"
+                    >
+                      WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+)}
+

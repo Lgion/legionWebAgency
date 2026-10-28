@@ -1,0 +1,14 @@
+@use 'scss/default';
+@use 'scss/compact';
+
+.actionGroup {
+  $block: &;
+
+  // Mixin de base BEM
+  @include default.actionGroup($block: $block);
+
+  // Modificateur autonome .--compact
+  &.--compact {
+    @include compact.compact($block: $block);
+  }
+}

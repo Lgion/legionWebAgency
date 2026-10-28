@@ -1,0 +1,83 @@
+---
+import './index.scss';
+
+export interface ActionItem {
+  id?: string;
+  type?: 'wave' | 'cart' | 'whatsapp' | 'admin' | 'custom';
+  label: string;
+  href?: string;
+  isButton?: boolean;
+  iconSvg?: string;
+  badgeCount?: number;
+  triggerClass?: string;
+  dataAttrs?: Record<string, string>;
+}
+
+interface Props {
+  actions?: ActionItem[];
+  modifier?: 'default' | 'compact';
+  className?: string;
+}
+
+const {
+  actions = [],
+  modifier = 'default',
+  className = '',
+} = Astro.props;
+---
+
+<div class={`actionGroup --${modifier} ${className}`.trim()}>
+  {actions.map((act) => {
+    const typeClass = act.type ? `--${act.type}` : '';
+    const fullClass = `actionGroup__btn ${typeClass} ${act.triggerClass || ''}`.trim();
+
+    return act.isButton ? (
+      <button
+        type="button"
+        id={act.id}
+        class={fullClass}
+        aria-label={act.label}
+        title={act.label}
+        {...(act.dataAttrs || {})}
+      >
+        {act.iconSvg && <Fragment set:html={act.iconSvg} />}
+        {typeof act.badgeCount !== 'undefined' && (
+          <span
+            class="actionGroup__badge"
+            data-type={act.type || 'counter'}
+            style={act.badgeCount > 0 ? '' : 'display: none;'}
+          >
+            {act.badgeCount}
+          </span>
+        )}
+      </button>
+    ) : (
+      <a
+        href={act.href || '#'}
+        id={act.id}
+        class={fullClass}
+        aria-label={act.label}
+        title={act.label}
+        target={act.href?.startsWith('http') ? '_blank' : undefined}
+        rel={act.href?.startsWith('http') ? 'noopener' : undefined}
+        {...(act.dataAttrs || {})}
+      >
+        {act.iconSvg && <Fragment set:html={act.iconSvg} />}
+        {typeof act.badgeCount !== 'undefined' && (
+          <span
+            class="actionGroup__badge"
+            data-type={act.type || 'counter'}
+            style={act.badgeCount > 0 ? '' : 'display: none;'}
+          >
+            {act.badgeCount}
+          </span>
+        )}
+      </a>
+    );
+  })}
+  <slot />
+</div>
+
+<script>
+  import './js/default.js';
+</script>

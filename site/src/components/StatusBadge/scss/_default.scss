@@ -1,0 +1,120 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO & LegionUI Optimized)
+=========================================================
+Pattern 2 : Instance Unique
+Micro-composant d'indicateur d'état (pastille lumineuse avec impulsion + libellé).
+
+Squelette attendu (Emmet) :
+span.statusBadge[.--modifierName]
+ ├── span.statusBadge__dot
+ └── span.statusBadge__label
+=========================================================
+*/
+@use 'sass:map';
+
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function statusBadge($defaultValues: "") {
+  @return ($defaultValues);
+}
+
+/************************************************************/
+/**************************VARIABLES*************************/
+/************************************************************/
+$statusBadge: (
+  bg-color: rgba(255, 255, 255, 0.05),
+  border-color: rgba(255, 255, 255, 0.1),
+  text-color: #e2e8f0,
+  dot-color: #10b981,
+  dot-shadow: 0 0 10px rgba(16, 185, 129, 0.6),
+  font-size: 0.76rem,
+  font-weight: 600,
+  padding: 0.28rem 0.75rem,
+  radius: 9999px,
+  dot-size: 8px
+);
+
+/************************************************************/
+/*************************PLACEHOLDER************************/
+/************************************************************/
+%statusBadge {
+  --template: "span.statusBadge > span.statusBadge__dot + span.statusBadge__label";
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: map.get($statusBadge, padding);
+  border-radius: map.get($statusBadge, radius);
+  background: map.get($statusBadge, bg-color);
+  border: 1px solid map.get($statusBadge, border-color);
+  font-size: map.get($statusBadge, font-size);
+  font-weight: map.get($statusBadge, font-weight);
+  color: map.get($statusBadge, text-color);
+  line-height: 1;
+  user-select: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  &__dot {
+    width: map.get($statusBadge, dot-size);
+    height: map.get($statusBadge, dot-size);
+    border-radius: 50%;
+    background-color: map.get($statusBadge, dot-color);
+    box-shadow: map.get($statusBadge, dot-shadow);
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  &__label {
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+}
+
+/************************************************************/
+/****************************MIXIN***************************/
+/************************************************************/
+@mixin statusBadge($paramMixi_: (), $block: "") {
+  $paramMixi: statusBadge(map.merge($statusBadge, $paramMixi_));
+
+  @extend %statusBadge;
+
+  padding: map.get($paramMixi, padding);
+  background: map.get($paramMixi, bg-color);
+  border-color: map.get($paramMixi, border-color);
+  color: map.get($paramMixi, text-color);
+
+  // Mappage mixte dynamique sémantique
+  > span:first-child,
+  > #{$block}__dot {
+    @extend %statusBadge__dot;
+    background-color: map.get($paramMixi, dot-color);
+    box-shadow: map.get($paramMixi, dot-shadow);
+  }
+
+  > span:last-child,
+  > #{$block}__label {
+    @extend %statusBadge__label;
+    font-size: map.get($paramMixi, font-size);
+    font-weight: map.get($paramMixi, font-weight);
+  }
+
+  // Modificateur autonome .--pulse
+  &.--pulse > span:first-child,
+  &.--pulse #{$block}__dot {
+    animation: statusBadgePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes statusBadgePulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
+}

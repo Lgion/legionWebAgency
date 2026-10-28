@@ -1,0 +1,3 @@
+J'ai déposé les notes du client dans le dossier brief/. 
+Initialise ce nouveau projet avec le CLI npm run init:client, puis remplis site/src/data/client.json à partir des données de l'interview en respectant le modèle client.example.json. 
+Place également ses photos dans site/public/images/. 

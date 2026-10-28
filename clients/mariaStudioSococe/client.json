@@ -1,30 +1,39 @@
 {
-  "$comment": "Configuration client : Business Center Prestige Services / Studio Maria Sococé",
+  "$comment": "Brief client : Business Center Prestige Services (Galerie Super U Deux Plateaux Sococé / Studio Photo Maria) — Fusion du brief audio/écrit et des fonctionnalités commerciales de la version en ligne",
   "slug": "studio-maria-sococe",
   "name": "Business Center Prestige Services",
   "activity": {
     "type": "LocalBusiness",
-    "label": "Studio Photo Pro & Réparation Tech",
-    "pitch": "Votre pôle d'excellence multiservices au Super U Deux Plateaux : Studio photo d'art, réparation smartphones en 30 min, bureautique & boutique tech.",
+    "label": "Studio Photo Pro • Impression & Cachets • Réparation Tech • Boutique • Mobile Money",
+    "pitch": "Votre centre d'excellence multiservices au sein de la galerie du Super U Deux Plateaux (proximité Gare de Sococé) : Studio photo & encadrement jusqu'à 2m×2m, cachets express & démarches en ligne, réparation smartphones/PC/imprimantes, boutique high-tech & maroquinerie, et guichet Mobile Money sécurisé.",
     "differentiators": [
-      "Shooting express & retouches pro en direct",
-      "Réparation écran & batterie en 30 minutes garanties",
-      "Retrait comptoir gratuit au Super U Deux Plateaux",
-      "Paiement Wave, Orange Money et espèces"
+      "5 pôles tout-en-un au sein du Super U Deux Plateaux (cadre climatisé, sécurisé & parking gratuit)",
+      "Studio Photo Maria : tirage immédiat, agrandissement jusqu'à 2m×2m, photo sur bois & restauration d'anciennes photos",
+      "Fabrication de cachets d'entreprise sur-le-champ & démarches administratives en ligne (Visa, Nationalité, Concours)",
+      "Partenaires officiels iPhone, Samsung, Tecno & Itel (en stock ou grandes capacités sur commande + option coursier Yango)",
+      "Guichet Mobile Money sécurisé (Wave, Orange, MTN, Push, Djamo) & paiement par QR Code ou Carte Visa"
     ]
   },
   "tier": 3,
-  "modules": ["vitrine", "admin", "catalogue", "analytics", "panier", "checkout", "commandes"],
+  "modules": [
+    "vitrine",
+    "admin",
+    "catalogue",
+    "analytics",
+    "panier",
+    "checkout",
+    "commandes"
+  ],
   "locale": "fr",
   "currency": "XOF",
   "timezone": "Africa/Abidjan",
   "contact": {
     "phone": "+2250789083085",
     "whatsapp": "+2250544263245",
-    "email": "contact@prestigeservices.ci",
+    "email": "",
     "address": {
-      "street": "Au sein du Centre Commercial Super U, Boulevard des Martyrs",
-      "district": "Deux Plateaux (proximité Gare de Sococé)",
+      "street": "Au sein de la Galerie du Super U Deux Plateaux, Boulevard des Martyrs",
+      "district": "Deux Plateaux, Sococé (Cocody)",
       "city": "Abidjan",
       "country": "CI"
     },
@@ -33,98 +42,497 @@
       "lng": -3.998492
     },
     "socials": {
-      "facebook": "https://facebook.com/businesscenterprestige",
-      "instagram": "https://instagram.com/businesscenterprestige"
+      "facebook": "",
+      "instagram": "",
+      "tiktok": ""
     }
   },
   "hours": [
-    { "days": ["Mo", "Tu", "We", "Th", "Fr", "Sa"], "opens": "09:00", "closes": "20:00" },
-    { "days": ["Su"], "opens": null, "closes": null }
+    {
+      "days": ["Mo", "Tu", "We", "Th", "Fr", "Sa"],
+      "opens": "09:00",
+      "closes": "20:00"
+    },
+    {
+      "days": ["Su"],
+      "opens": null,
+      "closes": null
+    }
   ],
   "booking": {
     "mode": "les-deux",
     "channel": "whatsapp"
   },
   "brand": {
-    "mood": "prestige, moderne, corporate",
+    "mood": "Professionnel, Moderne, Chaleureux et Prestige",
     "colors": {
-      "primary": "#0f172a",
-      "secondary": "#1e293b",
-      "accent": "#2563eb",
-      "surface": "#ffffff"
+      "primary": "#0B192C",
+      "secondary": "#162D4C",
+      "accent": "#C59B27",
+      "surface": "#FAF8F5"
     },
     "fonts": {
-      "heading": "Plus Jakarta Sans, sans-serif",
-      "body": "Inter, sans-serif"
+      "heading": "Plus Jakarta Sans, system-ui, sans-serif",
+      "body": "Inter, system-ui, sans-serif"
     },
     "logo": "",
-    "pattern": "dots",
-    "footerVariant": "devanture"
+    "pattern": "prestige-gold-grid",
+    "footerVariant": "carte-visite",
+    "gallery": [
+      {
+        "src": "/images/entree.jpeg",
+        "alt": "Entrée Principale du Business Center Prestige Services et Studio Photo Maria dans la galerie Super U Deux Plateaux",
+        "caption": "Entrée Principale du Business Center • Galerie Super U Deux Plateaux : Studio Photo Maria, vitrines High-Tech, Horlogerie & Cadeaux."
+      },
+      {
+        "src": "/images/produits_boutique.jpeg",
+        "alt": "Rayons Officiels High-Tech, Accessoires Gaming, Pochettes et Connectique",
+        "caption": "Rayons Officiels : High-Tech, Accessoires Gaming PS2–PS5, câbles blindés, chargeurs rapides et coques de protection."
+      },
+      {
+        "src": "/images/entree_couloir.jpeg",
+        "alt": "Accès Direct et Vitrines Intérieures Tablettes, Smartphones, Montres et Bijoux",
+        "caption": "Accès Direct & Sécurisé • Vitrines de smartphones, tablettes, montres chronographes et bijoux plaqués."
+      },
+      {
+        "src": "/images/tranferts_wave_push.jpeg",
+        "alt": "Guichet Agréé Mobile Money Wave, Orange Money, MTN MoMo et Push",
+        "caption": "Guichet Agréé Mobile Money : Dépôts & Retraits sécurisés en présence du client (Wave, Orange, MTN, Push, Djamo)."
+      }
+    ]
+  },
+  "actionHub": {
+    "eyebrow": "Espace Démarches & Actions Express",
+    "title": "Gagnez du Temps : Lancez Votre Demande à Distance",
+    "subtitle": "Sélectionnez votre besoin ci-dessous pour transférer vos fichiers à imprimer, envoyer une photo au laboratoire Studio Maria, planifier un coursier Yango ou estimer votre tarif en 1 clic.",
+    "cards": [
+      {
+        "id": "photo-lab",
+        "icon": "📸",
+        "badge": "Laboratoire Studio Maria",
+        "title": "Transférez vos Photos, Agrandissements 2m×2m & Restaurations",
+        "description": "Besoin d'un tirage HD, d'un agrandissement géant jusqu'à 2m×2m, d'une photo sur bois ou de restaurer l'ancienne photo d'un proche ? Envoyez-nous l'image sur WhatsApp.",
+        "bullets": [
+          "Tirage numérique HD, photo sur bois & cadres vitrés sur mesure",
+          "Normes biométriques officielles (Passeport, Visa, Concours en 5 min)",
+          "Restauration d'anciennes photos abîmées & changement d'arrière-plan"
+        ],
+        "ctaLabel": "Envoyer ma photo sur WhatsApp",
+        "whatsappMessage": "Bonjour Business Center Prestige Services, je souhaite vous envoyer une photo pour un tirage / agrandissement / restauration au Studio Maria :"
+      },
+      {
+        "id": "tech-yango",
+        "icon": "🛠️",
+        "badge": "Atelier Express & Coursier Yango",
+        "title": "Diagnostic Réparation & Collecte par Coursier Yango",
+        "description": "Écran fissuré, batterie fatiguée, ordinateur ou imprimante en panne ? Déposez votre appareil pendant vos courses au Super U ou faites-le récupérer chez vous par un coursier Yango.",
+        "bullets": [
+          "Réparation express smartphones (iPhone, Samsung, Tecno, Xiaomi, Itel)",
+          "Maintenance d'ordinateurs portables, écrans & imprimantes",
+          "Option enlèvement et retour sécurisé par coursier Yango sur Abidjan"
+        ],
+        "ctaLabel": "Demander un diagnostic / Coursier",
+        "whatsappMessage": "Bonjour, j'ai besoin d'un diagnostic de réparation (ou d'une collecte par coursier Yango) pour mon appareil :"
+      },
+      {
+        "id": "print-pao-cachets",
+        "icon": "🖨️",
+        "badge": "Impression, PAO & Cachets Minute",
+        "title": "Envoi PDF Impression, Conception PAO & Cachets d'Entreprise",
+        "description": "Transférez vos documents PDF avant votre passage au Super U ou commandez le cachet officiel de votre société (fabriqué sur-le-champ pendant que vous patientez).",
+        "bullets": [
+          "Impression laser HD couleur/N&B, reliure mémoires & plastification",
+          "Fabrication de cachets d'entreprise sur-le-champ au comptoir",
+          "Démarches en ligne : demandes de visa, nationalité, concours & CV"
+        ],
+        "ctaLabel": "Envoyer mon PDF ou texte de cachet",
+        "whatsappMessage": "Bonjour, j'ai des documents PDF à imprimer / un cachet d'entreprise à fabriquer au Super U Deux Plateaux :"
+      },
+      {
+        "id": "vip-stock",
+        "icon": "🛍️",
+        "badge": "Partenaires Officiels & Rappel Express",
+        "title": "Recherche d'Accessoire Précis ou Smartphone Grande Capacité",
+        "description": "Vous cherchez un téléphone grande capacité (iPhone, Samsung, Tecno, Itel), une manette PS4/PS5, un chargeur PC ou un coffret montre ? Nous l'avons en rayon ou sur commande partenaire.",
+        "bullets": [
+          "Partenaires officiels Samsung, iPhone, Tecno & Itel sur commande",
+          "Gaming PS2 à PS5, câbles blindés, powerbanks LED & informatique",
+          "Maroquinerie, montres chronographes (pile changée en 3 min) & bijoux"
+        ],
+        "ctaLabel": "Vérifier la disponibilité immédiate",
+        "whatsappMessage": "Bonjour, je recherche un article ou téléphone précis dans votre boutique du Super U :"
+      }
+    ]
+  },
+  "seasonal": {
+    "eyebrow": "Vitrine Saisonnière & Sélection Prestige",
+    "title": "Les Incontournables du Moment au Super U",
+    "subtitle": "Comme expliqué en boutique, nos arrivages s'adaptent à vos temps forts de l'année à Abidjan (Rentrée scolaire, Fêtes & Noël, Mariages, Gaming & Idées Cadeaux).",
+    "bannerText": "✨ Offre du moment : Tarifs préférentiels sur nos packs Photos d'Identité Express (8 photos), nos Sacs à Dos Ergonomiques et nos Forfaits Mariage !",
+    "items": [
+      {
+        "slug": "pack-photo-identite-8",
+        "name": "Pack Photo Identité Express (Planche de 8)",
+        "seasonTag": "Rentrée & Concours",
+        "price": 2500,
+        "priceFrom": false,
+        "image": "/images/entree.jpeg",
+        "description": "Normes passeport biométrique, visa Schengen/USA, concours administratifs et dossiers scolaires + version numérique WhatsApp."
+      },
+      {
+        "slug": "sac-a-dos-ergonomique-pc",
+        "name": "Sac à Dos Ergonomique Imperméable Écolier & PC",
+        "seasonTag": "Rentrée & Bureau",
+        "price": 18000,
+        "priceFrom": true,
+        "image": "/images/entree.jpeg",
+        "description": "Ultra résistant, multi-poches avec compartiment ordinateur portable renforcé, dos respirant et bretelles matelassées."
+      },
+      {
+        "slug": "gourde-isotherme-inox-750ml",
+        "name": "Gourde Isotherme Inox 750ml Prestige",
+        "seasonTag": "Rentrée & Sport",
+        "price": 6500,
+        "priceFrom": false,
+        "image": "/images/entree.jpeg",
+        "description": "Double paroi isolante en inox alimentaire, finitions dorées ou noires mat, bouchon étanche antifuite longue durée."
+      },
+      {
+        "slug": "peluches-geantes-coffrets-fetes",
+        "name": "Peluches Géantes & Coffrets Cadeaux Fêtes",
+        "seasonTag": "Fêtes & Noël",
+        "price": 15000,
+        "priceFrom": true,
+        "image": "/images/entree.jpeg",
+        "description": "Peluches ultra douces exposées à l'entrée du magasin pour émerveiller les enfants ou accompagner un cadeau d'anniversaire et de Noël."
+      },
+      {
+        "slug": "montre-homme-chronographe-or",
+        "name": "Montre Chronographe Acier & Édition Or",
+        "seasonTag": "Cadeaux & Prestige",
+        "price": 28000,
+        "priceFrom": true,
+        "image": "/images/entree_couloir.jpeg",
+        "description": "Boîtier acier doré ou argenté, bracelet cuir ou maille milanaise, écrin cadeau inclus et remplacement de pile en boutique."
+      },
+      {
+        "slug": "manette-ps4-ps5-sans-fil",
+        "name": "Manette Sans Fil DualShock PS4 / DualSense PS5",
+        "seasonTag": "Gaming & Détente",
+        "price": 22000,
+        "priceFrom": true,
+        "image": "/images/produits_boutique.jpeg",
+        "description": "Précision millimétrée, vibrations immersives, câble de charge renforcé inclus et testée en boutique avant retrait."
+      },
+      {
+        "slug": "power-bank-fast-charge-20000",
+        "name": "Power Bank Fast Charge 20 000 mAh Écran LED",
+        "seasonTag": "Tech & Mobilité",
+        "price": 14000,
+        "priceFrom": true,
+        "image": "/images/produits_boutique.jpeg",
+        "description": "Recharge jusqu'à 4 fois votre smartphone, affichage digital LED du pourcentage restant et ports USB-C Power Delivery."
+      },
+      {
+        "slug": "pack-mariage-reportage-photo-video",
+        "name": "Pack Mariage & Cérémonie : Reportage Photo & Vidéo",
+        "seasonTag": "Mariages & Événements",
+        "price": 150000,
+        "priceFrom": true,
+        "image": "/images/entree.jpeg",
+        "description": "Couverture mairie, cérémonie religieuse et réception par photographe et cadreur pro + album livre prestige et clé USB HD."
+      }
+    ]
   },
   "services": [
     {
-      "slug": "studio-photo-prestige",
-      "name": "Shooting Photo Studio Solo / Portrait",
-      "category": "Studio Photo",
-      "price": 10000,
-      "priceFrom": true,
-      "duration": 30,
-      "description": "Séance studio professionnel avec éclairage de maître, retouche haute définition et tirage express en 5 minutes."
-    },
-    {
-      "slug": "photos-identite-express",
-      "name": "Photos d'Identité Officielles (Lot de 8)",
-      "category": "Studio Photo",
-      "price": 3000,
+      "slug": "photos-identite-tous-formats",
+      "name": "Photos d'Identité Certifiées Express (Planche de 8)",
+      "category": "Photo & Vidéo",
+      "price": 2500,
       "priceFrom": false,
       "duration": 10,
-      "description": "Certifiées conformes pour passeport, visa étranger, concours administratifs et permis de conduire."
+      "image": "/images/entree.jpeg",
+      "highlights": [
+        "Prise de vue immédiate sans rendez-vous (Passeport, Visa, Concours)",
+        "Retouche légère anti-reflet & impression papier photo HD",
+        "Envoi de la version numérique haute résolution sur WhatsApp"
+      ],
+      "description": "Photos d'identité conformes aux normes biométriques officielles (passeport, visa Schengen/USA, permis, CNI et dossiers scolaires) tirées en 5 minutes."
     },
     {
-      "slug": "reparation-ecran-batterie",
-      "name": "Réparation Express Smartphone (Écran & Batterie)",
-      "category": "High-Tech",
+      "slug": "shooting-photo-studio-reportage",
+      "name": "Shooting Studio Portrait d'Art (Solo, Couple & Famille)",
+      "category": "Photo & Vidéo",
       "price": 15000,
       "priceFrom": true,
       "duration": 30,
-      "description": "Remplacement d'écran fissuré ou batterie fatiguée pour iPhone, Samsung, Tecno, Xiaomi avec pièces certifiées."
+      "image": "/images/entree.jpeg",
+      "highlights": [
+        "Studio climatisé avec éclairage professionnel & coaching pose",
+        "Photos retouchées en haute définition sur ordinateur",
+        "1 tirage grand format A4 offert + fichiers numériques HD"
+      ],
+      "description": "Séance au Studio Photo Maria (portrait corporate, anniversaire, famille, grossesse ou réseaux sociaux) avec retouche beauté et tirage immédiat."
     },
     {
-      "slug": "impression-flyers-pao",
-      "name": "Impression PAO & Tirage Laser HD",
-      "category": "Bureautique",
+      "slug": "agrandissement-cadres-photo-bois",
+      "name": "Agrandissement Grand Format (jusqu'à 2m×2m), Photo sur Bois & Cadres",
+      "category": "Photo & Vidéo",
+      "price": 10000,
+      "priceFrom": true,
+      "priceLabel": "Dès 10 000 F (selon format jusqu'à 2m×2m)",
+      "duration": 45,
+      "image": "/images/entree.jpeg",
+      "highlights": [
+        "Agrandissement grand format jusqu'à 2 mètres sur 2 mètres",
+        "Tirage photo sur bois & supports spéciaux durables",
+        "Cadres vitrés, biseautés et encadrements sur mesure en boutique"
+      ],
+      "description": "Sublimez vos clichés avec nos tirages tous formats jusqu'à 2m × 2m, nos impressions photo sur bois et notre atelier d'encadrement complet."
+    },
+    {
+      "slug": "restauration-anciennes-photos",
+      "name": "Restauration d'Anciennes Photos & Portraits Hommage",
+      "category": "Photo & Vidéo",
+      "price": 10000,
+      "priceFrom": true,
+      "duration": 40,
+      "image": "/images/entree.jpeg",
+      "highlights": [
+        "Restauration de photos de proches disparus ou abîmées par le temps",
+        "Réparation des déchirures, colorisation et changement de fond",
+        "Agrandissement et mise sous cadre vitré de prestige"
+      ],
+      "description": "Redonnez une seconde jeunesse aux souvenirs précieux : numérisation haute résolution, réparation pixel par pixel, changement d'arrière-plan et encadrement."
+    },
+    {
+      "slug": "couverture-mariage-ceremonie",
+      "name": "Couverture Mariage, Baptême & Cérémonie (Photo & Vidéo 4K)",
+      "category": "Photo & Vidéo",
+      "price": 150000,
+      "priceFrom": true,
+      "duration": 240,
+      "image": "/images/entree.jpeg",
+      "highlights": [
+        "Couverture mairie, église / mosquée et réception",
+        "Photographe et cadreur vidéo professionnels dédiés",
+        "Album livre photo relié grand format + Clé USB HD"
+      ],
+      "description": "Forfait événementiel complet avec équipe photo et vidéo dédiée, montage film rétrospective et remise d'un album livre prestige."
+    },
+    {
+      "slug": "cachets-entreprise-express",
+      "name": "Fabrication de Cachets d'Entreprise Sur-le-Champ",
+      "category": "Bureautique & Démarches",
+      "price": 8000,
+      "priceFrom": true,
+      "duration": 15,
+      "image": "/images/entree_couloir.jpeg",
+      "highlights": [
+        "Conception immédiate avec le nom et RCCM de votre société",
+        "Fabriqué sur-le-champ pendant que vous êtes assis au comptoir",
+        "Cachets automatiques ou manuels propres et durables"
+      ],
+      "description": "Besoin d'un cachet officiel pour votre entreprise ou cabinet ? Installez-vous : nous concevons et fabriquons votre cachet immédiatement sur place."
+    },
+    {
+      "slug": "impression-photocopie-multiformat",
+      "name": "Impressions Laser HD, Reliures Dossiers & PAO (Flyers/Cartes)",
+      "category": "Bureautique & Démarches",
       "price": 5000,
       "priceFrom": true,
-      "duration": 20,
-      "description": "Photocopies laser haute fidélité, conception de flyers, cartes de visite et reliures professionnelles."
+      "duration": 15,
+      "image": "/images/entree_couloir.jpeg",
+      "highlights": [
+        "Impression laser N&B et couleur sur papier 80g à 300g & papier photo",
+        "Reliure spirale de mémoires/rapports & plastification de diplômes",
+        "Conception PAO : Pack 100 cartes de visite ou flyers professionnels"
+      ],
+      "description": "Envoyez vos fichiers PDF sur WhatsApp avant de passer : impressions haute fidélité, photocopies en volume à tarif dégressif, reliures et création graphique."
+    },
+    {
+      "slug": "demarches-administratives-en-ligne",
+      "name": "Démarches en Ligne (Visa, Nationalité, Concours) & Scan HD",
+      "category": "Bureautique & Démarches",
+      "price": 3000,
+      "priceFrom": true,
+      "duration": 25,
+      "image": "/images/entree_couloir.jpeg",
+      "highlights": [
+        "Demandes de visa, certificats de nationalité & préinscriptions",
+        "Inscriptions aux concours (ENA, CAFOP, Police) & rédaction de CV Pro",
+        "Numérisation (Scan 600 DPI) vers WhatsApp, E-mail ou clé USB"
+      ],
+      "description": "Assistance complète au comptoir pour remplir vos dossiers officiels en ligne, mettre en page un CV percutant et numériser vos pièces justificatives."
+    },
+    {
+      "slug": "reparation-smartphones-tablettes",
+      "name": "Réparation Express Smartphones (Écran, Batterie & Charge)",
+      "category": "Réparation Tech",
+      "price": 10000,
+      "priceFrom": true,
+      "duration": 30,
+      "image": "/images/produits_boutique.jpeg",
+      "highlights": [
+        "Remplacement d'écran OLED/LCD & batterie neuve en 20 à 30 min",
+        "Pose offerte d'un verre trempé 9D sur tout changement d'écran",
+        "Réparation connecteur de charge, micro, déblocage & option coursier Yango"
+      ],
+      "description": "Intervention rapide pendant vos courses au Super U pour iPhone, Samsung, Xiaomi, Tecno, Infinix et Itel avec pièces certifiées."
+    },
+    {
+      "slug": "reparation-ordinateurs-imprimantes",
+      "name": "Maintenance & Réparation d'Ordinateurs, Écrans et Imprimantes",
+      "category": "Réparation Tech",
+      "price": 15000,
+      "priceFrom": true,
+      "duration": 60,
+      "image": "/images/produits_boutique.jpeg",
+      "highlights": [
+        "Dépannage PC portables, unités centrales et écrans",
+        "Réparation et entretien d'imprimantes de bureau",
+        "Réinstallation système, nettoyage & sauvegarde de données"
+      ],
+      "description": "Confiez-nous vos ordinateurs, moniteurs et imprimantes : diagnostic matériel et logiciel complet par nos techniciens."
+    },
+    {
+      "slug": "remplacement-piles-montres-voitures",
+      "name": "Remplacement Minute de Piles de Montres & Clés de Voiture",
+      "category": "Réparation Tech",
+      "price": 2000,
+      "priceFrom": true,
+      "duration": 5,
+      "image": "/images/entree_couloir.jpeg",
+      "highlights": [
+        "Piles bouton haute autonomie pour montres toutes marques",
+        "Piles pour télécommandes et clés électroniques de voiture",
+        "Changement immédiat en 3 minutes sans abîmer le boîtier"
+      ],
+      "description": "Redonnez vie à vos montres, réveils, calculatrices et clés de voiture grâce à notre service de remplacement de pile express."
+    },
+    {
+      "slug": "agence-mobile-money-transferts",
+      "name": "Guichet Agréé Mobile Money : Dépôt, Retrait & Paiement QR",
+      "category": "Mobile Money",
+      "price": 0,
+      "priceFrom": false,
+      "priceLabel": "Guichet Sécurisé Super U",
+      "duration": 5,
+      "image": "/images/tranferts_wave_push.jpeg",
+      "highlights": [
+        "Wave, Orange Money, MTN MoMo, Push & Djamo sans rupture de liquidité",
+        "Sécurité maximale : vérification du nom du bénéficiaire avec vous au guichet",
+        "Règlement de vos achats en boutique par QR Code Wave/Orange ou Carte Visa"
+      ],
+      "description": "Effectuez vos dépôts, retraits et transferts dans le cadre climatisé et sécurisé du Super U Deux Plateaux avec parking gratuit surveillé."
     }
   ],
   "products": [
     {
-      "slug": "manette-ps4-sans-fil",
-      "name": "Manette DualShock sans fil certifiée",
-      "category": "Gaming",
-      "price": 18000,
-      "stock": 10,
-      "description": "Haute précision pour consoles et PC avec câble de charge renforcé inclus."
+      "slug": "smartphones-tablettes-commande",
+      "name": "Smartphones & Tablettes (iPhone, Samsung, Tecno, Itel)",
+      "category": "Téléphonie & Partenaires",
+      "price": 65000,
+      "priceLabel": "En stock & Sur commande",
+      "stock": 20,
+      "image": "/images/entree_couloir.jpeg",
+      "badge": "Partenaires Officiels",
+      "description": "Téléphones neufs disponibles en vitrine, ou commande rapide de modèles grandes capacités mémoire directement auprès de nos fournisseurs officiels."
     },
     {
-      "slug": "chargeur-rapide-65w",
-      "name": "Chargeur Ultra Rapide GaN 65W Multi-Ports",
-      "category": "Connectique",
-      "price": 12000,
-      "stock": 15,
-      "description": "Compatible iPhone, Samsung, MacBook et PC portables en recharge express."
+      "slug": "manettes-consoles-jeux-video",
+      "name": "Manettes Sans Fil PS4 DualShock / PS5 DualSense & Jeux",
+      "category": "Gaming & Consoles",
+      "price": 22000,
+      "priceLabel": "Dès 22 000 FCFA",
+      "stock": 25,
+      "image": "/images/produits_boutique.jpeg",
+      "badge": "Best-Seller Gaming",
+      "description": "Manettes PS2, PS3, PS4 (22 000 F) et PS5 DualSense (45 000 F) testées sur place avec câble de charge offert, jeux vidéo et accessoires."
+    },
+    {
+      "slug": "chargeurs-cables-powerbank-protection",
+      "name": "Pack Charge Rapide 35W/65W, Câbles Blindés, Powerbank LED & Covers",
+      "category": "Énergie & Protection",
+      "price": 4500,
+      "priceLabel": "Dès 4 500 FCFA",
+      "stock": 50,
+      "image": "/images/produits_boutique.jpeg",
+      "badge": "Garantie Boutique",
+      "description": "Câbles blindés tressés (4 500 F), chargeurs rapides téléphone & PC, Power Bank 20 000 mAh écran LED (14 000 F), rallonges, coques et anti-casse."
+    },
+    {
+      "slug": "ordinateurs-peripheriques-cameras",
+      "name": "Ordinateurs, Souris, Claviers, Casques Audio & Caméras",
+      "category": "Informatique & Audio",
+      "price": 10000,
+      "priceLabel": "Dès 10 000 FCFA",
+      "stock": 30,
+      "image": "/images/produits_boutique.jpeg",
+      "badge": "Bureautique & Pro",
+      "description": "Équipements informatiques, souris sans fil, claviers, casques et écouteurs Bluetooth, caméras et calculatrices."
+    },
+    {
+      "slug": "bijoux-montres-horlogerie",
+      "name": "Montres Chronographes (Homme, Femme, Enfant) & Chaînes Plaquées",
+      "category": "Horlogerie & Bijoux",
+      "price": 15000,
+      "priceLabel": "Dès 15 000 FCFA",
+      "stock": 35,
+      "image": "/images/entree_couloir.jpeg",
+      "badge": "Pile Incluse",
+      "description": "Montres acier et édition Or en écrin cadeau, chaînes et bijoux plaqués, réveils enfants et remplacement de pile en 3 minutes."
+    },
+    {
+      "slug": "articles-divers-saisonniers",
+      "name": "Maroquinerie, Sacs à Dos, Cadres Dorés, Peluches & Gourdes Inox",
+      "category": "Maroquinerie & Saison",
+      "price": 6500,
+      "priceLabel": "Dès 6 500 FCFA",
+      "stock": 40,
+      "image": "/images/entree.jpeg",
+      "badge": "Arrivages Saison",
+      "description": "Sacs à main femme, sacoches cuir homme, sacs à dos scolaires/PC (18 000 F), gourdes isothermes 750ml (6 500 F), cadres photo bois doré et peluches."
     }
   ],
-  "promotions": [],
+  "promotions": [
+    {
+      "title": "Pack Shooting Studio + Tirage Grand Format A4 Offert",
+      "badge": "Offre Phare Studio Maria",
+      "description": "Séance photo professionnelle en studio climatisé avec 5 photos retouchées HD sur ordinateur + 1 tirage grand format A4 offert.",
+      "ctaText": "Réserver mon Shooting (15 000 F)"
+    },
+    {
+      "title": "Forfait Groupe Mariages & Cérémonies (Photo + Vidéo 4K)",
+      "badge": "Événements & Familles",
+      "description": "Couverture complète mairie, lieu de culte et réception avec album livre photo prestige relié et clé USB personnalisée.",
+      "ctaText": "Obtenir un devis Mariage"
+    },
+    {
+      "title": "Remise Volume Impressions, Mémoires & Pack 100 Flyers/Cartes",
+      "badge": "Entreprises & Étudiants",
+      "description": "Tarifs dégressifs sur vos impressions laser couleur/N&B, reliures de rapports et conception PAO de cartes de visite 300g.",
+      "ctaText": "Envoyer mes fichiers sur WhatsApp"
+    }
+  ],
   "delivery": {
     "enabled": true,
     "zones": [
-      { "name": "Cocody (Deux Plateaux, Angré, Riviera)", "fee": 1500 },
-      { "name": "Reste d'Abidjan (Plateau, Marcory, Yopougon)", "fee": 2500 }
+      {
+        "name": "Retrait Comptoir Gratuit (Super U Deux Plateaux Sococé)",
+        "fee": 0
+      },
+      {
+        "name": "Coursier Express Cocody (Deux Plateaux, Angré, Riviera)",
+        "fee": 1500
+      },
+      {
+        "name": "Livraison Reste d'Abidjan (selon commune)",
+        "fee": 2500
+      }
     ],
-    "homeService": false
+    "homeService": true
   },
   "payments": {
     "wave": true,
@@ -134,15 +542,18 @@
   },
   "primaryAction": "whatsapp",
   "seo": {
-    "city": "Abidjan, Deux Plateaux",
+    "city": "Abidjan, Deux Plateaux (Sococé)",
     "keywords": [
-      "studio photo abidjan",
-      "reparation telephone super u",
-      "shooting cocody",
-      "impression sococé",
-      "business center prestige services"
+      "business center prestige services",
+      "studio photo maria sococe",
+      "studio photo super u deux plateaux",
+      "cachet entreprise express abidjan",
+      "restauration ancienne photo abidjan",
+      "agrandissement photo 2m abidjan",
+      "reparation telephone ordinateur deux plateaux",
+      "agence wave orange money super u sococe"
     ],
-    "description": "Business Center Prestige Services au Super U Deux Plateaux (Sococé) : Studio photo pro, tirage express, réparation smartphone en 30 min et boutique high-tech."
+    "description": "Business Center Prestige Services dans la galerie du Super U Deux Plateaux (Sococé) à Abidjan : Studio Photo Maria (shooting, identité, agrandissement 2m×2m, restauration), cachets express, démarches en ligne, réparation téléphone/PC, boutique électronique & maroquinerie, et guichet Mobile Money."
   },
   "analytics": {
     "plausibleDomain": "prestigeservices.ci"

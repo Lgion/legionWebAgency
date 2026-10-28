@@ -1,14 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Accordion from '../components/library/contenu/Accordion/Accordion.astro';
-import Spinner from '../components/library/feedback/Spinner/Spinner.astro';
-import Skeleton from '../components/library/feedback/Skeleton/Skeleton.astro';
-import ServiceCard from '../components/library/contenu/ServiceCard/ServiceCard.astro';
-import Header from '../components/library/layout/Header/Header.astro';
-import Footer from '../components/library/layout/Footer/Footer.astro';
-import FabContact from '../components/library/conversion/FabContact/FabContact.astro';
-import FabTools from '../components/library/conversion/FabTools/FabTools.astro';
-import CartDrawer from '../components/library/commerce/Cart/CartDrawer.astro';
+import Accordion from '../components/Accordion/Accordion.astro';
+import Spinner from '../components/Spinner/Spinner.astro';
+import Skeleton from '../components/Skeleton/Skeleton.astro';
+import ServiceCard from '../components/ServiceCard/ServiceCard.astro';
+import Header from '../components/Header/Header.astro';
+import Footer from '../components/Footer/Footer.astro';
+import FabContact from '../components/FabContact/FabContact.astro';
+import FabTools from '../components/FabTools/FabTools.astro';
+import CartDrawer from '../components/Cart/CartDrawer.astro';
+import WaveModal from '../components/WaveModal/WaveModal.astro';
+import ActionHub from '../components/ActionHub/ActionHub.astro';
+import SeasonalShowcase from '../components/SeasonalShowcase/SeasonalShowcase.astro';
 
 const demoItems = [
   {
@@ -82,17 +85,35 @@ const demoService = {
 
       <!-- Section Prestations : ServiceCard & Panier -->
       <section class="demoSection">
-        <h2 class="demoSection__title">3. E-commerce & Panier : ServiceCard & CartDrawer</h2>
+        <h2 class="demoSection__title">3. E-commerce & Paiement : ServiceCard, CartDrawer & WaveModal</h2>
         <div style="max-width: 360px; margin-bottom: 1.5rem;">
           <ServiceCard service={demoService} />
         </div>
-        <button type="button" class="demoCartOpenBtn" id="demoOpenCartBtn">
-          🛒 Tester le CartDrawer (3 étapes)
-        </button>
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+          <button type="button" class="demoCartOpenBtn" id="demoOpenCartBtn">
+            🛒 Tester le CartDrawer (3 étapes)
+          </button>
+          <button type="button" class="demoCartOpenBtn openWaveModalTrigger" style="background: #1898e8;">
+            💳 Tester la Modale Paiement Wave QR
+          </button>
+        </div>
+      </section>
+
+      <!-- Section ActionHub -->
+      <section class="demoSection">
+        <h2 class="demoSection__title">4. Conversion : ActionHub (Démarches Express & Simulateur Devis)</h2>
+        <ActionHub />
+      </section>
+
+      <!-- Section SeasonalShowcase -->
+      <section class="demoSection">
+        <h2 class="demoSection__title">5. Commerce : SeasonalShowcase (Vitrine Saisonnière)</h2>
+        <SeasonalShowcase />
       </section>
     </div>
   </div>
 
+  <WaveModal />
   <CartDrawer />
   <FabContact />
   <FabTools />

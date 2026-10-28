@@ -1,0 +1,14 @@
+@use 'scss/default';
+@use 'scss/compact';
+
+.brandIdentity {
+  $block: &;
+
+  // Mixin BEM de base (5 sections strictes)
+  @include default.brandIdentity($block: $block);
+
+  // Modificateur autonome .--compact (pour sticky header ou formats denses)
+  &.--compact {
+    @include compact.compact($block: $block);
+  }
+}

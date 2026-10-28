@@ -1,0 +1,368 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO & A11Y Optimized — LegionUI)
+=========================================================
+Squelette attendu (Emmet) :
+dialog.waveModal[closedby="any"] > article.waveModal__card > header.waveModal__header + section.waveModal__body
+=========================================================
+*/
+
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function waveModal($defaultValues: "") {
+  @return ($defaultValues);
+}
+
+/******VARIABLES******/
+$waveModal: (
+  wave-blue: #1898e8,
+  wave-blue-dark: #0d84d1,
+  wave-blue-light: #e0f2fe,
+  surface-bg: #fcfaf7,
+  card-bg: #ffffff,
+  text-main: #0f172a,
+  text-muted: #64748b,
+  border-soft: #e2dfd9
+);
+
+/************************************************************/
+/**************************PLACEHOLDER**************************/
+/************************************************************/
+%waveModal {
+  --template: "dialog.waveModal[closedby='any'] > article.waveModal__card > header.waveModal__header + section.waveModal__body";
+  border: none;
+  padding: 0;
+  max-width: 440px;
+  width: calc(100% - 1.5rem);
+  border-radius: 20px;
+  background: transparent;
+  overscroll-behavior: contain;
+
+  &__card {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(11, 25, 44, 0.45);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.15rem 1.35rem;
+    color: #ffffff;
+  }
+
+  &__body {
+    padding: 1.35rem;
+  }
+}
+
+/************************************************************/
+/**************************MIXIN**************************/
+/************************************************************/
+@mixin waveModal($paramMixi_: (), $block: ".waveModal") {
+  $paramMixi: waveModal(map-merge($waveModal, $paramMixi_));
+
+  @extend %waveModal;
+
+  &:modal {
+    overscroll-behavior: contain;
+  }
+
+  &::backdrop {
+    background: rgba(11, 25, 44, 0.72);
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+
+  &__card,
+  > article {
+    @extend %waveModal__card;
+    background-color: map-get($paramMixi, surface-bg);
+    color: map-get($paramMixi, text-main);
+  }
+
+  &__header,
+  > article > header {
+    @extend %waveModal__header;
+    background: linear-gradient(135deg, map-get($paramMixi, wave-blue) 0%, map-get($paramMixi, wave-blue-dark) 100%);
+  }
+
+  &__brandGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  &__penguin {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+  }
+
+  &__subtitle {
+    margin: 0.15rem 0 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  &__close {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 150ms ease, transform 150ms ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: scale(1.05);
+    }
+  }
+
+  &__body,
+  > article > section {
+    @extend %waveModal__body;
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: map-get($paramMixi, text-main);
+    margin-bottom: 0.5rem;
+  }
+
+  &__inputWrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1.5px solid map-get($paramMixi, border-soft);
+    border-radius: 12px;
+    padding: 0.65rem 1rem;
+    margin-bottom: 0.75rem;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+
+    &:focus-within {
+      border-color: map-get($paramMixi, wave-blue);
+      box-shadow: 0 0 0 3px rgba(24, 152, 232, 0.15);
+    }
+  }
+
+  &__input {
+    border: none;
+    background: transparent;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: map-get($paramMixi, text-main);
+    width: 100%;
+    outline: none;
+  }
+
+  &__currency {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-left: 0.5rem;
+  }
+
+  &__presets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.15rem;
+  }
+
+  &__presetBtn {
+    padding: 0.55rem 0.4rem;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid map-get($paramMixi, border-soft);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: map-get($paramMixi, text-main);
+    cursor: pointer;
+    transition: all 150ms ease;
+
+    &:hover {
+      border-color: map-get($paramMixi, wave-blue);
+      color: map-get($paramMixi, wave-blue);
+    }
+
+    &.--active {
+      background: map-get($paramMixi, wave-blue);
+      border-color: map-get($paramMixi, wave-blue);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(24, 152, 232, 0.3);
+    }
+  }
+
+  &__qrCard {
+    background: #ffffff;
+    border: 2px solid #29a3f2;
+    border-radius: 18px;
+    padding: 1.15rem 1rem;
+    text-align: center;
+    max-width: 280px;
+    margin: 0 auto 1.15rem;
+    box-shadow: 0 10px 25px -5px rgba(24, 152, 232, 0.14);
+  }
+
+  &__qrHeading {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #334155;
+
+    strong {
+      color: map-get($paramMixi, wave-blue);
+      font-weight: 900;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  &__qrCanvasWrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 180px;
+    margin-bottom: 0.5rem;
+
+    img {
+      width: 180px;
+      height: 180px;
+      border-radius: 8px;
+    }
+  }
+
+  &__amountPill {
+    display: inline-block;
+    padding: 0.4rem 1.15rem;
+    border-radius: 9999px;
+    background: #ebf8ff;
+    border: 1px solid #bae6fd;
+    color: #0284c7;
+    font-weight: 800;
+    font-size: 1rem;
+    margin-bottom: 0.55rem;
+  }
+
+  &__partners {
+    margin: 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #94a3b8;
+  }
+
+  &__steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.84rem;
+      color: #475569;
+    }
+  }
+
+  &__stepNum {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e0f2fe;
+    color: #0284c7;
+    font-weight: 800;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.65rem;
+  }
+
+  &__openBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    background: map-get($paramMixi, wave-blue);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(24, 152, 232, 0.35);
+    transition: transform 150ms ease, background 150ms ease;
+
+    &:hover {
+      background: map-get($paramMixi, wave-blue-dark);
+      transform: translateY(-1px);
+    }
+  }
+
+  &__copyBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.8rem 0.95rem;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid map-get($paramMixi, border-soft);
+    color: map-get($paramMixi, text-main);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 150ms ease, border-color 150ms ease;
+
+    &:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+  }
+}
+
+/************************************************************/
+/**************************NATIVE SEMANTIC MAPPING**************************/
+/************************************************************/
+dialog.waveModal {
+  @include waveModal();
+}

@@ -1,0 +1,125 @@
+---
+import { client } from '@/lib/client';
+import './index.scss';
+
+export interface ServiceItem {
+  slug: string;
+  name: string;
+  category: string;
+  price: number;
+  priceFrom?: boolean;
+  priceLabel?: string;
+  duration?: number;
+  image?: string;
+  highlights?: string[];
+  description: string;
+}
+
+interface Props {
+  service: ServiceItem;
+  modifier?: 'default' | 'featured';
+  className?: string;
+}
+
+const {
+  service,
+  modifier = 'default',
+  className = ''
+} = Astro.props;
+
+const hasNumericPrice = typeof service.price === 'number' && service.price > 0;
+const formattedPrice = hasNumericPrice
+  ? new Intl.NumberFormat(client.locale || 'fr', {
+      style: 'currency',
+      currency: client.currency || 'XOF',
+      maximumFractionDigits: 0
+    }).format(service.price)
+  : (service.priceLabel || 'Sur devis WhatsApp');
+
+const whatsappClean = client.contact.whatsapp.replace(/[^0-9]/g, '');
+const waText = encodeURIComponent(`Bonjour ${client.name}, je souhaite avoir un tarif / réserver pour : ${service.name}`);
+---
+
+<article
+  class={`serviceCard --${modifier} ${className}`}
+  id={`service-${service.slug}`}
+  data-category={service.category}
+>
+  <div class="serviceCard__body">
+    <div class="serviceCard__header">
+      <span class="serviceCard__category">{service.category}</span>
+      {service.duration && (
+        <span class="serviceCard__duration">⏱ ~{service.duration} min</span>
+      )}
+    </div>
+
+    <h3 class="serviceCard__title">{service.name}</h3>
+    <p class="serviceCard__description">{service.description}</p>
+
+    {service.highlights && service.highlights.length > 0 && (
+      <ul class="serviceCard__highlights">
+        {service.highlights.map((pt) => (
+          <li>
+            <span class="serviceCard__check" aria-hidden="true">✦</span>
+            <span>{pt}</span>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <div class="serviceCard__footer">
+      <span class="serviceCard__price">
+        {hasNumericPrice && service.priceFrom && <small>À partir de </small>}
+        <strong>{formattedPrice}</strong>
+      </span>
+
+      <div class="serviceCard__actions">
+        <!-- Vrai lien vers la page de détail (SEO), intercepté en modal par progressive enhancement -->
+        <a
+          href={`/prestations/${service.slug}`}
+          class="serviceCard__cta modalTrigger"
+          data-slug={service.slug}
+          data-title={service.name}
+          data-category={service.category}
+          data-price={formattedPrice}
+          data-rawprice={service.price}
+          data-desc={service.description}
+          data-highlights={JSON.stringify(service.highlights || [])}
+          aria-label={`Détails et réservation de ${service.name}`}
+        >
+          Détails
+        </a>
+
+        {client.modules.cart && (
+          <button
+            type="button"
+            class="serviceCard__cartBtn addCartTrigger"
+            data-slug={service.slug}
+            data-name={service.name}
+            data-price={service.price}
+            aria-label={`Ajouter ${service.name} au panier`}
+            title="Ajouter au panier"
+          >
+            🛒
+          </button>
+        )}
+
+        {client.modules.whatsapp && (
+          <a
+            href={`https://wa.me/${whatsappClean}?text=${waText}`}
+            target="_blank"
+            rel="noopener"
+            class="serviceCard__waBtn"
+            aria-label={`Demander un devis WhatsApp pour ${service.name}`}
+          >
+            WhatsApp
+          </a>
+        )}
+      </div>
+    </div>
+  </div>
+</article>
+
+<script>
+  import './js/default.js';
+</script>

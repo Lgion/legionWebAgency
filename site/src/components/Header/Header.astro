@@ -1,0 +1,290 @@
+---
+import { client } from '@/lib/client';
+
+interface Props {
+  className?: string;
+}
+
+const { className = '' } = Astro.props;
+const whatsappClean = client.contact.whatsapp.replace(/[^0-9]/g, '');
+const initials = client.name
+  .split(' ')
+  .filter(Boolean)
+  .slice(0, 3)
+  .map((w) => w[0])
+  .join('')
+  .toUpperCase();
+---
+
+<header class={`appHeader ${className}`} id="mainHeader">
+  <div class="appHeader__container">
+    <a href="/" class="appHeader__brand" aria-label={`Accueil ${client.name}`}>
+      {client.brand.logo ? (
+        <img src={client.brand.logo} alt={client.name} class="appHeader__logo" width="140" height="40" />
+      ) : (
+        <span class="appHeader__emblem" aria-hidden="true">{initials}</span>
+      )}
+      <div class="appHeader__brandText">
+        <span class="appHeader__name">{client.name}</span>
+        <span class="appHeader__sub">{client.contact.address.district}</span>
+      </div>
+    </a>
+
+    <nav class="appHeader__nav" aria-label="Navigation principale">
+      <ul class="appHeader__navList">
+        {client.actionHub && (
+          <li><a href="/#service-hub" class="appHeader__link">Démarches & Devis</a></li>
+        )}
+        <li><a href="/#prestations" class="appHeader__link">Nos 5 Pôles</a></li>
+        {client.seasonal && (
+          <li><a href="/#saison" class="appHeader__link">Vitrine Saison</a></li>
+        )}
+        {client.products && client.products.length > 0 && (
+          <li><a href="/#produits" class="appHeader__link">Boutique</a></li>
+        )}
+        {client.brand.gallery && client.brand.gallery.length > 0 && (
+          <li><a href="/#galerie" class="appHeader__link">Galerie Super U</a></li>
+        )}
+        <li><a href="/#contact" class="appHeader__link">Accès & Horaires</a></li>
+      </ul>
+    </nav>
+
+    <div class="appHeader__actions">
+      {client.payments?.wave && (
+        <button
+          type="button"
+          class="appHeader__waveBtn openWaveModalTrigger"
+          aria-label="Payer par QR Code Wave"
+        >
+          <span class="appHeader__waveDot" aria-hidden="true">W</span>
+          <span>Wave QR</span>
+        </button>
+      )}
+
+      <button type="button" id="headerCartBtn" class="appHeader__cartBtn" aria-label="Ouvrir le panier">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"></path>
+        </svg>
+        <span id="headerCartBadge" class="appHeader__cartBadge">0</span>
+      </button>
+
+      <a href={`https://wa.me/${whatsappClean}`} class="appHeader__cta" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true">
+          <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
+        </svg>
+        <span>WhatsApp</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  import { getStorage } from '@/lib/storage';
+
+  function updateHeaderBadge() {
+    const data = getStorage();
+    const count = (data.cart || []).reduce((acc, item) => acc + item.quantity, 0);
+    const badge = document.getElementById('headerCartBadge');
+    if (badge) {
+      badge.textContent = count.toString();
+      badge.style.display = count > 0 ? 'flex' : 'none';
+    }
+  }
+
+  window.addEventListener('app:storage:change', updateHeaderBadge);
+
+  document.getElementById('headerCartBtn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('cart:open'));
+  });
+
+  updateHeaderBadge();
+</script>
+
+<style lang="scss">
+  .appHeader {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header, 100);
+    background: rgba(11, 25, 44, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(197, 155, 39, 0.3);
+    color: #ffffff;
+    transition: box-shadow 150ms ease;
+
+    &__container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0.7rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    &__brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    &__emblem {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #D4AF37 0%, #9E7B16 100%);
+      color: #0B192C;
+      font-weight: 900;
+      font-size: 0.9rem;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    }
+
+    &__brandText {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__name {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      color: #ffffff;
+    }
+
+    &__sub {
+      font-size: 0.72rem;
+      color: #D4AF37;
+      font-weight: 600;
+    }
+
+    &__nav {
+      display: none;
+
+      @media (min-width: 960px) {
+        display: block;
+      }
+    }
+
+    &__navList {
+      display: flex;
+      gap: 1.35rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    &__link {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      transition: color 150ms ease;
+
+      &:hover {
+        color: #D4AF37;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    &__waveBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 0.8rem;
+      border-radius: 9999px;
+      background: #1898e8;
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 150ms ease, background 150ms ease;
+
+      &:hover {
+        background: #0d84d1;
+        transform: translateY(-1px);
+      }
+    }
+
+    &__waveDot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #1898e8;
+      font-weight: 900;
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__cartBtn {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 150ms ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+
+    &__cartBadge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 4px;
+      border-radius: 9999px;
+      background: #D4AF37;
+      color: #0B192C;
+      font-size: 0.7rem;
+      font-weight: 800;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.48rem 0.95rem;
+      background: #25D366;
+      color: #ffffff;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(37, 211, 102, 0.28);
+      transition: transform 150ms ease, background 150ms ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        background: #1ebe5d;
+      }
+    }
+  }
+</style>

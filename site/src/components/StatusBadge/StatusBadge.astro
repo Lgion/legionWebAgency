@@ -1,0 +1,37 @@
+---
+import './index.scss';
+
+interface Props {
+  id?: string;
+  label: string;
+  status?: 'online' | 'busy' | 'offline';
+  pulse?: boolean;
+  className?: string;
+}
+
+const {
+  id,
+  label,
+  status = 'online',
+  pulse = true,
+  className = '',
+} = Astro.props;
+
+const modifierClasses = [
+  status ? `--${status}` : '',
+  pulse ? '--pulse' : '',
+].filter(Boolean).join(' ');
+---
+
+<span
+  id={id}
+  class={`statusBadge ${modifierClasses} ${className}`.trim()}
+  role="status"
+>
+  <span class="statusBadge__dot" aria-hidden="true"></span>
+  <span class="statusBadge__label">{label}</span>
+</span>
+
+<script>
+  import './js/default.js';
+</script>

@@ -1,0 +1,43 @@
+@use 'sass:map';
+
+/************************************************************/
+/******************MODIFIER : PILLS (Autonome)**************/
+/************************************************************/
+@mixin pills($block: "") {
+  > ul,
+  > #{$block}__list {
+    gap: 0.5rem;
+
+    > li,
+    > #{$block}__item {
+      > a,
+      > button,
+      > #{$block}__link,
+      > #{$block}__btn {
+        padding: 0.45rem 0.95rem;
+        border-radius: 9999px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+
+        &::after {
+          display: none;
+        }
+
+        &:hover,
+        &:focus-visible {
+          background: rgba(197, 155, 39, 0.15);
+          border-color: rgba(197, 155, 39, 0.4);
+          color: #ffd700;
+        }
+
+        &[aria-current="page"],
+        &.--active {
+          background: rgba(197, 155, 39, 0.25);
+          border-color: #ffd700;
+          color: #ffd700;
+        }
+      }
+    }
+  }
+}

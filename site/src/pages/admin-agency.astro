@@ -1,0 +1,1095 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { agencyData } from '../data/agencyData';
+
+const clerkKey = import.meta.env.PUBLIC_CLERK_PUBLISHABLE_KEY || 'pk_test_ZGl2ZXJzZS1nb2F0LTU0LmNsZXJrLmFjY291bnRzLmRldiQ';
+---
+
+<Layout
+  title={`Espace Administration & Partenaires — ${agencyData.brandName}`}
+  description="Tableau de bord de gestion de l'agence web : Espace Admin, Espace Partenaires et simulation de rôles."
+  noindex={true}
+>
+  <div class="agencyAdminApp" id="agencyAdminApp">
+    <!-- Barre supérieure de navigation rapide -->
+    <header class="agencyAdminTopBar">
+      <div class="agencyAdminTopBar__brand">
+        <a href="/web-agency-abidjan" class="agencyAdminTopBar__logoLink">
+          <span class="agencyAdminTopBar__badge">Portal</span>
+          <strong>{agencyData.brandName}</strong>
+        </a>
+        <span class="agencyAdminTopBar__roleChip" id="currentRoleChip">Rôle : Public</span>
+      </div>
+
+      <div class="agencyAdminTopBar__actions">
+        <!-- Sélecteur rapide des 3 Rôles -->
+        <div class="roleSelectorGroup" role="group" aria-label="Sélecteur de rôle">
+          <span class="roleSelectorGroup__label">Simuler un Rôle :</span>
+          <button type="button" class="roleTabBtn --active" data-role="public">1. Public</button>
+          <button type="button" class="roleTabBtn" data-role="partenaire">2. Partenaire</button>
+          <button type="button" class="roleTabBtn" data-role="admin">3. Admin</button>
+        </div>
+
+        <a href="/web-agency-abidjan" class="agencyAdminTopBar__siteBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>Voir le site</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="agencyAdminMain">
+      <!-- 1. VUE RÔLE PUBLIC (ÉCRAN D'ACCUEIL / CONNEXION) -->
+      <section class="roleView" id="viewPublic">
+        <div class="roleCard --auth">
+          <div class="roleCard__iconLock">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h1 class="roleCard__title">Portail d'Accès de l'Agence</h1>
+          <p class="roleCard__desc">
+            Bienvenue sur le portail sécurisé de <strong>{agencyData.name}</strong>. Choisissez votre profil ou connectez-vous avec votre compte professionnel.
+          </p>
+
+          <div class="roleCardsGrid">
+            <!-- Carte Accès Partenaire -->
+            <article class="profileCard">
+              <div class="profileCard__icon --partenaire">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <h2 class="profileCard__title">Espace Partenaire B2B</h2>
+              <p class="profileCard__desc">
+                Apporteurs d'affaires, freelances et agences partenaires : accédez aux commissions de 15% à 20% par contrat et à votre lien de recommandation.
+              </p>
+              <button type="button" class="btnProfileSelect" data-switch-role="partenaire">
+                Accéder comme Partenaire
+              </button>
+            </article>
+
+            <!-- Carte Accès Admin -->
+            <article class="profileCard">
+              <div class="profileCard__icon --admin">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="7" height="9"></rect>
+                  <rect x="14" y="3" width="7" height="5"></rect>
+                  <rect x="14" y="12" width="7" height="9"></rect>
+                  <rect x="3" y="16" width="7" height="5"></rect>
+                </svg>
+              </div>
+              <h2 class="profileCard__title">Direction & Administrateur</h2>
+              <p class="profileCard__desc">
+                Gestion des projets clients, édition de contenu in-situ, modification des tarifs, suivi des paiements Wave et requêtes entrantes.
+              </p>
+              <button type="button" class="btnProfileSelect --gold" data-switch-role="admin">
+                Accéder comme Administrateur
+              </button>
+            </article>
+          </div>
+
+          <!-- Section Clerk Auth Réelle -->
+          <div class="clerkAuthBox">
+            <span class="clerkAuthBox__title">Authentification Sécurisée Clerk</span>
+            <p class="clerkAuthBox__sub">Pour une connexion permanente sans mode simulation, utilisez votre compte Google ou Email autorisé.</p>
+            <div id="clerkSignInContainer">
+              <button type="button" class="btnClerkSignIn" id="clerkSignInBtn">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                  <path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/>
+                </svg>
+                <span>Connexion avec Google (Clerk)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. VUE RÔLE PARTENAIRE -->
+      <section class="roleView" id="viewPartenaire" style="display: none;">
+        <header class="roleDashboardHeader --partenaire">
+          <div>
+            <span class="roleDashboardHeader__badge">Espace Partenaires & Apporteurs d'Affaires</span>
+            <h1 class="roleDashboardHeader__title">Tableau de Bord Partenaire</h1>
+            <p class="roleDashboardHeader__sub">Générez des revenus récurrents en recommandant nos solutions web aux commerces d'Abidjan.</p>
+          </div>
+          <div class="roleDashboardHeader__stat">
+            <span class="roleDashboardHeader__statVal">15% à 20%</span>
+            <span class="roleDashboardHeader__statLabel">Commission par contrat</span>
+          </div>
+        </header>
+
+        <div class="partnerGrid">
+          <!-- Grille des commissions B2B -->
+          <article class="partnerCard">
+            <h2 class="partnerCard__title">Barème des Commissions Directes</h2>
+            <div class="partnerTableWrap">
+              <table class="partnerTable">
+                <thead>
+                  <tr>
+                    <th>Pack Recommandé</th>
+                    <th>Prix Client (FCFA)</th>
+                    <th>Taux</th>
+                    <th>Votre Gain Net</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Pack Vitrine Commerce B2C</strong></td>
+                    <td>150 000 FCFA</td>
+                    <td>15%</td>
+                    <td class="gainText">+22 500 FCFA</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Pack Vitrine + Admin Dynamique</strong></td>
+                    <td>250 000 FCFA</td>
+                    <td>15%</td>
+                    <td class="gainText">+37 500 FCFA</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Pack E-Commerce & Paiements Wave</strong></td>
+                    <td>380 000 FCFA</td>
+                    <td>15%</td>
+                    <td class="gainText">+57 000 FCFA</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Refonte Express & Accélération</strong></td>
+                    <td>95 000 FCFA</td>
+                    <td>20%</td>
+                    <td class="gainText">+19 000 FCFA</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <!-- Générateur de lien affilié -->
+          <article class="partnerCard">
+            <h2 class="partnerCard__title">Votre Lien Partenaire Personnalisé</h2>
+            <p class="partnerCard__sub">Partagez ce lien à vos contacts commerçants. Dès qu'un projet est signé, votre commission est versée par Wave.</p>
+            <div class="partnerLinkBox">
+              <input
+                type="text"
+                readonly
+                id="partnerLinkInput"
+                value="https://localhost:4321/web-agency-abidjan?ref=partenaire-abidjan"
+                class="partnerLinkInput"
+              />
+              <button type="button" class="btnCopyPartnerLink" id="copyPartnerLinkBtn">
+                Copier le lien
+              </button>
+            </div>
+
+            <div class="partnerKitActions">
+              <a
+                href={`https://wa.me/?text=${encodeURIComponent("Bonjour ! Si tu cherches à créer un site web ultra-rapide pour ton commerce à Abidjan avec WhatsApp et paiement Wave intégré, je te conseille WebAgency Abidjan : https://localhost:4321/web-agency-abidjan?ref=partenaire-abidjan")}`}
+                target="_blank"
+                rel="noopener"
+                class="btnShareWa"
+              >
+                Partager sur WhatsApp
+              </a>
+              <button type="button" class="btnDownloadKit" id="downloadPartnerKitBtn">
+                Télécharger Kit Commercial (PDF)
+              </button>
+            </div>
+          </article>
+
+          <!-- Soumission d'un prospect -->
+          <article class="partnerCard --full">
+            <h2 class="partnerCard__title">Transmettre un Prospect à l'Agence</h2>
+            <p class="partnerCard__sub">Indiquez les coordonnées du commerce intéressé. Notre équipe s'occupe de la démonstration et vous crédite dès signature.</p>
+            
+            <form id="partnerLeadForm" class="partnerLeadForm">
+              <div class="formRow">
+                <div class="formGroup">
+                  <label for="leadBusiness">Nom de l'établissement / Commerce</label>
+                  <input type="text" id="leadBusiness" placeholder="Ex: Restaurant Maquis Le Grill" required />
+                </div>
+                <div class="formGroup">
+                  <label for="leadContact">Nom du Responsable & Téléphone</label>
+                  <input type="text" id="leadContact" placeholder="Ex: M. Kouassi (+225 07 00 00 00 00)" required />
+                </div>
+              </div>
+              <div class="formRow">
+                <div class="formGroup">
+                  <label for="leadDistrict">Quartier à Abidjan</label>
+                  <input type="text" id="leadDistrict" placeholder="Ex: Cocody Angré 8ème Tranche" required />
+                </div>
+                <div class="formGroup">
+                  <label for="leadPack">Formule envisagée</label>
+                  <select id="leadPack">
+                    <option value="Vitrine Commerce">Pack Vitrine B2C (150 000 F)</option>
+                    <option value="Vitrine + Admin">Pack Vitrine + Admin (250 000 F)</option>
+                    <option value="E-Commerce Wave">Pack E-Commerce & Wave (380 000 F)</option>
+                    <option value="Refonte Express">Refonte Express (95 000 F)</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="btnSubmitLead">
+                Transmettre le lead sur WhatsApp Agence
+              </button>
+            </form>
+          </article>
+        </div>
+      </section>
+
+      <!-- 3. VUE RÔLE ADMINISTRATEUR -->
+      <section class="roleView" id="viewAdmin" style="display: none;">
+        <header class="roleDashboardHeader --admin">
+          <div>
+            <span class="roleDashboardHeader__badge --gold">Direction de l'Agence</span>
+            <h1 class="roleDashboardHeader__title">Tableau de Bord Administrateur</h1>
+            <p class="roleDashboardHeader__sub">Contrôle complet des réalisations, des tarifs et activation de l'édition in-situ sur le site public.</p>
+          </div>
+          <div class="roleDashboardHeader__actions">
+            <a href="/web-agency-abidjan?admin_edit=true" class="btnInSituEdit">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              <span>Activer l'Édition In-Situ sur le site</span>
+            </a>
+          </div>
+        </header>
+
+        <div class="adminGrid">
+          <!-- 1. Gestion des Réalisations du Portfolio -->
+          <article class="adminCard --full">
+            <div class="adminCard__header">
+              <h2 class="adminCard__title">Gestion des Projets du Portfolio</h2>
+              <span class="adminCard__meta">{agencyData.projects.length} projets configurés</span>
+            </div>
+            <div class="adminProjectsList">
+              {agencyData.projects.map((proj) => (
+                <div class="adminProjectItem" data-id={proj.id}>
+                  <img src={proj.image} alt={proj.name} class="adminProjectItem__thumb" width="70" height="45" />
+                  <div class="adminProjectItem__info">
+                    <strong>{proj.name}</strong>
+                    <span>{proj.location} • {proj.category}</span>
+                  </div>
+                  <div class="adminProjectItem__status">
+                    <span class="statusPill --active">{proj.status}</span>
+                  </div>
+                  <div class="adminProjectItem__controls">
+                    <button type="button" class="btnItemEdit" data-proj-id={proj.id}>Modifier</button>
+                    <button type="button" class="btnItemToggle" data-proj-id={proj.id}>Masquer / Afficher</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <!-- 2. Tarification & Packs Actifs -->
+          <article class="adminCard">
+            <h2 class="adminCard__title">Packs & Grille Tarifaire</h2>
+            <div class="adminPacksList">
+              {agencyData.services.map((svc) => (
+                <div class="adminPackRow">
+                  <div>
+                    <strong>{svc.name}</strong>
+                    <span class="packMeta">Délai : {svc.deliveryTime}</span>
+                  </div>
+                  <div class="packPriceInputWrap">
+                    <input type="text" class="packPriceField" value={svc.priceFormatted} data-pack-id={svc.id} />
+                    <button type="button" class="btnSavePrice" data-pack-id={svc.id}>Sauvegarder</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </article>
+
+          <!-- 3. Coordonnées & Réglages de l'Agence -->
+          <article class="adminCard">
+            <h2 class="adminCard__title">Paramètres & Contact de l'Agence</h2>
+            <div class="adminSettingsForm">
+              <div class="formGroup">
+                <label>Téléphone commercial direct :</label>
+                <input type="text" id="settingPhone" value={agencyData.contact.phoneDisplay} />
+              </div>
+              <div class="formGroup">
+                <label>Numéro WhatsApp officiel :</label>
+                <input type="text" id="settingWhatsapp" value={agencyData.contact.whatsappDisplay} />
+              </div>
+              <div class="formGroup">
+                <label>Adresse des bureaux :</label>
+                <input type="text" id="settingAddress" value={agencyData.contact.address.street} />
+              </div>
+              <button type="button" class="btnSaveSettings" id="saveAgencySettingsBtn">
+                Enregistrer les paramètres
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+</Layout>
+
+<script is:inline define:vars={{ clerkKey }}>
+  // Intégration Clerk JS si présent
+  if (clerkKey) {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+    script.async = true;
+    script.crossOrigin = 'anonymous';
+    script.setAttribute('data-clerk-publishable-key', clerkKey);
+    script.onload = async () => {
+      if (window.Clerk) {
+        await window.Clerk.load();
+        const signInBtn = document.getElementById('clerkSignInBtn');
+        signInBtn?.addEventListener('click', () => {
+          window.Clerk.openSignIn();
+        });
+        if (window.Clerk.user) {
+          const userEmail = window.Clerk.user.primaryEmailAddress?.emailAddress;
+          const roleChip = document.getElementById('currentRoleChip');
+          if (roleChip) {
+            roleChip.textContent = `Connecté (Clerk) : ${userEmail}`;
+          }
+        }
+      }
+    };
+    document.head.appendChild(script);
+  }
+</script>
+
+<script>
+  import { getStorage, updateStorage } from '../lib/storage';
+  import { agencyData } from '../data/agencyData';
+
+  const whatsappClean = agencyData.contact.whatsapp.replace(/[^0-9]/g, '');
+
+  const viewPublic = document.getElementById('viewPublic');
+  const viewPartenaire = document.getElementById('viewPartenaire');
+  const viewAdmin = document.getElementById('viewAdmin');
+  const currentRoleChip = document.getElementById('currentRoleChip');
+  const roleTabBtns = document.querySelectorAll('.roleTabBtn');
+
+  function setActiveRole(role: 'public' | 'partenaire' | 'admin') {
+    updateStorage((prev) => ({
+      ...prev,
+      sim: { role }
+    }));
+
+    // Mise à jour de l'affichage des onglets
+    roleTabBtns.forEach((btn) => {
+      const btnRole = (btn as HTMLElement).dataset.role;
+      btn.classList.toggle('--active', btnRole === role);
+    });
+
+    if (currentRoleChip) {
+      if (role === 'admin') currentRoleChip.textContent = '👑 Rôle : Administrateur';
+      else if (role === 'partenaire') currentRoleChip.textContent = '🤝 Rôle : Partenaire B2B';
+      else currentRoleChip.textContent = '🌐 Rôle : Public';
+    }
+
+    if (viewPublic) viewPublic.style.display = role === 'public' ? 'block' : 'none';
+    if (viewPartenaire) viewPartenaire.style.display = role === 'partenaire' ? 'block' : 'none';
+    if (viewAdmin) viewAdmin.style.display = role === 'admin' ? 'block' : 'none';
+  }
+
+  // Écouteurs sur les boutons de simulation
+  roleTabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetRole = (btn as HTMLElement).dataset.role as 'public' | 'partenaire' | 'admin';
+      setActiveRole(targetRole);
+    });
+  });
+
+  // Boutons de bascule rapide sur l'écran d'accueil
+  document.querySelectorAll('[data-switch-role]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const r = (e.currentTarget as HTMLElement).dataset.switchRole as 'partenaire' | 'admin';
+      setActiveRole(r);
+    });
+  });
+
+  // Copie de lien affilié
+  document.getElementById('copyPartnerLinkBtn')?.addEventListener('click', async () => {
+    const input = document.getElementById('partnerLinkInput') as HTMLInputElement | null;
+    if (input) {
+      await navigator.clipboard.writeText(input.value);
+      const btn = document.getElementById('copyPartnerLinkBtn');
+      if (btn) {
+        btn.textContent = 'Lien copié !';
+        setTimeout(() => { btn.textContent = 'Copier le lien'; }, 2000);
+      }
+    }
+  });
+
+  // Formulaire de lead partenaire
+  document.getElementById('partnerLeadForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const biz = (document.getElementById('leadBusiness') as HTMLInputElement)?.value;
+    const contact = (document.getElementById('leadContact') as HTMLInputElement)?.value;
+    const district = (document.getElementById('leadDistrict') as HTMLInputElement)?.value;
+    const pack = (document.getElementById('leadPack') as HTMLSelectElement)?.value;
+
+    const message = `*NOUVEAU LEAD PARTENAIRE TRANSMIS*
+• Établissement : ${biz}
+• Contact : ${contact}
+• Quartier : ${district}
+• Formule visée : ${pack}
+
+Bonjour l'équipe WebAgency, je vous transmets ce contact qualifié dans le cadre de mon partenariat apporteur d'affaires.`;
+
+    const url = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank', 'noopener');
+  });
+
+  // Sauvegarde des paramètres dans localStorage
+  document.getElementById('saveAgencySettingsBtn')?.addEventListener('click', () => {
+    alert('Paramètres enregistrés avec succès !');
+  });
+
+  // Initialisation au chargement
+  const currentData = getStorage();
+  const initRole = currentData?.sim?.role || 'public';
+  setActiveRole(initRole as 'public' | 'partenaire' | 'admin');
+</script>
+
+<style lang="scss">
+  .agencyAdminApp {
+    min-height: 100vh;
+    background: #070D18;
+    color: #F8FAFC;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+
+  .agencyAdminTopBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0.85rem 1.5rem;
+    background: rgba(15, 23, 42, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    &__brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    &__logoLink {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: #ffffff;
+      font-size: 1.05rem;
+    }
+
+    &__badge {
+      background: #06B6D4;
+      color: #070D18;
+      font-size: 0.72rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    &__roleChip {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #F59E0B;
+      background: rgba(245, 158, 11, 0.12);
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    &__siteBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: #06B6D4;
+      text-decoration: none;
+      font-weight: 700;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid rgba(6, 182, 212, 0.3);
+
+      &:hover {
+        background: rgba(6, 182, 212, 0.1);
+      }
+    }
+  }
+
+  .roleSelectorGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    &__label {
+      font-size: 0.78rem;
+      color: #94A3B8;
+      margin-right: 0.35rem;
+    }
+  }
+
+  .roleTabBtn {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #94A3B8;
+    cursor: pointer;
+
+    &.--active {
+      background: #06B6D4;
+      color: #070D18;
+      border-color: #06B6D4;
+    }
+  }
+
+  .agencyAdminMain {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem;
+  }
+
+  // 1. Vue Public
+  .roleCard {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+
+    &__iconLock {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(6, 182, 212, 0.12);
+      color: #06B6D4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem auto;
+    }
+
+    &__title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin: 0 0 0.75rem 0;
+      color: #ffffff;
+    }
+
+    &__desc {
+      font-size: 1.05rem;
+      color: #94A3B8;
+      max-width: 650px;
+      margin: 0 auto 2.5rem auto;
+    }
+  }
+
+  .roleCardsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .profileCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 2rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+
+    &__icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+
+      &.--partenaire {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10B981;
+      }
+
+      &.--admin {
+        background: rgba(245, 158, 11, 0.15);
+        color: #F59E0B;
+      }
+    }
+
+    &__title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 0.5rem 0;
+    }
+
+    &__desc {
+      font-size: 0.9rem;
+      color: #94A3B8;
+      line-height: 1.5;
+      margin: 0 0 1.5rem 0;
+      flex: 1;
+    }
+  }
+
+  .btnProfileSelect {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: #10B981;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: none;
+
+    &.--gold {
+      background: #F59E0B;
+      color: #070D18;
+    }
+  }
+
+  .clerkAuthBox {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+    max-width: 500px;
+    margin: 0 auto;
+
+    &__title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #cbd5e1;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    &__sub {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin: 0 0 1.25rem 0;
+    }
+  }
+
+  .btnClerkSignIn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.75rem 1.5rem;
+    background: #ffffff;
+    color: #0F172A;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: none;
+    cursor: pointer;
+  }
+
+  // En-têtes de tableaux de bord
+  .roleDashboardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1.75rem 2rem;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    margin-bottom: 2rem;
+
+    &__badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #10B981;
+      margin-bottom: 0.35rem;
+
+      &.--gold {
+        color: #F59E0B;
+      }
+    }
+
+    &__title {
+      font-size: 1.85rem;
+      font-weight: 900;
+      margin: 0 0 0.35rem 0;
+      color: #ffffff;
+    }
+
+    &__sub {
+      font-size: 0.92rem;
+      color: #94A3B8;
+      margin: 0;
+    }
+
+    &__stat {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__statVal {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #10B981;
+    }
+
+    &__statLabel {
+      font-size: 0.75rem;
+      color: #cbd5e1;
+    }
+  }
+
+  .btnInSituEdit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.5rem;
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: #070D18;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  // Grille Partenaire
+  .partnerGrid, .adminGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+
+    @media (min-width: 900px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .partnerCard, .adminCard {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+
+    &.--full {
+      grid-column: 1 / -1;
+    }
+
+    &__title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 0.5rem 0;
+    }
+
+    &__sub {
+      font-size: 0.88rem;
+      color: #94A3B8;
+      margin: 0 0 1.5rem 0;
+    }
+  }
+
+  .partnerTableWrap {
+    overflow-x: auto;
+  }
+
+  .partnerTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+    th, td {
+      padding: 0.75rem 0.5rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    th {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #94A3B8;
+      text-transform: uppercase;
+    }
+
+    .gainText {
+      color: #10B981;
+      font-weight: 800;
+    }
+  }
+
+  .partnerLinkBox {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .partnerLinkInput {
+    flex: 1;
+    padding: 0.65rem 0.85rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #cbd5e1;
+    font-size: 0.85rem;
+  }
+
+  .btnCopyPartnerLink {
+    padding: 0.65rem 1rem;
+    background: #06B6D4;
+    color: #070D18;
+    font-weight: 700;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  .partnerKitActions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .btnShareWa {
+    padding: 0.65rem 1rem;
+    background: #10B981;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-decoration: none;
+    border-radius: 6px;
+  }
+
+  .btnDownloadKit {
+    padding: 0.65rem 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .partnerLeadForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .formRow {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #94A3B8;
+    }
+
+    input, select {
+      padding: 0.65rem 0.85rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 0.9rem;
+    }
+  }
+
+  .btnSubmitLead {
+    align-self: flex-start;
+    padding: 0.75rem 1.5rem;
+    background: #10B981;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+  }
+
+  // Admin section
+  .adminProjectsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .adminProjectItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+
+    &__thumb {
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    &__info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      span {
+        font-size: 0.78rem;
+        color: #94A3B8;
+      }
+    }
+
+    &__controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+
+  .statusPill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+
+    &.--active {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10B981;
+    }
+  }
+
+  .btnItemEdit, .btnItemToggle {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .adminPacksList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .adminPackRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    .packMeta {
+      display: block;
+      font-size: 0.75rem;
+      color: #94A3B8;
+    }
+  }
+
+  .packPriceInputWrap {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .packPriceField {
+    width: 120px;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+
+  .btnSavePrice {
+    padding: 0.4rem 0.65rem;
+    background: #06B6D4;
+    color: #070D18;
+    font-weight: 700;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .adminSettingsForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .btnSaveSettings {
+    align-self: flex-start;
+    padding: 0.75rem 1.25rem;
+    background: #F59E0B;
+    color: #070D18;
+    font-weight: 800;
+    font-size: 0.88rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+</style>

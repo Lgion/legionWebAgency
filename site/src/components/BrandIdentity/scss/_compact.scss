@@ -1,0 +1,25 @@
+@use 'sass:map';
+
+/************************************************************/
+/*****************MODIFIER : COMPACT (Autonome)**************/
+/************************************************************/
+@mixin compact($block: "") {
+  gap: 0.55rem;
+
+  > span:first-child,
+  > #{$block}__emblem {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+  }
+
+  > div > span:first-child,
+  > #{$block}__name {
+    font-size: 0.95rem;
+  }
+
+  > div > span:last-child,
+  > #{$block}__tagline {
+    font-size: 0.62rem;
+  }
+}

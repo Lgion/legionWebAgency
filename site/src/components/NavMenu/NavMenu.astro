@@ -1,0 +1,62 @@
+---
+import './index.scss';
+
+export interface NavMenuItem {
+  label: string;
+  href?: string;
+  isButton?: boolean;
+  triggerClass?: string;
+  dataAttrs?: Record<string, string>;
+  active?: boolean;
+}
+
+interface Props {
+  items: NavMenuItem[];
+  ariaLabel?: string;
+  modifier?: 'default' | 'pills';
+  className?: string;
+}
+
+const {
+  items = [],
+  ariaLabel = 'Navigation principale',
+  modifier = 'default',
+  className = '',
+} = Astro.props;
+---
+
+<nav
+  class={`navMenu --${modifier} ${className}`.trim()}
+  aria-label={ariaLabel}
+>
+  <ul class="navMenu__list">
+    {items.map((item) => (
+      <li class="navMenu__item">
+        {item.isButton ? (
+          <button
+            type="button"
+            class={`navMenu__btn ${item.triggerClass || ''}`.trim()}
+            {...(item.dataAttrs || {})}
+            aria-current={item.active ? 'page' : undefined}
+          >
+            {item.label}
+          </button>
+        ) : (
+          <a
+            href={item.href || '#'}
+            class={`navMenu__link ${item.triggerClass || ''}`.trim()}
+            {...(item.dataAttrs || {})}
+            aria-current={item.active ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        )}
+      </li>
+    ))}
+    <slot />
+  </ul>
+</nav>
+
+<script>
+  import './js/default.js';
+</script>

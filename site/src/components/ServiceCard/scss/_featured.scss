@@ -1,0 +1,20 @@
+/*
+=========================================================
+📝 MODIFIER : .--featured (Service Mis en Avant)
+=========================================================
+*/
+@use 'sass:map';
+@use 'default';
+
+@mixin featured($paramMixi_: (), $block: ".serviceCard") {
+  $customFeatured: (
+    bg-color: #fbfbfd,
+    border-color: rgba(197, 155, 39, 0.45),
+    accent-color: #D4AF37,
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.12),
+    hover-shadow: 0 20px 36px -8px rgba(212, 175, 55, 0.22)
+  );
+
+  @include default.serviceCard(map.merge($customFeatured, $paramMixi_), $block);
+  border-top-width: 4px;
+}

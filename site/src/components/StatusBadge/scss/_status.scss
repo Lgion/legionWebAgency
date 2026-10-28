@@ -1,0 +1,41 @@
+@use 'sass:map';
+
+/************************************************************/
+/**************MODIFICATEURS DE STATUT (Autonomes)***********/
+/************************************************************/
+
+@mixin online($block: "") {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6ee7b7;
+
+  > span:first-child,
+  > #{$block}__dot {
+    background-color: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+  }
+}
+
+@mixin busy($block: "") {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fde68a;
+
+  > span:first-child,
+  > #{$block}__dot {
+    background-color: #f59e0b;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.7);
+  }
+}
+
+@mixin offline($block: "") {
+  background: rgba(100, 116, 139, 0.1);
+  border-color: rgba(100, 116, 139, 0.25);
+  color: #94a3b8;
+
+  > span:first-child,
+  > #{$block}__dot {
+    background-color: #64748b;
+    box-shadow: none;
+  }
+}

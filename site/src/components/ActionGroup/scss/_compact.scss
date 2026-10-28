@@ -1,0 +1,29 @@
+@use 'sass:map';
+
+/************************************************************/
+/*****************MODIFIER : COMPACT (Autonome)**************/
+/************************************************************/
+@mixin compact($block: "") {
+  gap: 0.45rem;
+
+  > button,
+  > a,
+  > #{$block}__btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+
+    svg {
+      width: 17px;
+      height: 17px;
+    }
+  }
+
+  #{$block}__badge {
+    min-width: 15px;
+    height: 15px;
+    font-size: 0.6rem;
+    top: -4px;
+    right: -4px;
+  }
+}

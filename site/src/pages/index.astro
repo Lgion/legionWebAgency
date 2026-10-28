@@ -1,63 +1,243 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { client } from '../lib/client';
-import Header from '../components/library/layout/Header/Header.astro';
-import Footer from '../components/library/layout/Footer/Footer.astro';
-import FabContact from '../components/library/conversion/FabContact/FabContact.astro';
-import FabTools from '../components/library/conversion/FabTools/FabTools.astro';
-import ServiceCard from '../components/library/contenu/ServiceCard/ServiceCard.astro';
-import Accordion from '../components/library/contenu/Accordion/Accordion.astro';
-import CartDrawer from '../components/library/commerce/Cart/CartDrawer.astro';
+import Header from '../components/Header/Header.astro';
+import Footer from '../components/Footer/Footer.astro';
+import FabContact from '../components/FabContact/FabContact.astro';
+import FabTools from '../components/FabTools/FabTools.astro';
+import ServiceCard from '../components/ServiceCard/ServiceCard.astro';
+import Accordion from '../components/Accordion/Accordion.astro';
+import CartDrawer from '../components/Cart/CartDrawer.astro';
+import WaveModal from '../components/WaveModal/WaveModal.astro';
+import ActionHub from '../components/ActionHub/ActionHub.astro';
+import SeasonalShowcase from '../components/SeasonalShowcase/SeasonalShowcase.astro';
+
+const whatsappClean = client.contact.whatsapp.replace(/[^0-9]/g, '');
+const phoneClean = client.contact.phone.replace(/[^0-9+]/g, '');
+
+// Extraction dynamique des catégories de prestations pour les onglets de filtrage
+const serviceCategories = Array.from(new Set(client.services.map((s) => s.category)));
 
 const faqs = [
   {
-    title: "Faut-il prendre rendez-vous pour venir ?",
-    content: "Nous vous accueillons avec et sans rendez-vous pendant toutes nos heures d'ouverture. Les personnes ayant réservé via WhatsApp restent prioritaires sur les créneaux chargés."
+    title: "Jusqu'à quelle taille pouvez-vous agrandir et encadrer une photo ?",
+    content: "Dans notre espace Studio Photo Maria, nous réalisons tous les formats de tirage photo jusqu'au très grand format 2 mètres sur 2 mètres (2m × 2m). Nous proposons également l'impression photo sur bois, les cadres vitrés et tous types d'encadrements sur mesure.",
+    defaultOpen: true
   },
   {
-    title: "Quels sont les modes de paiement acceptés ?",
-    content: "Nous acceptons les espèces, les paiements mobiles locaux (Wave, Orange Money) ainsi que les règlements directs à la caisse."
+    title: "Pouvez-vous restaurer une ancienne photo abîmée ou d'un parent décédé ?",
+    content: "Oui, c'est l'une de nos spécialités. Vous pouvez nous apporter une ancienne photo physique : nous la numérisons par ordinateur, réparons les défauts, changeons l'arrière-plan selon votre souhait et l'agrandissons avec un encadrement hommage de haute qualité."
   },
   {
-    title: "Proposez-vous un service à domicile ou la livraison ?",
-    content: client.delivery.enabled
-      ? "Oui, nous proposons la livraison et les prestations à domicile sur demande dans les zones sélectionnées."
-      : "Nos prestations s'effectuent directement en établissement pour vous garantir la meilleure qualité d'accueil et d'équipement."
+    title: "En combien de temps fabriquez-vous un cachet d'entreprise ?",
+    content: "Nous fabriquons votre cachet d'entreprise sur-le-champ ! Vous vous asseyez au comptoir avec les informations de votre société, nous concevons la maquette immédiatement et vous repartez avec votre cachet prêt à l'emploi."
+  },
+  {
+    title: "Puis-je commander un téléphone (iPhone, Samsung, Tecno) de grande capacité ?",
+    content: "Tout à fait. En plus de notre stock exposé en vitrine, nous travaillons directement avec les fournisseurs partenaires officiels (Samsung, iPhone, Tecno, Itel). Si vous cherchez un modèle précis ou une grande capacité mémoire, nous le faisons venir sur commande rapidement."
+  },
+  {
+    title: "Comment fonctionnent les dépôts, retraits Mobile Money et paiements en boutique ?",
+    content: "Pour votre sécurité, tous les dépôts et retraits d'espèces (Wave, Orange Money, MTN MoMo, Push, Djamo) s'effectuent physiquement à notre guichet dans la galerie du Super U après confirmation du nom du bénéficiaire. Pour régler vos achats ou prestations, vous pouvez payer par QR Code Wave, Orange Money ou par Carte Visa."
+  },
+  {
+    title: "Faut-il prendre rendez-vous ou proposez-vous la livraison sur Abidjan ?",
+    content: "L'accès à la boutique, aux impressions, aux cachets et au Mobile Money se fait sans rendez-vous du lundi au samedi de 09h00 à 20h00. Pour les shootings studio et reportages mariage/cérémonie, la réservation sur WhatsApp est conseillée. Nous livrons également vos commandes partout à Abidjan."
   }
 ];
 ---
 
-<Layout>
+<Layout image="/images/entree.jpeg">
   <Header />
 
   <main class="homePage">
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero__container">
-        <span class="hero__badge">{client.activity.label}</span>
-        <h1 class="hero__title">{client.name}</h1>
-        <p class="hero__pitch">{client.activity.pitch}</p>
-        
-        <div class="hero__actions">
-          <a href={`https://wa.me/${client.contact.whatsapp.replace(/[^0-9]/g, '')}`} class="btn btn--primary" target="_blank" rel="noopener">
-            Prendre contact sur WhatsApp
-          </a>
-          <a href="#prestations" class="btn btn--secondary">
-            Voir nos prestations
-          </a>
+    <!-- 1. HERO PRESTIGE BLEU MARINE & OR -->
+    <section class="prestigeHero">
+      <div class="prestigeHero__container">
+        <div class="prestigeHero__content">
+          <div class="prestigeHero__badges">
+            <span class="prestigeHero__locBadge">
+              📍 Galerie Super U Deux Plateaux (Sococé)
+            </span>
+            <span class="prestigeHero__hoursBadge">
+              🕘 Lun – Sam : 09h00 – 20h00
+            </span>
+          </div>
+
+          <h1 class="prestigeHero__title">
+            {client.name}
+            <span class="prestigeHero__titleGold">Studio Photo Maria & Pôle Multiservices</span>
+          </h1>
+
+          <p class="prestigeHero__pitch">{client.activity.pitch}</p>
+
+          <!-- Les 5 Pôles en un coup d'œil -->
+          <ul class="prestigeHero__poles" aria-label="Nos 5 domaines d'expertise">
+            <li><a href="#prestations" data-filter-jump="Photo & Vidéo">📸 Studio Photo & Cadres 2m×2m</a></li>
+            <li><a href="#prestations" data-filter-jump="Bureautique & Démarches">🖨️ Impression, Visa & Cachets Express</a></li>
+            <li><a href="#prestations" data-filter-jump="Réparation Tech">🛠️ Réparation Téléphones, PC & Piles</a></li>
+            <li><a href="#produits">🎮 Boutique Tech, Gaming & Bijoux</a></li>
+            <li><a href="#mobile-money">📲 Agence Wave, Orange, MTN & Push</a></li>
+          </ul>
+
+          <div class="prestigeHero__actions">
+            <a
+              href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent('Bonjour Business Center Prestige Services, je vous contacte depuis votre site internet pour une demande de tarif ou réservation.')}`}
+              class="heroBtn --whatsapp"
+              target="_blank"
+              rel="noopener"
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0012.04 2z"/>
+              </svg>
+              <span>Devis & Réservation WhatsApp</span>
+            </a>
+
+            <button type="button" class="heroBtn --wave openWaveModalTrigger">
+              <span>💳 Payer par QR Wave</span>
+            </button>
+
+            <a href={`tel:${phoneClean}`} class="heroBtn --outline">
+              <span>📞 {client.contact.phone}</span>
+            </a>
+          </div>
         </div>
+
+        <!-- Mosaïque Photos Réelles de la Boutique -->
+        <div class="prestigeHero__visual">
+          <figure class="prestigeHero__mainPhoto">
+            <img
+              src="/images/entree.jpeg"
+              alt="Devanture Business Center Prestige Services et Studio Photo Maria au Super U Deux Plateaux Sococé"
+              width="640"
+              height="420"
+              fetchpriority="high"
+            />
+            <figcaption>
+              <strong>Galerie Super U Deux Plateaux</strong> • Accès sécurisé & parking gratuit
+            </figcaption>
+          </figure>
+          <div class="prestigeHero__subPhotos">
+            <figure>
+              <img
+                src="/images/produits_boutique.jpeg"
+                alt="Rayons électronique, pochettes, gaming et accessoires"
+                width="300"
+                height="200"
+                loading="eager"
+              />
+              <figcaption>Boutique High-Tech & Accessoires</figcaption>
+            </figure>
+            <figure>
+              <img
+                src="/images/tranferts_wave_push.jpeg"
+                alt="Comptoir d'accueil et transferts Mobile Money Wave Orange MTN"
+                width="300"
+                height="200"
+                loading="eager"
+              />
+              <figcaption>Guichet Mobile Money & Accueil</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <!-- Séparateur SVG travaillé -->
+      <div class="prestigeHero__divider" aria-hidden="true">
+        <svg viewBox="0 0 1440 56" fill="none" preserveAspectRatio="none">
+          <path d="M0 56L1440 56L1440 16C1180 54 920 0 720 24C520 48 260 4 0 36L0 56Z" fill="var(--color-surface, #FAF8F5)"/>
+        </svg>
       </div>
     </section>
 
-    <!-- Prestations Section -->
+    <!-- 2. RUBAN DES ATOUTS DIFFÉRENCIATEURS -->
+    <section class="trustStrip" aria-label="Pourquoi nous choisir">
+      <div class="trustStrip__container">
+        <ul class="trustStrip__list">
+          {client.activity.differentiators.map((diff) => (
+            <li class="trustStrip__item">
+              <span class="trustStrip__star" aria-hidden="true">★</span>
+              <span>{diff}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <!-- 2bis. ESPACE DÉMARCHES EXPRESS & SIMULATEUR DE DEVIS (ActionHub) -->
+    <ActionHub />
+
+    <!-- 3. OFFRES & PROMOTIONS PHARES -->
+    {client.promotions && client.promotions.length > 0 && (
+      <section class="section --gold" id="promotions">
+        <div class="section__container">
+          <div class="section__header">
+            <span class="section__eyebrow">Offres Spéciales & Forfaits</span>
+            <h2 class="section__title">Nos Promotions du Moment</h2>
+            <p class="section__subtitle">Tarifs très abordables et devis personnalisé gratuit sur WhatsApp.</p>
+          </div>
+
+          <div class="promoGrid">
+            {client.promotions.map((promo) => (
+              <article class="promoCard">
+                {promo.badge && <span class="promoCard__badge">{promo.badge}</span>}
+                <h3 class="promoCard__title">{promo.title}</h3>
+                <p class="promoCard__desc">{promo.description}</p>
+                <a
+                  href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent('Bonjour, je souhaite profiter de l\'offre : ' + promo.title)}`}
+                  target="_blank"
+                  rel="noopener"
+                  class="promoCard__cta"
+                >
+                  <span>{promo.ctaText || 'En profiter sur WhatsApp'}</span>
+                  <span aria-hidden="true">→</span>
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- 4. NOS 5 PÔLES DE PRESTATIONS (AVEC ONGLETS DE FILTRAGE COMPACTS) -->
     <section class="section" id="prestations">
       <div class="section__container">
         <div class="section__header">
-          <h2 class="section__title">Nos Prestations</h2>
-          <p class="section__subtitle">Découvrez notre savoir-faire et nos forfaits adaptés à vos envies.</p>
+          <span class="section__eyebrow">Un service tout-en-un à Deux Plateaux</span>
+          <h2 class="section__title">Nos Prestations & Services sur Place</h2>
+          <p class="section__subtitle">
+            Sélectionnez un pôle pour filtrer nos services. Cliquez sur une prestation pour voir la fiche détaillée, l'ajouter au panier ou réserver sur WhatsApp.
+          </p>
         </div>
 
-        <div class="servicesGrid">
+        <!-- Barre d'onglets de filtrage -->
+        <div class="categoryTabs" role="tablist" aria-label="Filtrer les prestations par pôle">
+          <button
+            type="button"
+            role="tab"
+            aria-selected="true"
+            class="categoryTabs__btn --active"
+            data-filter="all"
+          >
+            Tous les pôles ({client.services.length})
+          </button>
+          {serviceCategories.map((cat) => {
+            const count = client.services.filter((s) => s.category === cat).length;
+            return (
+              <button
+                type="button"
+                role="tab"
+                aria-selected="false"
+                class="categoryTabs__btn"
+                data-filter={cat}
+              >
+                {cat} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        <div class="servicesGrid" id="servicesGridContainer">
           {client.services.map((service) => (
             <ServiceCard service={service} />
           ))}
@@ -65,47 +245,113 @@ const faqs = [
       </div>
     </section>
 
-    <!-- Produits Section (si configurés) -->
-    {client.products && client.products.length > 0 && (
-      <section class="section section--alt" id="produits">
-        <div class="section__container">
-          <div class="section__header">
-            <h2 class="section__title">Nos Produits & Soins</h2>
-            <p class="section__subtitle">Prolongez les bienfaits du studio chez vous avec notre sélection.</p>
+    <!-- 4bis. VITRINE SAISONNIÈRE (SeasonalShowcase) -->
+    <SeasonalShowcase />
+
+    <!-- 5. FOCUS AGENCE MOBILE MONEY & PAIEMENT WAVE / VISA -->
+    <section class="section --navy" id="mobile-money">
+      <div class="section__container">
+        <div class="momoBanner">
+          <div class="momoBanner__info">
+            <span class="momoBanner__eyebrow">Guichet Sécurisé Super U Deux Plateaux</span>
+            <h2 class="momoBanner__title">Agence Dépôt, Retrait & Paiement Mobile Money</h2>
+            <p class="momoBanner__desc">
+              Évitez les risques d'erreur : notre équipe vous accueille physiquement au guichet pour tous vos dépôts, retraits et transferts après vérification du nom du destinataire. Vous pouvez également régler tous vos achats et prestations en boutique par <strong>QR Code Wave</strong>, <strong>Orange Money</strong> ou <strong>Carte Bancaire Visa</strong>.
+            </p>
+
+            <ul class="momoBanner__operators" aria-label="Opérateurs disponibles">
+              <li>Wave Côte d'Ivoire</li>
+              <li>Orange Money</li>
+              <li>MTN MoMo</li>
+              <li>Push</li>
+              <li>Djamo</li>
+              <li>Carte Visa</li>
+            </ul>
+
+            <div class="momoBanner__actions">
+              <button type="button" class="heroBtn --wave openWaveModalTrigger">
+                💳 Afficher le QR Code de Paiement Wave
+              </button>
+              <a
+                href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent('Bonjour, j\'ai une question concernant votre guichet Mobile Money / Paiement.')}`}
+                target="_blank"
+                rel="noopener"
+                class="heroBtn --outlineLight"
+              >
+                Poser une question sur WhatsApp
+              </a>
+            </div>
           </div>
 
-          <div class="servicesGrid">
+          <figure class="momoBanner__figure">
+            <img
+              src="/images/tranferts_wave_push.jpeg"
+              alt="Guichet Mobile Money chez Business Center Prestige Services au Super U Sococé"
+              width="480"
+              height="380"
+              loading="lazy"
+            />
+            <figcaption>Opérations sécurisées au comptoir avec confirmation client</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. LA BOUTIQUE MULTI-RAYONS (ÉLECTRONIQUE, GAMING, BIJOUX & SAISON) -->
+    {client.products && client.products.length > 0 && (
+      <section class="section --alt" id="produits">
+        <div class="section__container">
+          <div class="section__header">
+            <span class="section__eyebrow">Vente en Boutique & Sur Commande Partenaires</span>
+            <h2 class="section__title">Notre Boutique High-Tech, Bijoux & Maroquinerie</h2>
+            <p class="section__subtitle">
+              Des centaines de références en rayon au Super U Deux Plateaux et arrivages réguliers. Ajoutez au panier ou commandez directement sur WhatsApp.
+            </p>
+          </div>
+
+          <div class="productsGrid">
             {client.products.map((product) => (
-              <article class="serviceCard" id={`product-${product.slug}`}>
-                <div class="serviceCard__body">
-                  <div class="serviceCard__header">
-                    <span class="serviceCard__category">{product.category}</span>
-                    <span class="serviceCard__duration">Stock: {product.stock}</span>
+              <article class="productShowcaseCard" id={`product-${product.slug}`}>
+                {product.image && (
+                  <div class="productShowcaseCard__media">
+                    <img src={product.image} alt={product.name} width="400" height="220" loading="lazy" />
+                    {product.badge && <span class="productShowcaseCard__badge">{product.badge}</span>}
                   </div>
-                  <h3 class="serviceCard__title">{product.name}</h3>
-                  <p class="serviceCard__description">{product.description}</p>
-                  <div class="serviceCard__footer">
-                    <span class="serviceCard__price">
+                )}
+                <div class="productShowcaseCard__body">
+                  <span class="productShowcaseCard__category">{product.category}</span>
+                  <h3 class="productShowcaseCard__title">{product.name}</h3>
+                  <p class="productShowcaseCard__description">{product.description}</p>
+                  <div class="productShowcaseCard__footer">
+                    <span class="productShowcaseCard__price">
                       <strong>
-                        {new Intl.NumberFormat(client.locale || 'fr', {
+                        {product.priceLabel || new Intl.NumberFormat(client.locale || 'fr', {
                           style: 'currency',
                           currency: client.currency || 'XOF',
                           maximumFractionDigits: 0
                         }).format(product.price)}
                       </strong>
                     </span>
-                    <div class="serviceCard__actions">
-                      <button
-                        type="button"
-                        class="serviceCard__cartBtn addCartTrigger"
-                        data-slug={product.slug}
-                        data-name={product.name}
-                        data-price={product.price}
-                        title={`Ajouter ${product.name} au panier`}
-                        aria-label={`Ajouter ${product.name} au panier`}
+                    <div class="productShowcaseCard__actions">
+                      {product.price > 0 && (
+                        <button
+                          type="button"
+                          class="productShowcaseCard__cartBtn addCartTrigger"
+                          data-slug={product.slug}
+                          data-name={product.name}
+                          data-price={product.price}
+                        >
+                          + Panier
+                        </button>
+                      )}
+                      <a
+                        href={`https://wa.me/${whatsappClean}?text=${encodeURIComponent('Bonjour, je souhaite connaître la disponibilité et le prix pour : ' + product.name)}`}
+                        target="_blank"
+                        rel="noopener"
+                        class="productShowcaseCard__waBtn"
                       >
-                        + Panier
-                      </button>
+                        WhatsApp
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -116,12 +362,49 @@ const faqs = [
       </section>
     )}
 
-    <!-- FAQ / Accordion Section -->
-    <section class="section section--subtle" id="faq">
-      <div class="section__container section__container--narrow">
+    <!-- 7. GALERIE PHOTOS RÉELLES DE LA BOUTIQUE -->
+    {client.brand.gallery && client.brand.gallery.length > 0 && (
+      <section class="section" id="galerie">
+        <div class="section__container">
+          <div class="section__header">
+            <span class="section__eyebrow">Au cœur du Super U Deux Plateaux</span>
+            <h2 class="section__title">Découvrez Notre Espace en Images</h2>
+            <p class="section__subtitle">
+              Un emplacement accessible, climatisé et sécurisé dans la galerie commerciale de Sococé. Cliquez sur une photo pour l'agrandir.
+            </p>
+          </div>
+
+          <div class="shopGalleryGrid">
+            {client.brand.gallery.map((photo) => (
+              <figure class="shopGalleryCard">
+                <button
+                  type="button"
+                  class="shopGalleryCard__zoomBtn galleryZoomTrigger"
+                  data-src={photo.src}
+                  data-alt={photo.alt}
+                  data-caption={photo.caption || photo.alt}
+                  aria-label={`Agrandir la photo : ${photo.alt}`}
+                >
+                  <img src={photo.src} alt={photo.alt} width="540" height="360" loading="lazy" />
+                  <span class="shopGalleryCard__zoomHint">🔍 Agrandir</span>
+                </button>
+                {photo.caption && (
+                  <figcaption class="shopGalleryCard__caption">{photo.caption}</figcaption>
+                )}
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- 8. FAQ / ACCORDION SECTION -->
+    <section class="section --subtle" id="faq">
+      <div class="section__container --narrow">
         <div class="section__header">
+          <span class="section__eyebrow">Vos Questions, Nos Réponses</span>
           <h2 class="section__title">Questions Fréquentes</h2>
-          <p class="section__subtitle">Tout ce que vous devez savoir avant votre venue.</p>
+          <p class="section__subtitle">Tout savoir sur le Studio Photo Maria, nos réparations, nos cachets express et notre boutique.</p>
         </div>
 
         <Accordion items={faqs} modifier="chrome" />
@@ -129,21 +412,37 @@ const faqs = [
     </section>
   </main>
 
-  <!-- Modale accessible (Dialog) pour le pattern lien-modale -->
-  <dialog id="serviceModal" class="serviceModal" aria-labelledby="modalTitle">
-    <div class="serviceModal__box">
+  <!-- Modale accessible (Dialog) pour le pattern lien-modale des prestations -->
+  <dialog id="serviceModal" class="serviceModal" closedby="any" aria-labelledby="modalTitle">
+    <article class="serviceModal__box">
       <button type="button" id="modalCloseBtn" class="serviceModal__close" aria-label="Fermer la boîte de dialogue">✕</button>
+      <span id="modalCategory" class="serviceModal__category"></span>
       <h3 id="modalTitle" class="serviceModal__title"></h3>
       <p id="modalPrice" class="serviceModal__price"></p>
       <p id="modalDesc" class="serviceModal__desc"></p>
+      <ul id="modalHighlights" class="serviceModal__highlights"></ul>
       <div class="serviceModal__actions">
-        <a id="modalWaBtn" href="#" class="btn btn--primary" target="_blank" rel="noopener">Réserver cette prestation</a>
-        <button type="button" id="modalAddCartBtn" class="btn btn--accent">+ Ajouter au panier</button>
-        <a id="modalFullLink" href="#" class="btn btn--secondary">Page complète</a>
+        <a id="modalWaBtn" href="#" class="btn --primary" target="_blank" rel="noopener">
+          Demander un prix / Réserver sur WhatsApp
+        </a>
+        <button type="button" id="modalWaveBtn" class="btn --wave openWaveModalTrigger">
+          Payer avec Wave QR
+        </button>
+        <a id="modalFullLink" href="#" class="btn --secondary">Fiche complète</a>
       </div>
-    </div>
+    </article>
   </dialog>
 
+  <!-- Modale Lightbox pour agrandir les photos de la boutique -->
+  <dialog id="galleryModal" class="galleryModal" closedby="any" aria-label="Aperçu photo agrandi">
+    <figure class="galleryModal__box">
+      <button type="button" id="galleryCloseBtn" class="galleryModal__close" aria-label="Fermer l'aperçu photo">✕</button>
+      <img id="galleryModalImg" src="" alt="" />
+      <figcaption id="galleryModalCaption"></figcaption>
+    </figure>
+  </dialog>
+
+  <WaveModal />
   <CartDrawer />
   <Footer />
   <FabContact />
@@ -153,38 +452,84 @@ const faqs = [
 <script>
   import { updateStorage } from '@/lib/storage';
 
-  // Script d'amélioration progressive pour le pattern lien-modale
+  // 1. Filtrage par onglets des 5 pôles de prestations
+  const tabBtns = document.querySelectorAll('.categoryTabs__btn');
+  const serviceCards = document.querySelectorAll('#servicesGridContainer .serviceCard');
+
+  function filterServices(category: string) {
+    tabBtns.forEach((btn) => {
+      const isMatch = (btn as HTMLElement).dataset.filter === category;
+      btn.classList.toggle('--active', isMatch);
+      btn.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+    });
+
+    serviceCards.forEach((card) => {
+      const cardEl = card as HTMLElement;
+      const cardCat = cardEl.dataset.category || '';
+      if (category === 'all' || cardCat === category) {
+        cardEl.style.display = 'flex';
+      } else {
+        cardEl.style.display = 'none';
+      }
+    });
+  }
+
+  tabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cat = (btn as HTMLElement).dataset.filter || 'all';
+      filterServices(cat);
+    });
+  });
+
+  // Liens rapides du Hero qui activent directement le bon filtre de pôle
+  document.querySelectorAll('[data-filter-jump]').forEach((link) => {
+    link.addEventListener('click', () => {
+      const targetCat = (link as HTMLElement).dataset.filterJump;
+      if (targetCat) {
+        filterServices(targetCat);
+      }
+    });
+  });
+
+  // 2. Pattern Lien-Modale pour les prestations
   const modal = document.getElementById('serviceModal') as HTMLDialogElement | null;
   const closeBtn = document.getElementById('modalCloseBtn');
+  const categoryEl = document.getElementById('modalCategory');
   const titleEl = document.getElementById('modalTitle');
   const priceEl = document.getElementById('modalPrice');
   const descEl = document.getElementById('modalDesc');
+  const highlightsEl = document.getElementById('modalHighlights');
   const waBtn = document.getElementById('modalWaBtn') as HTMLAnchorElement | null;
   const fullLink = document.getElementById('modalFullLink') as HTMLAnchorElement | null;
-  const modalCartBtn = document.getElementById('modalAddCartBtn');
-
-  let currentModalItem = { slug: '', name: '', price: 0 };
 
   document.querySelectorAll('.modalTrigger').forEach((btn) => {
     btn.addEventListener('click', (e) => {
-      // Si la balise dialog est supportée, interception du clic
       if (modal && typeof modal.showModal === 'function') {
         e.preventDefault();
         const target = e.currentTarget as HTMLElement;
         const slug = target.dataset.slug || '';
         const title = target.dataset.title || '';
+        const category = target.dataset.category || '';
         const price = target.dataset.price || '';
-        const rawprice = Number(target.dataset.rawprice) || 0;
         const desc = target.dataset.desc || '';
+        let highlights: string[] = [];
+        try {
+          highlights = JSON.parse(target.dataset.highlights || '[]');
+        } catch {
+          highlights = [];
+        }
 
-        currentModalItem = { slug, name: title, price: rawprice };
-
+        if (categoryEl) categoryEl.textContent = category;
         if (titleEl) titleEl.textContent = title;
         if (priceEl) priceEl.textContent = price;
         if (descEl) descEl.textContent = desc;
+        if (highlightsEl) {
+          highlightsEl.innerHTML = highlights.map((h) => `<li>✦ ${h}</li>`).join('');
+          highlightsEl.style.display = highlights.length > 0 ? 'flex' : 'none';
+        }
         if (fullLink) fullLink.href = `/prestations/${slug}`;
         if (waBtn) {
-          waBtn.href = `https://wa.me/?text=${encodeURIComponent('Bonjour, je souhaite réserver : ' + title)}`;
+          waBtn.href = `https://wa.me/2250544263245?text=${encodeURIComponent('Bonjour Business Center Prestige Services, je souhaite un tarif / réserver : ' + title)}`;
         }
 
         modal.showModal();
@@ -193,27 +538,54 @@ const faqs = [
     });
   });
 
-  modalCartBtn?.addEventListener('click', () => {
-    if (!currentModalItem.slug) return;
-    updateStorage(prev => {
-      const existing = prev.cart.find(i => i.id === currentModalItem.slug);
-      if (existing) {
-        existing.quantity += 1;
-      } else {
-        prev.cart.push({
-          id: currentModalItem.slug,
-          name: currentModalItem.name,
-          price: currentModalItem.price,
-          quantity: 1,
-        });
-      }
-      return prev;
-    });
+  closeBtn?.addEventListener('click', () => {
     modal?.close();
-    window.dispatchEvent(new CustomEvent('cart:open'));
   });
 
-  // Gestion des clics "Ajouter au panier" direct sur les cartes
+  modal?.addEventListener('close', () => {
+    if (window.location.pathname.startsWith('/prestations/')) {
+      window.history.pushState(null, '', '/');
+    }
+  });
+
+  // Fallback light-dismiss pour serviceModal
+  if (modal && !('closedBy' in HTMLDialogElement.prototype)) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.close();
+    });
+  }
+
+  // 3. Lightbox Galerie Photos de la boutique
+  const galleryModal = document.getElementById('galleryModal') as HTMLDialogElement | null;
+  const galleryCloseBtn = document.getElementById('galleryCloseBtn');
+  const galleryImg = document.getElementById('galleryModalImg') as HTMLImageElement | null;
+  const galleryCaption = document.getElementById('galleryModalCaption');
+
+  document.querySelectorAll('.galleryZoomTrigger').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const el = btn as HTMLElement;
+      if (galleryImg) {
+        galleryImg.src = el.dataset.src || '';
+        galleryImg.alt = el.dataset.alt || '';
+      }
+      if (galleryCaption) {
+        galleryCaption.textContent = el.dataset.caption || '';
+      }
+      galleryModal?.showModal();
+    });
+  });
+
+  galleryCloseBtn?.addEventListener('click', () => {
+    galleryModal?.close();
+  });
+
+  if (galleryModal && !('closedBy' in HTMLDialogElement.prototype)) {
+    galleryModal.addEventListener('click', (e) => {
+      if (e.target === galleryModal) galleryModal.close();
+    });
+  }
+
+  // 4. Gestion des clics "Ajouter au panier" éventuels
   document.addEventListener('click', (e) => {
     const target = (e.target as HTMLElement).closest('.addCartTrigger') as HTMLElement | null;
     if (!target) return;
@@ -233,215 +605,924 @@ const faqs = [
     });
     window.dispatchEvent(new CustomEvent('cart:open'));
   });
-
-  closeBtn?.addEventListener('click', () => {
-    modal?.close();
-  });
-
-  modal?.addEventListener('close', () => {
-    window.history.pushState(null, '', '/');
-  });
-
-  // Fermeture par clic sur le backdrop
-  modal?.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.close();
-    }
-  });
 </script>
 
 <style lang="scss">
   .homePage {
-    background-color: var(--color-surface, #ffffff);
+    background-color: var(--color-surface, #FAF8F5);
   }
 
-  .hero {
-    padding: 5rem 1.25rem 4rem;
-    text-align: center;
-    background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+  /* =========================================================
+     1. HERO PRESTIGE BLEU MARINE & OR
+     ========================================================= */
+  .prestigeHero {
+    position: relative;
+    background:
+      radial-gradient(circle at 85% 15%, rgba(212, 175, 55, 0.18) 0%, transparent 45%),
+      linear-gradient(135deg, #07111e 0%, #0B192C 55%, #162D4C 100%);
+    color: #ffffff;
+    padding: 3.5rem 1.25rem 5.5rem;
+    overflow: hidden;
 
     &__container {
-      max-width: 760px;
+      max-width: 1240px;
       margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      align-items: center;
+
+      @media (min-width: 992px) {
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 3rem;
+      }
     }
 
-    &__badge {
-      display: inline-block;
-      font-size: 0.85rem;
+    &__badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+      margin-bottom: 1.25rem;
+    }
+
+    &__locBadge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.4rem 0.9rem;
+      border-radius: 9999px;
+      background: rgba(212, 175, 55, 0.18);
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      color: #F3E5AB;
+      font-size: 0.82rem;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.35rem 0.85rem;
-      border-radius: var(--radius-full, 9999px);
-      background: rgba(15, 23, 42, 0.06);
-      color: var(--color-text-main, #0f172a);
-      margin-bottom: 1.5rem;
+    }
+
+    &__hoursBadge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.4rem 0.9rem;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #e2e8f0;
+      font-size: 0.82rem;
+      font-weight: 600;
     }
 
     &__title {
-      font-size: clamp(2.25rem, 6vw, 3.75rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin: 0 0 1.25rem;
-      color: var(--color-text-main, #0f172a);
+      font-size: clamp(2rem, 4.5vw, 3.25rem);
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      line-height: 1.12;
+      margin: 0 0 1.15rem;
+      color: #ffffff;
+    }
+
+    &__titleGold {
+      display: block;
+      margin-top: 0.35rem;
+      font-size: clamp(1.2rem, 2.5vw, 1.65rem);
+      font-weight: 700;
+      color: #D4AF37;
     }
 
     &__pitch {
-      font-size: 1.25rem;
-      color: var(--color-text-muted, #64748b);
-      margin: 0 0 2.5rem;
-      line-height: 1.6;
+      font-size: 1.08rem;
+      color: #cbd5e1;
+      line-height: 1.65;
+      margin: 0 0 1.5rem;
+    }
+
+    &__poles {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+
+      li a {
+        display: inline-block;
+        padding: 0.42rem 0.85rem;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        color: #f8fafc;
+        font-size: 0.82rem;
+        font-weight: 600;
+        transition: all 150ms ease;
+
+        &:hover {
+          background: rgba(212, 175, 55, 0.22);
+          border-color: #D4AF37;
+          color: #ffffff;
+          transform: translateY(-1px);
+        }
+      }
     }
 
     &__actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: center;
-    }
-  }
-
-  .section {
-    padding: 4.5rem 1.25rem;
-
-    &--subtle {
-      background-color: #f8fafc;
+      gap: 0.85rem;
     }
 
-    &__container {
-      max-width: 1200px;
-      margin: 0 auto;
+    &__visual {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
 
-      &--narrow {
-        max-width: 800px;
+    &__mainPhoto {
+      margin: 0;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid rgba(212, 175, 55, 0.45);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+
+      img {
+        width: 100%;
+        height: 260px;
+        object-fit: cover;
+        display: block;
+      }
+
+      figcaption {
+        padding: 0.65rem 1rem;
+        background: rgba(7, 17, 30, 0.9);
+        color: #f8fafc;
+        font-size: 0.82rem;
+
+        strong {
+          color: #D4AF37;
+        }
       }
     }
 
-    &__header {
-      text-align: center;
-      margin-bottom: 3rem;
+    &__subPhotos {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+
+      figure {
+        margin: 0;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(7, 17, 30, 0.75);
+
+        img {
+          width: 100%;
+          height: 120px;
+          object-fit: cover;
+          display: block;
+        }
+
+        figcaption {
+          padding: 0.45rem 0.65rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #cbd5e1;
+          text-align: center;
+        }
+      }
     }
 
-    &__title {
-      font-size: 2.25rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin: 0 0 0.5rem;
-      color: var(--color-text-main, #0f172a);
-    }
+    &__divider {
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      line-height: 0;
 
-    &__subtitle {
-      font-size: 1.1rem;
-      color: var(--color-text-muted, #64748b);
-      margin: 0;
+      svg {
+        width: 100%;
+        height: 44px;
+      }
     }
   }
 
-  .servicesGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .btn {
+  .heroBtn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.85rem 1.75rem;
-    border-radius: var(--radius-md, 8px);
-    font-weight: 600;
+    gap: 0.55rem;
+    padding: 0.85rem 1.4rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.92rem;
     text-decoration: none;
-    transition: transform var(--transition-fast, 150ms), background 150ms;
+    cursor: pointer;
+    transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
 
     &:hover {
       transform: translateY(-2px);
     }
 
-    &--primary {
+    &.--whatsapp {
       background: #25D366;
-      color: white;
-      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+      color: #ffffff;
+      box-shadow: 0 8px 20px -4px rgba(37, 211, 102, 0.45);
     }
 
-    &--secondary {
-      background: #0f172a;
-      color: white;
+    &.--wave {
+      background: #1898e8;
+      color: #ffffff;
+      box-shadow: 0 8px 20px -4px rgba(24, 152, 232, 0.45);
     }
 
-    &--accent {
-      background: var(--color-accent, #2563eb);
-      color: white;
-      border: none;
+    &.--outline {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.55);
+      color: #F3E5AB;
+
+      &:hover {
+        background: rgba(212, 175, 55, 0.18);
+      }
+    }
+
+    &.--outlineLight {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+    }
+  }
+
+  /* =========================================================
+     2. RUBAN DES ATOUTS DIFFÉRENCIATEURS
+     ========================================================= */
+  .trustStrip {
+    padding: 1.5rem 1.25rem 0.5rem;
+
+    &__container {
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+
+    &__list {
+      list-style: none;
+      padding: 1.25rem 1.5rem;
+      margin: 0;
+      background: #ffffff;
+      border: 1px solid rgba(197, 155, 39, 0.3);
+      border-radius: 14px;
+      box-shadow: 0 10px 25px -10px rgba(11, 25, 44, 0.08);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    &__item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--color-primary, #0B192C);
+      line-height: 1.4;
+    }
+
+    &__star {
+      color: var(--color-accent, #C59B27);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+  }
+
+  /* =========================================================
+     3. SECTIONS & PROMOTIONS
+     ========================================================= */
+  .section {
+    padding: 4rem 1.25rem;
+
+    &.--gold {
+      padding-top: 3rem;
+      padding-bottom: 2rem;
+    }
+
+    &.--alt {
+      background-color: #f3efe6;
+    }
+
+    &.--subtle {
+      background-color: #ffffff;
+    }
+
+    &.--navy {
+      background: linear-gradient(135deg, #0B192C 0%, #162D4C 100%);
+      color: #ffffff;
+    }
+
+    &__container {
+      max-width: 1240px;
+      margin: 0 auto;
+
+      &.--narrow {
+        max-width: 860px;
+      }
+    }
+
+    &__header {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 2.5rem;
+    }
+
+    &__eyebrow {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8a680d;
+      background: rgba(197, 155, 39, 0.16);
+      padding: 0.3rem 0.85rem;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+    }
+
+    &__title {
+      font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.6rem;
+      color: var(--color-primary, #0B192C);
+    }
+
+    &__subtitle {
+      font-size: 1.02rem;
+      color: #475569;
+      margin: 0;
+      line-height: 1.6;
+    }
+  }
+
+  .promoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .promoCard {
+    background: linear-gradient(135deg, #0B192C 0%, #162D4C 100%);
+    color: #ffffff;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 16px;
+    padding: 1.65rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 12px 28px -8px rgba(11, 25, 44, 0.25);
+
+    &__badge {
+      align-self: flex-start;
+      padding: 0.25rem 0.7rem;
+      border-radius: 9999px;
+      background: #D4AF37;
+      color: #0B192C;
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 0.85rem;
+    }
+
+    &__title {
+      font-size: 1.22rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 0.6rem;
+    }
+
+    &__desc {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      line-height: 1.55;
+      margin: 0 0 1.25rem;
+    }
+
+    &__cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      background: rgba(212, 175, 55, 0.16);
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      color: #F3E5AB;
+      font-weight: 700;
+      font-size: 0.86rem;
+      text-decoration: none;
+      transition: background 150ms ease, color 150ms ease;
+
+      &:hover {
+        background: #D4AF37;
+        color: #0B192C;
+      }
+    }
+  }
+
+  /* =========================================================
+     4. ONGLETS DE FILTRAGE & GRILLE DE PRESTATIONS
+     ========================================================= */
+  .categoryTabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-bottom: 2.25rem;
+
+    &__btn {
+      padding: 0.6rem 1.15rem;
+      border-radius: 9999px;
+      background: #ffffff;
+      border: 1px solid rgba(11, 25, 44, 0.15);
+      color: var(--color-primary, #0B192C);
+      font-size: 0.88rem;
+      font-weight: 700;
       cursor: pointer;
+      transition: all 150ms ease;
+
+      &:hover {
+        border-color: var(--color-accent, #C59B27);
+      }
+
+      &.--active {
+        background: var(--color-primary, #0B192C);
+        border-color: var(--color-primary, #0B192C);
+        color: #D4AF37;
+        box-shadow: 0 6px 16px rgba(11, 25, 44, 0.18);
+      }
+    }
+  }
+
+  .servicesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* =========================================================
+     5. BANNIÈRE AGENCE MOBILE MONEY
+     ========================================================= */
+  .momoBanner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: center;
+
+    @media (min-width: 900px) {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+
+    &__eyebrow {
+      display: inline-block;
+      padding: 0.3rem 0.85rem;
+      border-radius: 9999px;
+      background: rgba(212, 175, 55, 0.2);
+      color: #F3E5AB;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.85rem;
+    }
+
+    &__title {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      color: #ffffff;
+      margin: 0 0 1rem;
+    }
+
+    &__desc {
+      color: #cbd5e1;
+      font-size: 1rem;
+      line-height: 1.65;
+      margin: 0 0 1.35rem;
+
+      strong {
+        color: #F3E5AB;
+      }
+    }
+
+    &__operators {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.75rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      li {
+        padding: 0.4rem 0.85rem;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: #ffffff;
+      }
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+
+    &__figure {
+      margin: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid rgba(212, 175, 55, 0.45);
+      background: #07111e;
+
+      img {
+        width: 100%;
+        height: 290px;
+        object-fit: cover;
+        display: block;
+      }
+
+      figcaption {
+        padding: 0.65rem 1rem;
+        font-size: 0.8rem;
+        color: #cbd5e1;
+        text-align: center;
+      }
+    }
+  }
+
+  /* =========================================================
+     6. BOUTIQUE MULTI-RAYONS
+     ========================================================= */
+  .productsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .productShowcaseCard {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(11, 25, 44, 0.1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 6px 18px rgba(11, 25, 44, 0.05);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px -10px rgba(11, 25, 44, 0.14);
+    }
+
+    &__media {
+      position: relative;
+      height: 185px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 300ms ease;
+      }
+    }
+
+    &:hover &__media img {
+      transform: scale(1.04);
+    }
+
+    &__badge {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      background: var(--color-primary, #0B192C);
+      color: #D4AF37;
+      font-size: 0.74rem;
+      font-weight: 800;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    &__body {
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    &__category {
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #8a680d;
+      margin-bottom: 0.35rem;
+    }
+
+    &__title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--color-primary, #0B192C);
+      margin: 0 0 0.55rem;
+    }
+
+    &__description {
+      font-size: 0.92rem;
+      color: #475569;
+      line-height: 1.55;
+      margin: 0 0 1.25rem;
+    }
+
+    &__footer {
+      margin-top: auto;
+      padding-top: 0.9rem;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    &__price {
+      font-size: 0.92rem;
+      color: #8a680d;
+      font-weight: 800;
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    &__cartBtn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.48rem 0.85rem;
+      border-radius: 8px;
+      background: var(--color-primary, #0B192C);
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 150ms ease;
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+
+    &__waBtn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.48rem 0.85rem;
+      border-radius: 8px;
+      background: #25D366;
+      color: #ffffff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 150ms ease;
+
+      &:hover {
+        background: #1ebe5d;
+      }
+    }
+  }
+
+  /* =========================================================
+     7. GALERIE PHOTOS DE LA BOUTIQUE
+     ========================================================= */
+  .shopGalleryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .shopGalleryCard {
+    margin: 0;
+    background: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(11, 25, 44, 0.1);
+    box-shadow: 0 4px 14px rgba(11, 25, 44, 0.05);
+
+    &__zoomBtn {
+      position: relative;
+      display: block;
+      width: 100%;
+      padding: 0;
+      overflow: hidden;
+      cursor: zoom-in;
+
+      img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        display: block;
+        transition: transform 250ms ease;
+      }
+    }
+
+    &:hover &__zoomBtn img {
+      transform: scale(1.04);
+    }
+
+    &__zoomHint {
+      position: absolute;
+      bottom: 0.65rem;
+      right: 0.65rem;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      background: rgba(11, 25, 44, 0.82);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    &__caption {
+      padding: 0.85rem 1rem;
+      font-size: 0.86rem;
+      color: #334155;
+      line-height: 1.45;
+    }
+  }
+
+  /* =========================================================
+     8. MODALES ACCESSIBLES (<dialog closedby="any">)
+     ========================================================= */
+  .serviceModal,
+  .galleryModal {
+    border: none;
+    border-radius: 18px;
+    padding: 0;
+    max-width: 540px;
+    width: calc(100% - 1.5rem);
+    background: transparent;
+    overscroll-behavior: contain;
+
+    &:modal {
+      overscroll-behavior: contain;
+    }
+
+    &::backdrop {
+      background: rgba(11, 25, 44, 0.7);
+      backdrop-filter: blur(4px);
+      overflow: hidden;
+      overscroll-behavior: contain;
     }
   }
 
   .serviceModal {
-    border: none;
-    border-radius: var(--radius-lg, 16px);
-    padding: 0;
-    max-width: 520px;
-    width: 90%;
-    background: transparent;
-
-    &::backdrop {
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
-    }
-
     &__box {
       background: #ffffff;
-      padding: 2.25rem;
-      border-radius: var(--radius-lg, 16px);
-      box-shadow: var(--shadow-float);
+      padding: 2rem;
+      border-radius: 18px;
+      border-top: 4px solid var(--color-accent, #C59B27);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
       position: relative;
     }
 
     &__close {
       position: absolute;
-      top: 1.25rem;
-      right: 1.25rem;
+      top: 1.15rem;
+      right: 1.15rem;
       background: #f1f5f9;
-      border: none;
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       cursor: pointer;
       font-size: 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #64748b;
+      color: #475569;
+    }
 
-      &:hover {
-        background: #e2e8f0;
-        color: #0f172a;
-      }
+    &__category {
+      display: inline-block;
+      padding: 0.25rem 0.7rem;
+      border-radius: 9999px;
+      background: rgba(197, 155, 39, 0.16);
+      color: #8a680d;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 0.65rem;
     }
 
     &__title {
-      font-size: 1.75rem;
-      margin: 0 0 0.5rem;
-      color: #0f172a;
+      font-size: 1.5rem;
+      margin: 0 0 0.4rem;
+      color: var(--color-primary, #0B192C);
     }
 
     &__price {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: var(--color-accent, #2563eb);
-      margin: 0 0 1rem;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #8a680d;
+      margin: 0 0 0.85rem;
     }
 
     &__desc {
       color: #475569;
       line-height: 1.6;
-      margin-bottom: 2rem;
+      margin: 0 0 1.15rem;
+    }
+
+    &__highlights {
+      list-style: none;
+      padding: 0.9rem 1rem;
+      margin: 0 0 1.5rem;
+      background: #faf8f5;
+      border-radius: 10px;
+      border: 1px solid rgba(197, 155, 39, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #1e293b;
     }
 
     &__actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.65rem;
+    }
+  }
+
+  .galleryModal {
+    max-width: 760px;
+
+    &__box {
+      margin: 0;
+      background: #0B192C;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      border: 2px solid rgba(212, 175, 55, 0.45);
+
+      img {
+        width: 100%;
+        max-height: 75vh;
+        object-fit: contain;
+        background: #050b14;
+      }
+
+      figcaption {
+        padding: 1rem 1.25rem;
+        color: #f8fafc;
+        font-size: 0.95rem;
+        text-align: center;
+      }
+    }
+
+    &__close {
+      position: absolute;
+      top: 0.85rem;
+      right: 0.85rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(11, 25, 44, 0.85);
+      color: #ffffff;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    text-decoration: none;
+    cursor: pointer;
+
+    &.--primary {
+      background: #25D366;
+      color: #ffffff;
+    }
+
+    &.--wave {
+      background: #1898e8;
+      color: #ffffff;
+    }
+
+    &.--secondary {
+      background: #f1f5f9;
+      color: var(--color-primary, #0B192C);
     }
   }
 </style>

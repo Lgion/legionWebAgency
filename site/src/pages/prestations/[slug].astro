@@ -1,11 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { client } from '../../lib/client';
-import Header from '../../components/library/layout/Header/Header.astro';
-import Footer from '../../components/library/layout/Footer/Footer.astro';
-import FabContact from '../../components/library/conversion/FabContact/FabContact.astro';
-import FabTools from '../../components/library/conversion/FabTools/FabTools.astro';
-import CartDrawer from '../../components/library/commerce/Cart/CartDrawer.astro';
+import Header from '../../components/Header/Header.astro';
+import Footer from '../../components/Footer/Footer.astro';
+import FabContact from '../../components/FabContact/FabContact.astro';
+import FabTools from '../../components/FabTools/FabTools.astro';
+import CartDrawer from '../../components/Cart/CartDrawer.astro';
+import WaveModal from '../../components/WaveModal/WaveModal.astro';
 
 export function getStaticPaths() {
   return client.services.map((service) => ({
@@ -15,27 +16,31 @@ export function getStaticPaths() {
 }
 
 const { service } = Astro.props;
-const formattedPrice = new Intl.NumberFormat(client.locale || 'fr', {
-  style: 'currency',
-  currency: client.currency || 'XOF',
-  maximumFractionDigits: 0
-}).format(service.price);
+const hasNumericPrice = typeof service.price === 'number' && service.price > 0;
+const formattedPrice = hasNumericPrice
+  ? new Intl.NumberFormat(client.locale || 'fr', {
+      style: 'currency',
+      currency: client.currency || 'XOF',
+      maximumFractionDigits: 0
+    }).format(service.price)
+  : (service.priceLabel || 'Sur devis gratuit WhatsApp');
 
 const whatsappMessage = encodeURIComponent(
-  `Bonjour, je souhaite réserver la prestation "${service.name}" (${formattedPrice}).`
+  `Bonjour ${client.name}, je souhaite avoir un tarif ou réserver la prestation "${service.name}".`
 );
 ---
 
 <Layout
   title={`${service.name} — ${client.name}`}
-  description={`${service.name} chez ${client.name}. ${service.description}`}
+  description={`${service.name} chez ${client.name} (${client.contact.address.district}). ${service.description}`}
+  image={service.image}
 >
   <Header />
 
   <main class="serviceDetailPage">
     <div class="serviceDetailPage__container">
       <nav class="serviceDetailPage__breadcrumb" aria-label="Fil d'Ariane">
-        <a href="/">Accueil</a> &gt; <span>Prestations</span> &gt; <strong>{service.name}</strong>
+        <a href="/">Accueil</a> &gt; <a href="/#prestations">Nos 5 Pôles</a> &gt; <strong>{service.name}</strong>
       </nav>
 
       <article class="serviceDetailCard">
@@ -43,17 +48,32 @@ const whatsappMessage = encodeURIComponent(
         <h1 class="serviceDetailCard__title">{service.name}</h1>
         <p class="serviceDetailCard__description">{service.description}</p>
 
+        {service.highlights && service.highlights.length > 0 && (
+          <ul class="serviceDetailCard__highlights">
+            {service.highlights.map((pt: string) => (
+              <li>
+                <span class="serviceDetailCard__check" aria-hidden="true">✦</span>
+                <span>{pt}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
         <div class="serviceDetailCard__meta">
           <div class="metaItem">
-            <span class="metaItem__label">Tarif</span>
+            <span class="metaItem__label">Tarif & Modalités</span>
             <span class="metaItem__value">{formattedPrice}</span>
           </div>
           {service.duration && (
             <div class="metaItem">
               <span class="metaItem__label">Durée estimée</span>
-              <span class="metaItem__value">{service.duration} minutes</span>
+              <span class="metaItem__value">~{service.duration} minutes</span>
             </div>
           )}
+          <div class="metaItem">
+            <span class="metaItem__label">Lieu</span>
+            <span class="metaItem__value">Galerie Super U Deux Plateaux (Sococé)</span>
+          </div>
         </div>
 
         <div class="serviceDetailCard__actions">
@@ -63,10 +83,16 @@ const whatsappMessage = encodeURIComponent(
             target="_blank"
             rel="noopener"
           >
-            Réserver sur WhatsApp
+            Demander un prix / Réserver sur WhatsApp
           </a>
 
-          {(client.tier >= 2 || client.modules.includes('panier')) && (
+          {client.payments?.wave && (
+            <button type="button" class="wavePayBtn openWaveModalTrigger">
+              Payer par QR Code Wave
+            </button>
+          )}
+
+          {hasNumericPrice && (client.tier >= 2 || client.modules.includes('panier')) && (
             <button
               type="button"
               id="detailAddCartBtn"
@@ -79,12 +105,13 @@ const whatsappMessage = encodeURIComponent(
             </button>
           )}
 
-          <a href="/" class="backBtn">Retour au catalogue</a>
+          <a href="/#prestations" class="backBtn">← Retour aux prestations</a>
         </div>
       </article>
     </div>
   </main>
 
+  <WaveModal />
   <CartDrawer />
   <Footer />
   <FabContact />
@@ -120,20 +147,21 @@ const whatsappMessage = encodeURIComponent(
   .serviceDetailPage {
     min-height: 70vh;
     padding: 3rem 1.25rem;
-    background: #f8fafc;
+    background: var(--color-surface, #FAF8F5);
 
     &__container {
-      max-width: 800px;
+      max-width: 840px;
       margin: 0 auto;
     }
 
     &__breadcrumb {
-      margin-bottom: 2rem;
+      margin-bottom: 1.75rem;
       font-size: 0.9rem;
       color: #64748b;
 
       a {
-        color: var(--color-accent, #2563eb);
+        color: var(--color-primary, #0B192C);
+        font-weight: 600;
         &:hover { text-decoration: underline; }
       }
     }
@@ -141,48 +169,76 @@ const whatsappMessage = encodeURIComponent(
 
   .serviceDetailCard {
     background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: var(--radius-lg, 16px);
+    border: 1px solid rgba(11, 25, 44, 0.1);
+    border-top: 4px solid var(--color-accent, #C59B27);
+    border-radius: 18px;
     padding: 2.5rem;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 15px 35px -10px rgba(11, 25, 44, 0.08);
 
     &__category {
       display: inline-block;
-      font-size: 0.85rem;
-      font-weight: 700;
+      padding: 0.3rem 0.8rem;
+      border-radius: 9999px;
+      background: rgba(197, 155, 39, 0.15);
+      font-size: 0.82rem;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--color-accent, #2563eb);
-      margin-bottom: 0.75rem;
+      color: #8a680d;
+      margin-bottom: 0.85rem;
     }
 
     &__title {
-      font-size: 2.25rem;
+      font-size: clamp(1.75rem, 4vw, 2.35rem);
       margin: 0 0 1rem;
-      color: #0f172a;
+      color: var(--color-primary, #0B192C);
     }
 
     &__description {
       font-size: 1.1rem;
       color: #475569;
       line-height: 1.7;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    &__highlights {
+      list-style: none;
+      padding: 1.25rem;
+      margin: 0 0 1.75rem;
+      background: #faf8f5;
+      border-radius: 12px;
+      border: 1px solid rgba(197, 155, 39, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        font-weight: 600;
+        color: #1e293b;
+      }
+    }
+
+    &__check {
+      color: var(--color-accent, #C59B27);
     }
 
     &__meta {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1.5rem;
+      gap: 1.25rem;
       background: #f8fafc;
-      padding: 1.5rem;
-      border-radius: 8px;
+      padding: 1.35rem;
+      border-radius: 12px;
       margin-bottom: 2rem;
     }
 
     &__actions {
       display: flex;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 0.85rem;
     }
   }
 
@@ -191,27 +247,43 @@ const whatsappMessage = encodeURIComponent(
     flex-direction: column;
 
     &__label {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #64748b;
       margin-bottom: 0.25rem;
     }
 
     &__value {
-      font-size: 1.35rem;
-      font-weight: 700;
-      color: #0f172a;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--color-primary, #0B192C);
     }
   }
 
   .bookBtn {
     display: inline-flex;
     align-items: center;
-    padding: 0.85rem 1.75rem;
+    padding: 0.85rem 1.5rem;
     background: #25D366;
     color: white;
-    font-weight: 600;
-    border-radius: 8px;
+    font-weight: 700;
+    border-radius: 10px;
     text-decoration: none;
+    transition: transform 150ms;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .wavePayBtn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.85rem 1.35rem;
+    background: #1898e8;
+    color: #ffffff;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
     transition: transform 150ms;
 
     &:hover {
@@ -222,11 +294,11 @@ const whatsappMessage = encodeURIComponent(
   .backBtn {
     display: inline-flex;
     align-items: center;
-    padding: 0.85rem 1.75rem;
+    padding: 0.85rem 1.35rem;
     background: #f1f5f9;
     color: #334155;
-    font-weight: 600;
-    border-radius: 8px;
+    font-weight: 700;
+    border-radius: 10px;
     text-decoration: none;
 
     &:hover {
@@ -237,18 +309,11 @@ const whatsappMessage = encodeURIComponent(
   .cartBtn {
     display: inline-flex;
     align-items: center;
-    padding: 0.85rem 1.75rem;
-    background: var(--color-accent, #2563eb);
+    padding: 0.85rem 1.5rem;
+    background: var(--color-primary, #0B192C);
     color: white;
-    font-weight: 600;
-    border-radius: 8px;
-    border: none;
+    font-weight: 700;
+    border-radius: 10px;
     cursor: pointer;
-    transition: transform 150ms, opacity 150ms;
-
-    &:hover {
-      transform: translateY(-2px);
-      opacity: 0.95;
-    }
   }
 </style>

@@ -1,0 +1,22 @@
+@use 'scss/default';
+@use 'scss/status';
+
+.statusBadge {
+  $block: &;
+
+  // Mixin BEM de base
+  @include default.statusBadge($block: $block);
+
+  // Modificateurs autonomes de statut
+  &.--online {
+    @include status.online($block: $block);
+  }
+
+  &.--busy {
+    @include status.busy($block: $block);
+  }
+
+  &.--offline {
+    @include status.offline($block: $block);
+  }
+}

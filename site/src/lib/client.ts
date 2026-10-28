@@ -58,6 +58,11 @@ export interface ClientData {
     logo: string;
     pattern: string;
     footerVariant: string;
+    gallery?: Array<{
+      src: string;
+      alt: string;
+      caption?: string;
+    }>;
   };
   services: Array<{
     slug: string;
@@ -65,7 +70,10 @@ export interface ClientData {
     category: string;
     price: number;
     priceFrom?: boolean;
+    priceLabel?: string;
     duration?: number;
+    image?: string;
+    highlights?: string[];
     description: string;
   }>;
   products: Array<{
@@ -73,10 +81,48 @@ export interface ClientData {
     name: string;
     category: string;
     price: number;
+    priceLabel?: string;
     stock: number;
+    image?: string;
+    badge?: string;
     description: string;
   }>;
-  promotions: Array<any>;
+  promotions: Array<{
+    title: string;
+    badge?: string;
+    description: string;
+    ctaText?: string;
+  }>;
+  actionHub?: {
+    eyebrow?: string;
+    title: string;
+    subtitle: string;
+    cards: Array<{
+      id: string;
+      icon: string;
+      badge: string;
+      title: string;
+      description: string;
+      bullets: string[];
+      ctaLabel: string;
+      whatsappMessage: string;
+    }>;
+  };
+  seasonal?: {
+    eyebrow?: string;
+    title: string;
+    subtitle: string;
+    bannerText?: string;
+    items: Array<{
+      slug: string;
+      name: string;
+      seasonTag: string;
+      price: number;
+      priceFrom?: boolean;
+      image?: string;
+      description: string;
+    }>;
+  };
   delivery: {
     enabled: boolean;
     zones: Array<{ name: string; fee: number }>;

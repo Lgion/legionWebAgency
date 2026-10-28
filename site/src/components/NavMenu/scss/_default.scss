@@ -1,0 +1,143 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO & LegionUI Optimized)
+=========================================================
+Pattern 1 : Multi-Items
+Composant de menu de navigation sémantique pour entêtes et barres de navigation.
+
+Squelette attendu (Emmet) :
+nav.navMenu[.--modifierName]
+ └── ul.navMenu__list
+      └── li.navMenu__item
+           └── a.navMenu__link
+=========================================================
+*/
+@use 'sass:map';
+
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function navMenu($defaultValues: "") {
+  @return ($defaultValues);
+}
+
+/************************************************************/
+/**************************VARIABLES*************************/
+/************************************************************/
+$navMenu: (
+  gap: 1.5rem,
+  item-gap: 0.35rem,
+  text-color: #cbd5e1,
+  hover-color: #e6c875,
+  active-color: #ffd700,
+  font-size: 0.88rem,
+  font-weight: 500,
+  indicator-height: 2px,
+  indicator-color: #C59B27
+);
+
+/************************************************************/
+/*************************PLACEHOLDER************************/
+/************************************************************/
+%navMenu {
+  --template: "nav.navMenu > ul.navMenu__list > li.navMenu__item > a.navMenu__link";
+
+  display: none;
+
+  @media (min-width: 1024px) {
+    display: block;
+  }
+
+  &__list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: map.get($navMenu, gap);
+  }
+
+  &__item {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+  }
+
+  &__link,
+  &__btn {
+    font-size: map.get($navMenu, font-size);
+    font-weight: map.get($navMenu, font-weight);
+    color: map.get($navMenu, text-color);
+    text-decoration: none;
+    padding: 0.35rem 0.15rem;
+    position: relative;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    line-height: 1;
+    transition: color 0.2s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: map.get($navMenu, indicator-height);
+      background: map.get($navMenu, indicator-color);
+      border-radius: 1px;
+      transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+}
+
+/************************************************************/
+/****************************MIXIN***************************/
+/************************************************************/
+@mixin navMenu($paramMixi_: (), $block: "") {
+  $paramMixi: navMenu(map.merge($navMenu, $paramMixi_));
+
+  @extend %navMenu;
+
+  // Mappage mixte dynamique sémantique
+  > ul,
+  > #{$block}__list {
+    @extend %navMenu__list;
+    gap: map.get($paramMixi, gap);
+
+    > li,
+    > #{$block}__item {
+      @extend %navMenu__item;
+
+      > a,
+      > button,
+      > #{$block}__link,
+      > #{$block}__btn {
+        @extend %navMenu__link;
+        color: map.get($paramMixi, text-color);
+        font-size: map.get($paramMixi, font-size);
+        font-weight: map.get($paramMixi, font-weight);
+
+        &:hover,
+        &:focus-visible {
+          color: map.get($paramMixi, hover-color);
+
+          &::after {
+            width: 100%;
+          }
+        }
+
+        &[aria-current="page"],
+        &.--active {
+          color: map.get($paramMixi, active-color);
+          font-weight: 600;
+
+          &::after {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

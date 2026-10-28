@@ -1,0 +1,262 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO Optimized)
+=========================================================
+Squelette attendu (Emmet) :
+article.serviceCard[.--modifierName]
+ └── div.serviceCard__body
+      ├── div.serviceCard__header
+      │    ├── span.serviceCard__category
+      │    └── span.serviceCard__duration
+      ├── h3.serviceCard__title
+      ├── p.serviceCard__description
+      ├── ul.serviceCard__highlights
+      │    └── li
+      │         ├── span.serviceCard__check
+      │         └── span
+      └── div.serviceCard__footer
+           ├── span.serviceCard__price
+           │    ├── small
+           │    └── strong
+           └── div.serviceCard__actions
+                ├── a.serviceCard__cta.modalTrigger
+                ├── button.serviceCard__cartBtn.addCartTrigger
+                └── a.serviceCard__waBtn
+=========================================================
+*/
+@use 'sass:map';
+
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function serviceCard($defaultValues: "") {
+  @return ($defaultValues);
+}
+
+/************************************************************/
+/**************************VARIABLES*************************/
+/************************************************************/
+$serviceCard: (
+  bg-color: #ffffff,
+  border-color: rgba(11, 25, 44, 0.1),
+  accent-color: var(--color-accent, #C59B27),
+  text-color: #1a1a1a,
+  text-muted: #64748b,
+  border-radius: 14px,
+  box-shadow: 0 4px 14px rgba(11, 25, 44, 0.04),
+  hover-transform: translateY(-4px),
+  hover-shadow: 0 16px 30px -8px rgba(11, 25, 44, 0.12)
+);
+
+/************************************************************/
+/*************************PLACEHOLDER************************/
+/************************************************************/
+%serviceCard {
+  --template: "article.serviceCard > div.serviceCard__body > div.serviceCard__header + h3 + p + ul + div.serviceCard__footer";
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 14px;
+  padding: 1.5rem;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+  position: relative;
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.78rem;
+  }
+
+  &__category {
+    display: inline-block;
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    background: rgba(197, 155, 39, 0.14);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #8a680d;
+  }
+
+  &__duration {
+    color: #64748b;
+    font-weight: 600;
+  }
+
+  &__title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.3;
+    color: #0b192c;
+  }
+
+  &__description {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.5;
+    flex-grow: 1;
+  }
+
+  &__highlights {
+    list-style: none;
+    margin: 0 0 1.25rem 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    li {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      color: #334155;
+    }
+  }
+
+  &__check {
+    color: var(--color-accent, #C59B27);
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px dashed rgba(11, 25, 44, 0.1);
+    margin-top: auto;
+  }
+
+  &__price {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+
+    small {
+      font-size: 0.7rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    strong {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0b192c;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    background: #0b192c;
+    color: #ffffff;
+    transition: background 150ms ease, transform 150ms ease;
+
+    &:hover {
+      background: #1e3a5f;
+      transform: translateY(-1px);
+    }
+  }
+
+  &__cartBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid rgba(11, 25, 44, 0.15);
+    background: #ffffff;
+    cursor: pointer;
+    transition: border-color 150ms ease, background 150ms ease;
+
+    &:hover {
+      background: rgba(197, 155, 39, 0.12);
+      border-color: var(--color-accent, #C59B27);
+    }
+  }
+
+  &__waBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: rgba(37, 211, 102, 0.12);
+    color: #128c7e;
+    border: 1px solid rgba(37, 211, 102, 0.25);
+    text-decoration: none;
+    transition: background 150ms ease;
+
+    &:hover {
+      background: #25d366;
+      color: #ffffff;
+    }
+  }
+}
+
+/************************************************************/
+/****************************MIXIN***************************/
+/************************************************************/
+@mixin serviceCard($paramMixi_: (), $block: ".serviceCard") {
+  $paramMixi: serviceCard(map.merge($serviceCard, $paramMixi_));
+
+  @extend %serviceCard;
+  background-color: map.get($paramMixi, bg-color);
+  border: 1px solid map.get($paramMixi, border-color);
+  border-top: 3px solid map.get($paramMixi, accent-color);
+  box-shadow: map.get($paramMixi, box-shadow);
+
+  &:hover {
+    transform: map.get($paramMixi, hover-transform);
+    box-shadow: map.get($paramMixi, hover-shadow);
+    border-color: map.get($paramMixi, accent-color);
+  }
+
+  // MAPPING SÉMANTIQUE DYNAMIQUE
+  > div,
+  #{$block}__body {
+    @extend %serviceCard__body;
+  }
+
+  h3,
+  #{$block}__title {
+    @extend %serviceCard__title;
+    color: map.get($paramMixi, text-color);
+  }
+
+  p,
+  #{$block}__description {
+    @extend %serviceCard__description;
+    color: map.get($paramMixi, text-muted);
+  }
+}

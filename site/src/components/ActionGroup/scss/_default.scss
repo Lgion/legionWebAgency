@@ -1,0 +1,169 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO & LegionUI Optimized)
+=========================================================
+Pattern 1 : Multi-Items / Groupe de conversion
+Composant regroupant les micro-actions de contact, commande et conversion rapide.
+
+Squelette attendu (Emmet) :
+div.actionGroup[.--modifierName]
+ ├── button.actionGroup__btn[.--cart|.--wave|.--whatsapp]
+ └── a.actionGroup__btn
+=========================================================
+*/
+@use 'sass:map';
+
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function actionGroup($defaultValues: "") {
+  @return ($defaultValues);
+}
+
+/************************************************************/
+/**************************VARIABLES*************************/
+/************************************************************/
+$actionGroup: (
+  gap: 0.65rem,
+  btn-size: 42px,
+  btn-radius: 12px,
+  btn-bg: rgba(255, 255, 255, 0.05),
+  btn-border: rgba(255, 255, 255, 0.1),
+  btn-color: #f1f5f9,
+  badge-bg: #ef4444,
+  badge-color: #ffffff,
+  badge-size: 18px
+);
+
+/************************************************************/
+/*************************PLACEHOLDER************************/
+/************************************************************/
+%actionGroup {
+  --template: "div.actionGroup > button.actionGroup__btn + a.actionGroup__btn";
+
+  display: inline-flex;
+  align-items: center;
+  gap: map.get($actionGroup, gap);
+
+  &__btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: map.get($actionGroup, btn-size);
+    height: map.get($actionGroup, btn-size);
+    border-radius: map.get($actionGroup, btn-radius);
+    background: map.get($actionGroup, btn-bg);
+    border: 1px solid map.get($actionGroup, btn-border);
+    color: map.get($actionGroup, btn-color);
+    text-decoration: none;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.2;
+      transition: transform 0.2s ease;
+    }
+
+    img {
+      object-fit: contain;
+    }
+
+    &:hover,
+    &:focus-visible {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: map.get($actionGroup, badge-size);
+    height: map.get($actionGroup, badge-size);
+    padding: 0 4px;
+    border-radius: 9999px;
+    background: map.get($actionGroup, badge-bg);
+    color: map.get($actionGroup, badge-color);
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    border: 2px solid #0B192C;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/************************************************************/
+/****************************MIXIN***************************/
+/************************************************************/
+@mixin actionGroup($paramMixi_: (), $block: "") {
+  $paramMixi: actionGroup(map.merge($actionGroup, $paramMixi_));
+
+  @extend %actionGroup;
+
+  gap: map.get($paramMixi, gap);
+
+  // Mappage mixte dynamique sémantique
+  > button,
+  > a,
+  > #{$block}__btn {
+    @extend %actionGroup__btn;
+    width: map.get($paramMixi, btn-size);
+    height: map.get($paramMixi, btn-size);
+    border-radius: map.get($paramMixi, btn-radius);
+
+    // Variantes autonomes d'icônes
+    &.--wave {
+      &:hover {
+        border-color: #1898E8;
+        box-shadow: 0 4px 16px rgba(24, 152, 232, 0.35);
+      }
+    }
+
+    &.--whatsapp {
+      color: #25D366;
+      &:hover {
+        background: rgba(37, 211, 102, 0.12);
+        border-color: #25D366;
+        box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
+      }
+    }
+
+    &.--cart {
+      &:hover {
+        border-color: #e6c875;
+        box-shadow: 0 4px 16px rgba(197, 155, 39, 0.35);
+      }
+    }
+
+    &.--admin {
+      opacity: 0.75;
+      &:hover {
+        opacity: 1;
+        border-color: rgba(255, 255, 255, 0.35);
+      }
+    }
+  }
+
+  // Badge panier ou compteur
+  #{$block}__badge {
+    @extend %actionGroup__badge;
+  }
+}

@@ -17,7 +17,7 @@
 | Niveau | Où | Rôle |
 |---|---|---|
 | Règles | `.agents/rules/` | Conventions permanentes (code, design, perf, SEO, sécurité) |
-| Boilerplate | `site/`, `api/`, `src/components/library/` | Code et composants réutilisables |
+| Boilerplate | `site/`, `api/`, `site/src/components/` | Code et composants réutilisables |
 | Brief client | `client.json` (modèle : `client.example.json`) | Données et modules activés pour un client |
 
 ## Paliers d'offre (modules activables dans `client.json`)

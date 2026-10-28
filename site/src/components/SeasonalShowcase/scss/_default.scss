@@ -1,0 +1,275 @@
+/*
+=========================================================
+📝 NATIVE HTML TEMPLATES (SEO Optimized — LegionUI)
+=========================================================
+Squelette attendu (Emmet) :
+section.seasonalShowcase > div.seasonalShowcase__container > header.seasonalShowcase__header + div.seasonalShowcase__banner + ul.seasonalShowcase__grid
+=========================================================
+*/
+
+@use 'sass:map';
+
+/************************************************************/
+/**************************FUNCTION**************************/
+/************************************************************/
+@function seasonalShowcase($defaultValues: "") {
+  @return ($defaultValues);
+}
+
+/******VARIABLES******/
+$seasonalShowcase: (
+  navy-bg: #0B192C,
+  gold-accent: #C59B27,
+  gold-bright: #D4AF37,
+  surface-bg: #FAF8F5
+);
+
+/************************************************************/
+/**************************PLACEHOLDER**************************/
+/************************************************************/
+%seasonalShowcase {
+  --template: "section.seasonalShowcase > div.seasonalShowcase__container > header.seasonalShowcase__header + div.seasonalShowcase__banner + ul.seasonalShowcase__grid";
+  padding: 4rem 1.25rem;
+
+  &__container {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  &__header {
+    text-align: center;
+    max-width: 740px;
+    margin: 0 auto 2rem;
+  }
+
+  &__grid {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(275px, 1fr));
+    gap: 1.35rem;
+  }
+}
+
+/************************************************************/
+/**************************MIXIN**************************/
+/************************************************************/
+@mixin seasonalShowcase($paramMixi_: (), $block: ".seasonalShowcase") {
+  $paramMixi: seasonalShowcase(map.merge($seasonalShowcase, $paramMixi_));
+
+  @extend %seasonalShowcase;
+  background: linear-gradient(180deg, #faf8f5 0%, #f3efe6 100%);
+
+  &__container,
+  > div {
+    @extend %seasonalShowcase__container;
+  }
+
+  &__header,
+  > div > header {
+    @extend %seasonalShowcase__header;
+  }
+
+  &__eyebrow {
+    display: inline-block;
+    padding: 0.3rem 0.85rem;
+    border-radius: 9999px;
+    background: rgba(197, 155, 39, 0.18);
+    color: #8a680d;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+  }
+
+  &__title {
+    font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+    font-weight: 800;
+    color: map.get($paramMixi, navy-bg);
+    margin: 0 0 0.6rem;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    font-size: 1.02rem;
+    color: #475569;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  &__banner {
+    background: linear-gradient(135deg, map.get($paramMixi, navy-bg) 0%, #162D4C 100%);
+    color: #ffffff;
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    border-radius: 14px;
+    padding: 1rem 1.35rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    box-shadow: 0 10px 25px -8px rgba(11, 25, 44, 0.2);
+
+    p {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #F3E5AB;
+    }
+  }
+
+  &__bannerBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.05rem;
+    border-radius: 9999px;
+    background: #25D366;
+    color: #ffffff;
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  &__grid,
+  > div > ul {
+    @extend %seasonalShowcase__grid;
+  }
+
+  &__card {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid rgba(11, 25, 44, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 200ms ease, box-shadow 200ms ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px -10px rgba(11, 25, 44, 0.14);
+    }
+  }
+
+  &__media {
+    position: relative;
+    height: 165px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 300ms ease;
+    }
+  }
+
+  &__card:hover &__media img {
+    transform: scale(1.05);
+  }
+
+  &__tag {
+    position: absolute;
+    top: 0.7rem;
+    left: 0.7rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 9999px;
+    background: rgba(11, 25, 44, 0.9);
+    color: map.get($paramMixi, gold-bright);
+    font-size: 0.73rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+  }
+
+  &__body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  &__itemTitle {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: map.get($paramMixi, navy-bg);
+    margin: 0 0 0.45rem;
+    line-height: 1.3;
+  }
+
+  &__itemDesc {
+    font-size: 0.88rem;
+    color: #475569;
+    line-height: 1.5;
+    margin: 0 0 1.15rem;
+  }
+
+  &__footer {
+    margin-top: auto;
+    padding-top: 0.85rem;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__price {
+    font-size: 0.98rem;
+    color: map.get($paramMixi, navy-bg);
+
+    small {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    strong {
+      color: #8a680d;
+      font-weight: 800;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  &__cartBtn {
+    padding: 0.45rem 0.75rem;
+    border-radius: 8px;
+    background: map.get($paramMixi, navy-bg);
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 150ms ease;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+
+  &__waBtn {
+    padding: 0.45rem 0.75rem;
+    border-radius: 8px;
+    background: #25D366;
+    color: #ffffff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+}
+
+/************************************************************/
+/**************************NATIVE SEMANTIC MAPPING**************************/
+/************************************************************/
+section.seasonalShowcase {
+  @include seasonalShowcase();
+}
+

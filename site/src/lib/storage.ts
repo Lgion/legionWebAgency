@@ -21,7 +21,7 @@ export interface AppStorageData {
     theme: 'auto' | 'light' | 'dark';
   };
   sim: {
-    role: 'public' | 'admin' | null;
+    role: 'public' | 'partenaire' | 'admin' | null;
   };
   consent: {
     analytics?: boolean;

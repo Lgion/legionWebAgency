@@ -1,0 +1,14 @@
+@use 'scss/default';
+@use 'scss/featured';
+
+.serviceCard {
+  $block: &;
+
+  // Modificateur par défaut (BEM pur)
+  @include default.serviceCard($block: $block);
+
+  // Modificateur esthétique Featured (autonome .--featured)
+  &.--featured {
+    @include featured.featured($block: $block);
+  }
+}

@@ -1,0 +1,236 @@
+---
+import './index.scss';
+import { client } from '@/lib/client';
+
+interface Props {
+  defaultAmount?: number;
+}
+
+const { defaultAmount = 10000 } = Astro.props;
+const presets = [5000, 10000, 15000, 20000, 30000, 50000];
+const wavePhone = client.contact.whatsapp.replace(/[^0-9]/g, '') || client.contact.phone.replace(/[^0-9]/g, '');
+---
+
+<dialog id="wavePaymentModal" class="waveModal" closedby="any" aria-labelledby="waveModalTitle">
+  <article class="waveModal__card">
+    <header class="waveModal__header">
+      <div class="waveModal__brandGroup">
+        <span class="waveModal__penguin" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="32" height="32" fill="none">
+            <rect width="40" height="40" rx="10" fill="#1898E8"/>
+            <ellipse cx="21" cy="24" rx="10" ry="12" fill="#0B192C"/>
+            <ellipse cx="21" cy="25" rx="6.5" ry="8.5" fill="#FFFFFF"/>
+            <circle cx="19" cy="18" r="1.6" fill="#FFFFFF"/>
+            <circle cx="24" cy="18" r="1.6" fill="#FFFFFF"/>
+            <path d="M19.5 21.5L23.5 21.5L21.5 24Z" fill="#F59E0B"/>
+            <path d="M11 21C9 17 11 14 14 16L13 23Z" fill="#0B192C"/>
+          </svg>
+        </span>
+        <div>
+          <h2 id="waveModalTitle" class="waveModal__title">Paiement Wave</h2>
+          <p class="waveModal__subtitle">{client.name} • {client.contact.address.district}</p>
+        </div>
+      </div>
+      <button type="button" id="waveModalCloseBtn" class="waveModal__close" aria-label="Fermer la fenêtre de paiement Wave">✕</button>
+    </header>
+
+    <section class="waveModal__body">
+      <label for="waveAmountInput" class="waveModal__label">Montant à payer (FCFA)</label>
+      <div class="waveModal__inputWrap">
+        <input
+          type="number"
+          id="waveAmountInput"
+          class="waveModal__input"
+          value={defaultAmount}
+          min="500"
+          step="500"
+          inputmode="numeric"
+        />
+        <span class="waveModal__currency">FCFA</span>
+      </div>
+
+      <div class="waveModal__presets" role="group" aria-label="Montants rapides">
+        {presets.map((amount) => (
+          <button
+            type="button"
+            class={`waveModal__presetBtn ${amount === defaultAmount ? '--active' : ''}`}
+            data-amount={amount}
+          >
+            {new Intl.NumberFormat('fr-FR').format(amount)} F
+          </button>
+        ))}
+      </div>
+
+      <div class="waveModal__qrCard">
+        <p class="waveModal__qrHeading">Payez avec <strong>wave</strong></p>
+        <div class="waveModal__qrCanvasWrap" id="waveQrContainer">
+          <img id="waveQrImg" alt="QR Code de paiement Wave" width="180" height="180" />
+        </div>
+        <span id="waveAmountPill" class="waveModal__amountPill">
+          {new Intl.NumberFormat('fr-FR').format(defaultAmount)} FCFA
+        </span>
+        <p class="waveModal__partners">PARTENAIRES AGRÉÉS : UBA • ORABANK</p>
+      </div>
+
+      <ol class="waveModal__steps">
+        <li>
+          <span class="waveModal__stepNum">1</span>
+          <span>Ouvrez l'application <strong>Wave Côte d'Ivoire</strong> sur votre smartphone.</span>
+        </li>
+        <li>
+          <span class="waveModal__stepNum">2</span>
+          <span>Appuyez sur <strong>Scanner</strong> et visez ce QR code.</span>
+        </li>
+        <li>
+          <span class="waveModal__stepNum">3</span>
+          <span>Validez le règlement pour <strong>{client.name}</strong>.</span>
+        </li>
+      </ol>
+
+      <div class="waveModal__actions">
+        <a
+          id="waveDeepLinkBtn"
+          href={`https://pay.wave.com/m/${wavePhone}?amount=${defaultAmount}`}
+          target="_blank"
+          rel="noopener"
+          class="waveModal__openBtn"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" fill="rgba(255,255,255,0.25)"/>
+            <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/>
+          </svg>
+          <span>Ouvrir dans Wave (Mobile)</span>
+        </a>
+        <button type="button" id="waveCopyLinkBtn" class="waveModal__copyBtn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span id="waveCopyText">Copier lien</span>
+        </button>
+      </div>
+    </section>
+  </article>
+</dialog>
+
+<script>
+  import QRCode from 'qrcode';
+
+  const dialog = document.getElementById('wavePaymentModal') as HTMLDialogElement | null;
+  const closeBtn = document.getElementById('waveModalCloseBtn');
+  const amountInput = document.getElementById('waveAmountInput') as HTMLInputElement | null;
+  const amountPill = document.getElementById('waveAmountPill');
+  const qrImg = document.getElementById('waveQrImg') as HTMLImageElement | null;
+  const deepLinkBtn = document.getElementById('waveDeepLinkBtn') as HTMLAnchorElement | null;
+  const copyBtn = document.getElementById('waveCopyLinkBtn');
+  const copyText = document.getElementById('waveCopyText');
+  const presetBtns = document.querySelectorAll('.waveModal__presetBtn');
+
+  function getWaveUrl(amount: number) {
+    const baseHref = deepLinkBtn?.getAttribute('href')?.split('?')[0] || 'https://pay.wave.com/m/business-center-prestige';
+    return `${baseHref}?amount=${amount}`;
+  }
+
+  async function updateWaveQr(amount: number) {
+    const validAmount = Math.max(100, Number(amount) || 10000);
+    const formatted = new Intl.NumberFormat('fr-FR').format(validAmount);
+    if (amountPill) {
+      amountPill.textContent = `${formatted} FCFA`;
+    }
+    const waveUrl = getWaveUrl(validAmount);
+    if (deepLinkBtn) {
+      deepLinkBtn.href = waveUrl;
+    }
+    if (qrImg) {
+      try {
+        const dataUrl = await QRCode.toDataURL(waveUrl, {
+          width: 180,
+          margin: 1,
+          color: { dark: '#000000', light: '#ffffff' }
+        });
+        qrImg.src = dataUrl;
+      } catch {
+        // Fallback silencieux
+      }
+    }
+
+    presetBtns.forEach((btn) => {
+      const btnAmount = Number((btn as HTMLElement).dataset.amount);
+      btn.classList.toggle('--active', btnAmount === validAmount);
+    });
+  }
+
+  // Initialisation du QR Code
+  updateWaveQr(Number(amountInput?.value) || 10000);
+
+  amountInput?.addEventListener('input', () => {
+    updateWaveQr(Number(amountInput.value));
+  });
+
+  presetBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const val = Number((btn as HTMLElement).dataset.amount) || 10000;
+      if (amountInput) amountInput.value = String(val);
+      updateWaveQr(val);
+    });
+  });
+
+  copyBtn?.addEventListener('click', async () => {
+    const url = deepLinkBtn?.href || '';
+    try {
+      await navigator.clipboard.writeText(url);
+      if (copyText) {
+        copyText.textContent = 'Lien copié !';
+        setTimeout(() => {
+          copyText.textContent = 'Copier lien';
+        }, 2000);
+      }
+    } catch {
+      // Fallback
+    }
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    dialog?.close();
+  });
+
+  // Fallback light-dismiss pour les navigateurs ne supportant pas closedby="any"
+  if (dialog && !('closedBy' in HTMLDialogElement.prototype)) {
+    dialog.addEventListener('click', (event) => {
+      if (event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      const isDialogContent = (
+        rect.top <= event.clientY &&
+        event.clientY <= rect.top + rect.height &&
+        rect.left <= event.clientX &&
+        event.clientX <= rect.left + rect.width
+      );
+      if (!isDialogContent) {
+        dialog.close();
+      }
+    });
+  }
+
+  // Écouteur global pour ouvrir la modale Wave depuis n'importe quel bouton .openWaveModalTrigger
+  document.addEventListener('click', (e) => {
+    const trigger = (e.target as HTMLElement).closest('.openWaveModalTrigger') as HTMLElement | null;
+    if (!trigger || !dialog) return;
+    e.preventDefault();
+    const customAmount = Number(trigger.dataset.amount);
+    if (customAmount && amountInput) {
+      amountInput.value = String(customAmount);
+      updateWaveQr(customAmount);
+    }
+    dialog.showModal();
+  });
+
+  window.addEventListener('wave:open', ((e: CustomEvent) => {
+    if (!dialog) return;
+    if (e.detail?.amount && amountInput) {
+      amountInput.value = String(e.detail.amount);
+      updateWaveQr(Number(e.detail.amount));
+    }
+    dialog.showModal();
+  }) as EventListener);
+</script>
+
